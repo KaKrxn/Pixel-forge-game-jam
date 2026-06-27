@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -41,3 +41,17 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Wall
+    uniqueID: 3381924699
+    locked: 0
+  - name: Door
+    uniqueID: 2186264065
+    locked: 0
+  - name: Customer
+    uniqueID: 166060543
+    locked: 0
+  - name: Counter
+    uniqueID: 23284193
+    locked: 0
+  m_RenderingLayers:
+  - Default
