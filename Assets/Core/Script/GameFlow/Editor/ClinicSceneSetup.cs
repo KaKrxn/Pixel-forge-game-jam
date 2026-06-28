@@ -38,7 +38,7 @@ public static class ClinicSceneSetup
     {
         EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        GameObject gameFlowObject = FindOrCreate("GameFlow");
+        GameObject gameFlowObject = FindOrCreateAny("GameFlowManager", "GameFlow");
         GameObject customerObject = FindOrCreate("Customer");
         GameObject spawnPoint = FindOrCreate("CustomerSpawnPoint");
         GameObject outsideDoorPoint = FindOrCreate("OutsideDoorPoint");
@@ -46,6 +46,8 @@ public static class ClinicSceneSetup
         GameObject counterPoint = FindOrCreate("CounterPoint");
         GameObject exitPoint = FindOrCreate("CustomerExitPoint");
         GameObject doorObject = FindOrCreate("Door");
+        RoomLayers mainRoom = SetupRoomHierarchy("Main RoomRoot");
+        RoomLayers treatmentRoom = SetupRoomHierarchy("Treatment RoomRoot");
 
         spawnPoint.transform.position = new Vector3(-5.93f, -2f, 0f);
         outsideDoorPoint.transform.position = new Vector3(-1.2f, -2f, 0f);
@@ -54,9 +56,13 @@ public static class ClinicSceneSetup
         exitPoint.transform.position = new Vector3(-6.6f, -2f, 0f);
         doorObject.transform.position = outsideDoorPoint.transform.position;
         customerObject.transform.position = spawnPoint.transform.position;
+        customerObject.transform.SetParent(mainRoom.Gameplay.transform, true);
+        doorObject.transform.SetParent(mainRoom.Gameplay.transform, true);
 
         GameFlow gameFlow = GetOrAdd<GameFlow>(gameFlowObject);
         Dialog dialog = GetOrAdd<Dialog>(gameFlowObject);
+        RoomTransition roomTransition = GetOrAdd<RoomTransition>(gameFlowObject);
+        Treatment treatment = GetOrAdd<Treatment>(gameFlowObject);
         CustomerAgent customer = GetOrAdd<CustomerAgent>(customerObject);
         CustomerLayer customerLayer = GetOrAdd<CustomerLayer>(customerObject);
         Door door = GetOrAdd<Door>(doorObject);
@@ -68,7 +74,7 @@ public static class ClinicSceneSetup
         customerRenderer.sortingOrder = -10;
 
         AssignObject(customerLayer, "targetRenderer", customerRenderer);
-        AssignString(customerLayer, "outsideSortingLayer", "Wall");
+        AssignString(customerLayer, "outsideSortingLayer", "BG_Far");
         AssignInt(customerLayer, "outsideSortingOrder", -10);
         AssignString(customerLayer, "insideSortingLayer", "Customer");
         AssignInt(customerLayer, "insideSortingOrder", 0);
@@ -78,11 +84,14 @@ public static class ClinicSceneSetup
 
         GameObject canvasObject = FindOrCreateCanvas();
         DialogUi dialogUi = SetupDialogUi(canvasObject);
+        TreatmentUi treatmentUi = SetupTreatmentUi(canvasObject);
 
         DialogData dialogData = LoadOrCreateDialogData();
 
         AssignObject(gameFlow, "firstCustomer", customer);
         AssignObject(gameFlow, "dialog", dialog);
+        AssignObject(gameFlow, "roomTransition", roomTransition);
+        AssignObject(gameFlow, "treatment", treatment);
         AssignBool(gameFlow, "startOnPlay", true);
 
         AssignObject(customer, "spawnPoint", spawnPoint.transform);
@@ -104,6 +113,11 @@ public static class ClinicSceneSetup
         AssignObject(dialog, "nextButton", dialogUi.NextButton);
 
         EnsureEventSystem();
+        Camera camera = SetupCamera();
+        SetupParallaxPlaceholders(mainRoom);
+        SetupParallaxPlaceholders(treatmentRoom);
+        SetupRoomTransition(roomTransition, mainRoom, treatmentRoom, camera);
+        SetupTreatment(treatment, gameFlow, roomTransition, treatmentUi);
 
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
@@ -111,6 +125,143 @@ public static class ClinicSceneSetup
         AssetDatabase.Refresh();
 
         Debug.Log("Clinic scene setup complete.");
+    }
+
+    [MenuItem("Pixel Forge/Setup/Run Clinic Scene Setup")]
+    public static void RunFromMenu()
+    {
+        Run();
+    }
+
+    private static RoomLayers SetupRoomHierarchy(string rootName)
+    {
+        GameObject root = FindOrCreate(rootName);
+        root.transform.position = Vector3.zero;
+
+        GameObject background = FindOrCreateChild(root.transform, "00_Background");
+        GameObject midground = FindOrCreateChild(root.transform, "01_Midground");
+        GameObject mainArea = FindOrCreateChild(root.transform, "02_MainArea");
+        GameObject gameplay = FindOrCreateChild(root.transform, "03_Gameplay");
+        GameObject foreground = FindOrCreateChild(root.transform, "04_Foreground");
+        GameObject vfx = FindOrCreateChild(root.transform, "05_VFX");
+
+        return new RoomLayers(root, background, midground, mainArea, gameplay, foreground, vfx);
+    }
+
+    private static Camera SetupCamera()
+    {
+        Camera camera = Camera.main;
+        if (camera == null)
+        {
+            GameObject cameraObject = FindOrCreate("Main Camera");
+            camera = GetOrAdd<Camera>(cameraObject);
+            cameraObject.tag = "MainCamera";
+        }
+
+        camera.transform.SetParent(null, true);
+        camera.transform.position = new Vector3(0f, 0f, -10f);
+        camera.transform.rotation = Quaternion.identity;
+        camera.orthographic = true;
+        camera.orthographicSize = 5f;
+        camera.clearFlags = CameraClearFlags.SolidColor;
+        camera.backgroundColor = new Color(0.035f, 0.03f, 0.04f, 1f);
+
+        MouseParallax mouseParallax = GetOrAdd<MouseParallax>(camera.gameObject);
+        AssignObject(mouseParallax, "target", camera.transform);
+        AssignVector2(mouseParallax, "maxOffset", new Vector2(0.5f, 0.28f));
+        AssignFloat(mouseParallax, "smoothTime", 0.08f);
+        AssignBool(mouseParallax, "snapToPixelGrid", true);
+        AssignFloat(mouseParallax, "pixelsPerUnit", 16f);
+
+        CameraSway cameraSway = GetOrAdd<CameraSway>(camera.gameObject);
+        cameraSway.enabled = false;
+        AssignObject(cameraSway, "target", camera.transform);
+        AssignVector2(cameraSway, "amplitude", new Vector2(0.125f, 0.0625f));
+        AssignVector2(cameraSway, "frequency", new Vector2(0.28f, 0.21f));
+        AssignBool(cameraSway, "snapToPixelGrid", true);
+        AssignFloat(cameraSway, "pixelsPerUnit", 16f);
+
+        AddOrConfigurePixelPerfectCamera(camera.gameObject);
+        return camera;
+    }
+
+    private static void SetupRoomTransition(RoomTransition roomTransition, RoomLayers mainRoom, RoomLayers treatmentRoom, Camera camera)
+    {
+        AssignObject(roomTransition, "counterRoomRoot", mainRoom.Root);
+        AssignObject(roomTransition, "treatmentRoomRoot", treatmentRoom.Root);
+        AssignObject(roomTransition, "targetCamera", camera);
+        AssignVector3(roomTransition, "counterCameraPosition", new Vector3(0f, 0f, -10f));
+        AssignVector3(roomTransition, "treatmentCameraPosition", new Vector3(0f, 0f, -10f));
+
+        mainRoom.Root.SetActive(true);
+        treatmentRoom.Root.SetActive(false);
+        EditorUtility.SetDirty(mainRoom.Root);
+        EditorUtility.SetDirty(treatmentRoom.Root);
+    }
+
+    private static void SetupTreatment(Treatment treatment, GameFlow gameFlow, RoomTransition roomTransition, TreatmentUi treatmentUi)
+    {
+        AssignObject(treatment, "flow", gameFlow);
+        AssignObject(treatment, "roomTransition", roomTransition);
+        AssignObject(treatment, "root", treatmentUi.Root);
+        AssignObject(treatment, "titleText", treatmentUi.TitleText);
+        AssignObject(treatment, "bodyText", treatmentUi.BodyText);
+        AssignObject(treatment, "completeButton", treatmentUi.CompleteButton);
+        AssignObject(treatment, "returnButton", treatmentUi.ReturnButton);
+        AssignObject(treatment, "resumeButton", treatmentUi.ResumeButton);
+        treatmentUi.Root.SetActive(false);
+    }
+
+    private static void AddOrConfigurePixelPerfectCamera(GameObject cameraObject)
+    {
+        System.Type pixelPerfectType = System.AppDomain.CurrentDomain.GetAssemblies()
+            .Select(assembly => assembly.GetType("UnityEngine.Rendering.Universal.PixelPerfectCamera"))
+            .FirstOrDefault(type => type != null);
+
+        if (pixelPerfectType == null)
+        {
+            Debug.LogWarning("URP Pixel Perfect Camera type was not found. Add it manually if the package is available.");
+            return;
+        }
+
+        Component pixelPerfect = cameraObject.GetComponent(pixelPerfectType) ?? cameraObject.AddComponent(pixelPerfectType);
+        SerializedObject serializedPixelPerfect = new SerializedObject(pixelPerfect);
+        SetSerializedInt(serializedPixelPerfect, "m_AssetsPPU", 16);
+        SetSerializedInt(serializedPixelPerfect, "m_RefResolutionX", 320);
+        SetSerializedInt(serializedPixelPerfect, "m_RefResolutionY", 180);
+        SetSerializedEnum(serializedPixelPerfect, "m_GridSnapping", 1);
+        SetSerializedEnum(serializedPixelPerfect, "m_CropFrame", 0);
+        SetSerializedEnum(serializedPixelPerfect, "m_FilterMode", 1);
+        serializedPixelPerfect.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(pixelPerfect);
+    }
+
+    private static void SetupParallaxPlaceholders(RoomLayers roomLayers)
+    {
+        Sprite sprite = FindFirstCoreSprite();
+        CreateLayerSprite(roomLayers.Background.transform, "BG_Far_Placeholder", sprite, "BG_Far", 0, new Vector3(0f, 0.55f, 8f), new Color(0.18f, 0.2f, 0.28f, 1f), new Vector2(0.03f, 0.02f));
+        CreateLayerSprite(roomLayers.Midground.transform, "BG_Mid_Placeholder", sprite, "BG_Mid", 0, new Vector3(0f, 0.15f, 7f), new Color(0.28f, 0.24f, 0.24f, 1f), new Vector2(0.08f, 0.04f));
+        CreateLayerSprite(roomLayers.MainArea.transform, "Main_Room_Placeholder", sprite, "Main", 0, new Vector3(0f, -0.25f, 6.2f), new Color(0.34f, 0.29f, 0.25f, 1f), new Vector2(0.12f, 0.06f));
+        CreateLayerSprite(roomLayers.Foreground.transform, "Foreground_Placeholder", sprite, "Foreground", 0, new Vector3(0f, -2.85f, 6.5f), new Color(0.1f, 0.08f, 0.09f, 0.9f), new Vector2(0.22f, 0.12f));
+    }
+
+    private static void CreateLayerSprite(Transform parent, string name, Sprite sprite, string sortingLayer, int sortingOrder, Vector3 positionAndScale, Color color, Vector2 parallaxStrength)
+    {
+        GameObject layerObject = FindOrCreateChild(parent, name);
+        layerObject.transform.localPosition = new Vector3(positionAndScale.x, positionAndScale.y, 0f);
+        layerObject.transform.localScale = new Vector3(positionAndScale.z, positionAndScale.z, 1f);
+
+        SpriteRenderer renderer = GetOrAdd<SpriteRenderer>(layerObject);
+        renderer.sprite = sprite;
+        renderer.color = color;
+        renderer.sortingLayerName = sortingLayer;
+        renderer.sortingOrder = sortingOrder;
+
+        ParallaxLayer parallaxLayer = GetOrAdd<ParallaxLayer>(parent.gameObject);
+        AssignObject(parallaxLayer, "cameraTransform", Camera.main != null ? Camera.main.transform : null);
+        AssignVector2(parallaxLayer, "parallaxStrength", parallaxStrength);
+        AssignBool(parallaxLayer, "snapToPixelGrid", true);
+        AssignFloat(parallaxLayer, "pixelsPerUnit", 16f);
     }
 
     private static GameObject SetupBubble(GameObject customerObject)
@@ -238,6 +389,87 @@ public static class ClinicSceneSetup
         return new DialogUi(root, speakerText, bodyText, nextButton);
     }
 
+    private static TreatmentUi SetupTreatmentUi(GameObject canvasObject)
+    {
+        GameObject root = FindChild(canvasObject.transform, "TreatmentRoot") ?? new GameObject("TreatmentRoot", typeof(RectTransform));
+        root.transform.SetParent(canvasObject.transform, false);
+
+        RectTransform rootRect = root.GetComponent<RectTransform>();
+        rootRect.anchorMin = new Vector2(0.18f, 0.16f);
+        rootRect.anchorMax = new Vector2(0.82f, 0.78f);
+        rootRect.offsetMin = Vector2.zero;
+        rootRect.offsetMax = Vector2.zero;
+
+        Image panel = GetOrAdd<Image>(root);
+        panel.color = new Color(0.045f, 0.038f, 0.035f, 0.92f);
+
+        Text titleText = SetupText(root.transform, "TitleText", new Vector2(0.06f, 0.76f), new Vector2(0.94f, 0.94f), 36, new Color(1f, 0.82f, 0.36f, 1f), TextAnchor.MiddleCenter);
+        titleText.text = "Treatment Room";
+
+        Text bodyText = SetupText(root.transform, "BodyText", new Vector2(0.08f, 0.34f), new Vector2(0.92f, 0.74f), 26, Color.white, TextAnchor.UpperCenter);
+        bodyText.text = "Placeholder treatment state.";
+
+        Button returnButton = SetupButton(root.transform, "ReturnCounterButton", "Return Counter", new Vector2(0.08f, 0.1f), new Vector2(0.34f, 0.26f));
+        Button completeButton = SetupButton(root.transform, "CompleteTreatmentButton", "Complete Test", new Vector2(0.37f, 0.1f), new Vector2(0.63f, 0.26f));
+        Button resumeButton = SetupButton(root.transform, "ResumeTreatmentButton", "Resume", new Vector2(0.66f, 0.1f), new Vector2(0.92f, 0.26f));
+
+        root.SetActive(false);
+        return new TreatmentUi(root, titleText, bodyText, completeButton, returnButton, resumeButton);
+    }
+
+    private static Text SetupText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, Color color, TextAnchor alignment)
+    {
+        GameObject textObject = FindChild(parent, name) ?? new GameObject(name, typeof(RectTransform));
+        textObject.transform.SetParent(parent, false);
+
+        RectTransform rect = textObject.GetComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        Text text = GetOrAdd<Text>(textObject);
+        text.font = GetDefaultFont();
+        text.fontSize = fontSize;
+        text.color = color;
+        text.alignment = alignment;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
+        return text;
+    }
+
+    private static Button SetupButton(Transform parent, string name, string label, Vector2 anchorMin, Vector2 anchorMax)
+    {
+        GameObject buttonObject = FindChild(parent, name) ?? new GameObject(name, typeof(RectTransform));
+        buttonObject.transform.SetParent(parent, false);
+
+        RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+        buttonRect.anchorMin = anchorMin;
+        buttonRect.anchorMax = anchorMax;
+        buttonRect.offsetMin = Vector2.zero;
+        buttonRect.offsetMax = Vector2.zero;
+
+        Image buttonImage = GetOrAdd<Image>(buttonObject);
+        buttonImage.color = new Color(0.9f, 0.62f, 0.22f, 1f);
+
+        Button button = GetOrAdd<Button>(buttonObject);
+        button.targetGraphic = buttonImage;
+
+        GameObject labelObject = FindChild(buttonObject.transform, "Text") ?? new GameObject("Text", typeof(RectTransform));
+        labelObject.transform.SetParent(buttonObject.transform, false);
+        RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+        Stretch(labelRect);
+
+        Text buttonText = GetOrAdd<Text>(labelObject);
+        buttonText.font = GetDefaultFont();
+        buttonText.fontSize = 22;
+        buttonText.color = Color.black;
+        buttonText.alignment = TextAnchor.MiddleCenter;
+        buttonText.text = label;
+
+        return button;
+    }
+
     private static GameObject FindOrCreateCanvas()
     {
         Canvas existingCanvas = Object.FindFirstObjectByType<Canvas>();
@@ -334,14 +566,61 @@ public static class ClinicSceneSetup
 
     private static GameObject FindOrCreate(string name)
     {
-        GameObject found = GameObject.Find(name);
+        GameObject found = FindSceneObject(name);
         return found != null ? found : new GameObject(name);
+    }
+
+    private static GameObject FindOrCreateAny(params string[] names)
+    {
+        foreach (string name in names)
+        {
+            GameObject found = FindSceneObject(name);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return new GameObject(names[0]);
+    }
+
+    private static GameObject FindSceneObject(string name)
+    {
+        GameObject activeFound = GameObject.Find(name);
+        if (activeFound != null)
+        {
+            return activeFound;
+        }
+
+        GameObject[] objects = Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (GameObject sceneObject in objects)
+        {
+            if (sceneObject.name == name && sceneObject.scene.IsValid())
+            {
+                return sceneObject;
+            }
+        }
+
+        return null;
     }
 
     private static GameObject FindChild(Transform parent, string name)
     {
         Transform child = parent.Find(name);
         return child != null ? child.gameObject : null;
+    }
+
+    private static GameObject FindOrCreateChild(Transform parent, string name)
+    {
+        GameObject child = FindChild(parent, name);
+        if (child != null)
+        {
+            return child;
+        }
+
+        child = new GameObject(name);
+        child.transform.SetParent(parent, false);
+        return child;
     }
 
     private static T GetOrAdd<T>(GameObject gameObject) where T : Component
@@ -374,6 +653,22 @@ public static class ClinicSceneSetup
         EditorUtility.SetDirty(target);
     }
 
+    private static void AssignVector2(Object target, string propertyName, Vector2 value)
+    {
+        SerializedObject serializedObject = new SerializedObject(target);
+        serializedObject.FindProperty(propertyName).vector2Value = value;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(target);
+    }
+
+    private static void AssignVector3(Object target, string propertyName, Vector3 value)
+    {
+        SerializedObject serializedObject = new SerializedObject(target);
+        serializedObject.FindProperty(propertyName).vector3Value = value;
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(target);
+    }
+
     private static void AssignInt(Object target, string propertyName, int value)
     {
         SerializedObject serializedObject = new SerializedObject(target);
@@ -388,6 +683,24 @@ public static class ClinicSceneSetup
         serializedObject.FindProperty(propertyName).stringValue = value;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(target);
+    }
+
+    private static void SetSerializedInt(SerializedObject serializedObject, string propertyName, int value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+        if (property != null)
+        {
+            property.intValue = value;
+        }
+    }
+
+    private static void SetSerializedEnum(SerializedObject serializedObject, string propertyName, int value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+        if (property != null)
+        {
+            property.enumValueIndex = value;
+        }
     }
 
     private static void Stretch(RectTransform rect)
@@ -430,5 +743,47 @@ public static class ClinicSceneSetup
         public Text SpeakerText { get; }
         public Text BodyText { get; }
         public Button NextButton { get; }
+    }
+
+    private readonly struct TreatmentUi
+    {
+        public TreatmentUi(GameObject root, Text titleText, Text bodyText, Button completeButton, Button returnButton, Button resumeButton)
+        {
+            Root = root;
+            TitleText = titleText;
+            BodyText = bodyText;
+            CompleteButton = completeButton;
+            ReturnButton = returnButton;
+            ResumeButton = resumeButton;
+        }
+
+        public GameObject Root { get; }
+        public Text TitleText { get; }
+        public Text BodyText { get; }
+        public Button CompleteButton { get; }
+        public Button ReturnButton { get; }
+        public Button ResumeButton { get; }
+    }
+
+    private readonly struct RoomLayers
+    {
+        public RoomLayers(GameObject root, GameObject background, GameObject midground, GameObject mainArea, GameObject gameplay, GameObject foreground, GameObject vfx)
+        {
+            Root = root;
+            Background = background;
+            Midground = midground;
+            MainArea = mainArea;
+            Gameplay = gameplay;
+            Foreground = foreground;
+            Vfx = vfx;
+        }
+
+        public GameObject Root { get; }
+        public GameObject Background { get; }
+        public GameObject Midground { get; }
+        public GameObject MainArea { get; }
+        public GameObject Gameplay { get; }
+        public GameObject Foreground { get; }
+        public GameObject Vfx { get; }
     }
 }

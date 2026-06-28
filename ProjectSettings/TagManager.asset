@@ -11,10 +11,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Customer
+  - Counter
+  - Wall
   - 
   - 
   - 
@@ -41,17 +41,35 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: BG_Far
+    uniqueID: 101301
+    locked: 0
+  - name: BG_Mid
+    uniqueID: 101302
+    locked: 0
   - name: Wall
     uniqueID: 3381924699
     locked: 0
   - name: Door
     uniqueID: 2186264065
     locked: 0
+  - name: Main
+    uniqueID: 101303
+    locked: 0
   - name: Customer
     uniqueID: 166060543
     locked: 0
   - name: Counter
     uniqueID: 23284193
+    locked: 0
+  - name: Foreground
+    uniqueID: 101304
+    locked: 0
+  - name: VFX
+    uniqueID: 101305
+    locked: 0
+  - name: UI
+    uniqueID: 101306
     locked: 0
   m_RenderingLayers:
   - Default

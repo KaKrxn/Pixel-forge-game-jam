@@ -7,7 +7,9 @@ public enum ClinicFlowState
     CustomerEntering,
     WaitingForDialog,
     DialogActive,
+    TransitionToTreatment,
     TreatmentReady,
+    TreatmentActive,
     CustomerLeaving,
     Complete
 }
@@ -16,6 +18,8 @@ public sealed class GameFlow : MonoBehaviour
 {
     [SerializeField] private CustomerAgent firstCustomer;
     [SerializeField] private Dialog dialog;
+    [SerializeField] private RoomTransition roomTransition;
+    [SerializeField] private Treatment treatment;
     [SerializeField] private bool startOnPlay = true;
 
     public ClinicFlowState CurrentState { get; private set; } = ClinicFlowState.Idle;
@@ -72,6 +76,27 @@ public sealed class GameFlow : MonoBehaviour
             return;
         }
 
+        SetState(ClinicFlowState.TransitionToTreatment);
+
+        if (treatment != null)
+        {
+            SetState(ClinicFlowState.TreatmentActive);
+            treatment.Begin(activeCustomer);
+            return;
+        }
+
+        roomTransition?.ShowTreatmentRoom();
+        SetState(ClinicFlowState.TreatmentReady);
+    }
+
+    public void CompleteTreatment(CustomerAgent customer)
+    {
+        if (customer != activeCustomer || (CurrentState != ClinicFlowState.TreatmentReady && CurrentState != ClinicFlowState.TreatmentActive))
+        {
+            return;
+        }
+
+        roomTransition?.ShowCounterRoom();
         SetState(ClinicFlowState.CustomerLeaving);
 
         if (activeCustomer != null)
@@ -96,12 +121,12 @@ public sealed class GameFlow : MonoBehaviour
 
     public void CompleteTestTreatment()
     {
-        if (CurrentState != ClinicFlowState.TreatmentReady)
+        if (CurrentState != ClinicFlowState.TreatmentReady && CurrentState != ClinicFlowState.TreatmentActive)
         {
             return;
         }
 
-        SetState(ClinicFlowState.Complete);
+        CompleteTreatment(activeCustomer);
     }
 
     private void SetState(ClinicFlowState nextState)
