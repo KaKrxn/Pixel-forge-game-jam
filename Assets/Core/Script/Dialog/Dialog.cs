@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -11,7 +12,27 @@ public sealed class Dialog : MonoBehaviour
     [SerializeField] private TMP_Text bodyText;
     [SerializeField] private Button nextButton;
 
+    [Header("Typewriter")]
+    [SerializeField, Min(0f)] private float charactersPerSecond = 45f;
+    [SerializeField] private bool useUnscaledTime = true;
+
+    [Header("Text Blip SFX")]
+    [SerializeField] private AudioSource dialogAudioSource;
+    [SerializeField] private AudioClip playerBlipClip;
+    [SerializeField] private AudioClip customerBlipClip;
+    [SerializeField, Range(0f, 1f)] private float blipVolume = 0.45f;
+    [SerializeField, Min(1)] private int blipEveryVisibleCharacters = 2;
+    [SerializeField, Min(0f)] private float minimumBlipInterval = 0.025f;
+    [SerializeField] private bool stopBlipsWhenLineCompletes = true;
+
     private int lineIndex;
+    private Coroutine typewriterRoutine;
+    private DialogSpeaker currentSpeaker;
+    private bool isTyping;
+    private int visibleCharactersSinceLastBlip;
+    private float lastBlipTime;
+    private AudioClip lastCustomerBlipClip;
+    private AudioClip currentLineBlipClip;
 
     private void Awake()
     {
@@ -26,6 +47,9 @@ public sealed class Dialog : MonoBehaviour
     public void Open(CustomerAgent customer)
     {
         lineIndex = 0;
+        lastCustomerBlipClip = null;
+        currentLineBlipClip = null;
+        StopTypewriter(resetTextVisibility: true);
 
         if (dialogData == null || dialogData.Count == 0)
         {
@@ -45,6 +69,11 @@ public sealed class Dialog : MonoBehaviour
 
     public void Advance()
     {
+        if (isTyping)
+        {
+            return;
+        }
+
         lineIndex++;
 
         if (dialogData == null || lineIndex >= dialogData.Count)
@@ -66,17 +95,17 @@ public sealed class Dialog : MonoBehaviour
 
         if (speakerText != null)
         {
-            speakerText.text = line.Speaker.ToString();
+            speakerText.text = dialogData.GetDisplayName(line.Speaker);
         }
 
-        if (bodyText != null)
-        {
-            bodyText.text = line.Text;
-        }
+        currentSpeaker = line.Speaker;
+        SelectLineBlipClip();
+        StartTypewriter(line.Text);
     }
 
     private void Complete()
     {
+        StopTypewriter(resetTextVisibility: true);
         Hide();
 
         if (flow != null)
@@ -139,6 +168,161 @@ public sealed class Dialog : MonoBehaviour
         nextText.text = "Next";
     }
 
+    private void StartTypewriter(string text)
+    {
+        StopTypewriter(resetTextVisibility: true);
+        SetNextButtonVisible(false);
+
+        if (bodyText == null)
+        {
+            FinishTypewriter();
+            return;
+        }
+
+        bodyText.text = text ?? string.Empty;
+        bodyText.maxVisibleCharacters = 0;
+        bodyText.ForceMeshUpdate();
+
+        int characterCount = bodyText.textInfo.characterCount;
+        if (characterCount == 0 || charactersPerSecond <= 0f)
+        {
+            bodyText.maxVisibleCharacters = characterCount;
+            FinishTypewriter();
+            return;
+        }
+
+        isTyping = true;
+        visibleCharactersSinceLastBlip = 0;
+        lastBlipTime = -minimumBlipInterval;
+        typewriterRoutine = StartCoroutine(RunTypewriter(characterCount));
+    }
+
+    private IEnumerator RunTypewriter(int characterCount)
+    {
+        int visibleCharacters = 0;
+        float characterInterval = 1f / charactersPerSecond;
+        float revealAccumulator = 0f;
+
+        while (visibleCharacters < characterCount)
+        {
+            revealAccumulator += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            int charactersToReveal = Mathf.FloorToInt(revealAccumulator / characterInterval);
+
+            if (charactersToReveal <= 0)
+            {
+                yield return null;
+                continue;
+            }
+
+            revealAccumulator -= charactersToReveal * characterInterval;
+
+            for (int i = 0; i < charactersToReveal && visibleCharacters < characterCount; i++)
+            {
+                visibleCharacters++;
+                bodyText.maxVisibleCharacters = visibleCharacters;
+                TryPlayBlipForCharacter(visibleCharacters - 1);
+            }
+
+            yield return null;
+        }
+
+        FinishTypewriter();
+    }
+
+    private void TryPlayBlipForCharacter(int characterIndex)
+    {
+        if (bodyText == null || dialogAudioSource == null)
+        {
+            return;
+        }
+
+        TMP_TextInfo textInfo = bodyText.textInfo;
+        if (characterIndex < 0 || characterIndex >= textInfo.characterCount)
+        {
+            return;
+        }
+
+        char character = textInfo.characterInfo[characterIndex].character;
+        if (char.IsWhiteSpace(character))
+        {
+            return;
+        }
+
+        visibleCharactersSinceLastBlip++;
+        if (visibleCharactersSinceLastBlip < blipEveryVisibleCharacters)
+        {
+            return;
+        }
+
+        float currentTime = useUnscaledTime ? Time.unscaledTime : Time.time;
+        if (currentTime - lastBlipTime < minimumBlipInterval)
+        {
+            return;
+        }
+
+        if (currentLineBlipClip == null)
+        {
+            return;
+        }
+
+        visibleCharactersSinceLastBlip = 0;
+        lastBlipTime = currentTime;
+        dialogAudioSource.PlayOneShot(currentLineBlipClip, blipVolume);
+    }
+
+    private void SelectLineBlipClip()
+    {
+        currentLineBlipClip = dialogData != null
+            ? dialogData.GetBlipClip(currentSpeaker, playerBlipClip, customerBlipClip, lastCustomerBlipClip)
+            : (currentSpeaker == DialogSpeaker.Player ? playerBlipClip : customerBlipClip);
+
+        if (currentSpeaker == DialogSpeaker.Customer && currentLineBlipClip != null)
+        {
+            lastCustomerBlipClip = currentLineBlipClip;
+        }
+    }
+
+    private void FinishTypewriter()
+    {
+        isTyping = false;
+        typewriterRoutine = null;
+        StopDialogBlips();
+        SetNextButtonVisible(true);
+    }
+
+    private void StopTypewriter(bool resetTextVisibility)
+    {
+        if (typewriterRoutine != null)
+        {
+            StopCoroutine(typewriterRoutine);
+            typewriterRoutine = null;
+        }
+
+        isTyping = false;
+        StopDialogBlips();
+
+        if (resetTextVisibility && bodyText != null)
+        {
+            bodyText.maxVisibleCharacters = int.MaxValue;
+        }
+    }
+
+    private void StopDialogBlips()
+    {
+        if (stopBlipsWhenLineCompletes && dialogAudioSource != null)
+        {
+            dialogAudioSource.Stop();
+        }
+    }
+
+    private void SetNextButtonVisible(bool visible)
+    {
+        if (nextButton != null)
+        {
+            nextButton.gameObject.SetActive(visible);
+        }
+    }
+
     private static TMP_Text CreateText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, Color color, TextAlignmentOptions alignment)
     {
         GameObject textObject = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
@@ -162,6 +346,9 @@ public sealed class Dialog : MonoBehaviour
 
     private void Hide()
     {
+        StopTypewriter(resetTextVisibility: true);
+        SetNextButtonVisible(false);
+
         if (root != null)
         {
             root.SetActive(false);

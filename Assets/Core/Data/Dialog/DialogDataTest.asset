@@ -12,12 +12,57 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
   m_Name: DialogDataTest
   m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Player
+  customerDisplayName: Rinna
+  customerBlipClip: {fileID: 0}
+  customerBlipClips:
+  - {fileID: 8300000, guid: 023cfcbfb9325e543b13260751e6a474, type: 3}
+  - {fileID: 8300000, guid: e9378dd533c6ace4f90a98c4e858d58e, type: 3}
+  - {fileID: 8300000, guid: eecd2fa1baaa83540a8b7281c5ca8b32, type: 3}
+  - {fileID: 8300000, guid: 62c2c3ba15f70194e87acbaa518f53e1, type: 3}
+  - {fileID: 8300000, guid: 50e602c3f4dad13409cc20a22e16724c, type: 3}
   lines:
+  - speaker: 1
+    text: Please, keep the candle close. Something under my skin calms when the light
+      touches it.
   - speaker: 0
-    text: HI
+    text: Breathe slowly, Rinna. Tell me what happened before the pain started.
   - speaker: 1
-    text: Hey!!!
+    text: I was gathering moonroot by the old well when a black vine cut my wrist.
+  - speaker: 0
+    text: The wrist is the first place I should inspect. Did the pain move anywhere
+      else?
   - speaker: 1
-    text: '#$#$$$##%@'
+    text: It crawled from my wrist to my palm, like a warm thread pulling toward
+      my fingers.
+  - speaker: 0
+    text: So the hand may hold the entry wound and the moving trace.
   - speaker: 1
-    text: Bye
+    text: Then my shoulder burned when I tried to pull the thorn out.
+  - speaker: 0
+    text: A second cluster may be hiding higher up the arm.
+  - speaker: 1
+    text: I heard clicking under my skin whenever the shop light flickered.
+  - speaker: 0
+    text: The parasite reacts when the candle weakens, so I must work before the
+      flame falls.
+  - speaker: 1
+    text: There is a hard splinter in my palm. It feels colder than bone.
+  - speaker: 0
+    text: That sounds like a parasite shard. I will need to remove it carefully.
+  - speaker: 1
+    text: My vision blurred when I looked away from the candle.
+  - speaker: 0
+    text: Keep watching the flame. It may slow the change while I prepare.
+  - speaker: 1
+    text: If I scratch the mark, the veins around it turn dark.
+  - speaker: 0
+    text: Do not touch it. Dark veins mean the infection is spreading from that point.
+  - speaker: 1
+    text: The worst sting is still in my wrist, but my fingers twitch on their own.
+  - speaker: 0
+    text: Then I will check the wrist first, then the palm and fingers.
+  - speaker: 1
+    text: Please hurry. When the candle dims, I feel something smiling inside me.
+  - speaker: 0
+    text: Stay with my voice. I know where to begin, and I will not let it take you.
