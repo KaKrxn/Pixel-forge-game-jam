@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public sealed class RoomTransition : MonoBehaviour
@@ -5,10 +7,17 @@ public sealed class RoomTransition : MonoBehaviour
     [SerializeField] private GameObject counterRoomRoot;
     [SerializeField] private GameObject treatmentRoomRoot;
     [SerializeField] private Camera targetCamera;
+    [SerializeField] private CanvasGroup fadeCanvasGroup;
     [SerializeField] private Vector3 counterCameraPosition = new Vector3(0f, 0f, -10f);
     [SerializeField] private Vector3 treatmentCameraPosition = new Vector3(0f, 0f, -10f);
+    [SerializeField] private float closeEyeDuration = 0.18f;
+    [SerializeField] private float closedEyeHoldDuration = 0.08f;
+    [SerializeField] private float openEyeDuration = 0.22f;
+    [SerializeField] private bool useUnscaledTime = true;
 
     public bool IsInTreatmentRoom { get; private set; }
+
+    private Coroutine transitionRoutine;
 
     private void Awake()
     {
@@ -17,21 +26,100 @@ public sealed class RoomTransition : MonoBehaviour
             targetCamera = Camera.main;
         }
 
-        ShowCounterRoom();
+        SetFade(0f, blocksRaycasts: false);
+        ApplyImmediate(counterRoomVisible: true, counterCameraPosition);
     }
 
     public void ShowCounterRoom()
     {
-        IsInTreatmentRoom = false;
-        ApplyRoomState(counterRoomVisible: true);
-        MoveCamera(counterCameraPosition);
+        ShowCounterRoom(null);
+    }
+
+    public void ShowCounterRoom(Action completed)
+    {
+        StartBlinkTransition(counterRoomVisible: true, counterCameraPosition, completed);
     }
 
     public void ShowTreatmentRoom()
     {
-        IsInTreatmentRoom = true;
-        ApplyRoomState(counterRoomVisible: false);
-        MoveCamera(treatmentCameraPosition);
+        ShowTreatmentRoom(null);
+    }
+
+    public void ShowTreatmentRoom(Action completed)
+    {
+        StartBlinkTransition(counterRoomVisible: false, treatmentCameraPosition, completed);
+    }
+
+    private void StartBlinkTransition(bool counterRoomVisible, Vector3 cameraPosition, Action completed)
+    {
+        if (!isActiveAndEnabled || fadeCanvasGroup == null)
+        {
+            ApplyImmediate(counterRoomVisible, cameraPosition);
+            completed?.Invoke();
+            return;
+        }
+
+        if (transitionRoutine != null)
+        {
+            StopCoroutine(transitionRoutine);
+        }
+
+        transitionRoutine = StartCoroutine(BlinkTransition(counterRoomVisible, cameraPosition, completed));
+    }
+
+    private IEnumerator BlinkTransition(bool counterRoomVisible, Vector3 cameraPosition, Action completed)
+    {
+        SetFade(0f, blocksRaycasts: true);
+        yield return Fade(0f, 1f, closeEyeDuration);
+
+        ApplyImmediate(counterRoomVisible, cameraPosition);
+
+        if (closedEyeHoldDuration > 0f)
+        {
+            yield return Wait(closedEyeHoldDuration);
+        }
+
+        yield return Fade(1f, 0f, openEyeDuration);
+        SetFade(0f, blocksRaycasts: false);
+        transitionRoutine = null;
+        completed?.Invoke();
+    }
+
+    private IEnumerator Fade(float from, float to, float duration)
+    {
+        if (duration <= 0f)
+        {
+            SetFade(to, blocksRaycasts: true);
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            SetFade(Mathf.Lerp(from, to, t), blocksRaycasts: true);
+            yield return null;
+        }
+
+        SetFade(to, blocksRaycasts: true);
+    }
+
+    private IEnumerator Wait(float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    private void ApplyImmediate(bool counterRoomVisible, Vector3 cameraPosition)
+    {
+        IsInTreatmentRoom = !counterRoomVisible;
+        ApplyRoomState(counterRoomVisible);
+        MoveCamera(cameraPosition);
     }
 
     private void ApplyRoomState(bool counterRoomVisible)
@@ -67,5 +155,18 @@ public sealed class RoomTransition : MonoBehaviour
         {
             cameraSway.Recenter();
         }
+    }
+
+    private void SetFade(float alpha, bool blocksRaycasts)
+    {
+        if (fadeCanvasGroup == null)
+        {
+            return;
+        }
+
+        fadeCanvasGroup.alpha = alpha;
+        fadeCanvasGroup.blocksRaycasts = blocksRaycasts;
+        fadeCanvasGroup.interactable = false;
+        fadeCanvasGroup.gameObject.SetActive(alpha > 0f || blocksRaycasts);
     }
 }

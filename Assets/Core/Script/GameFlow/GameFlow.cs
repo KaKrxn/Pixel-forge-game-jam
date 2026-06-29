@@ -20,6 +20,7 @@ public sealed class GameFlow : MonoBehaviour
     [SerializeField] private Dialog dialog;
     [SerializeField] private RoomTransition roomTransition;
     [SerializeField] private Treatment treatment;
+    [SerializeField] private Candle candle;
     [SerializeField] private bool startOnPlay = true;
 
     public ClinicFlowState CurrentState { get; private set; } = ClinicFlowState.Idle;
@@ -27,6 +28,7 @@ public sealed class GameFlow : MonoBehaviour
     public event Action<ClinicFlowState> StateChanged;
 
     private CustomerAgent activeCustomer;
+    private Sanity activeSanity;
 
     private void Start()
     {
@@ -36,9 +38,24 @@ public sealed class GameFlow : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        TickHiddenStatusSystems(Time.deltaTime);
+    }
+
     public void StartFirstCustomer()
     {
         activeCustomer = firstCustomer;
+        activeSanity = activeCustomer != null ? activeCustomer.GetComponent<Sanity>() : null;
+        if (activeSanity != null)
+        {
+            activeSanity.SetCandle(candle);
+            activeSanity.ResetSanity();
+            activeSanity.StopMonitoring();
+            activeSanity.TransformationReached -= TriggerTransformation;
+            activeSanity.TransformationReached += TriggerTransformation;
+        }
+
         SetState(ClinicFlowState.CustomerEntering);
         activeCustomer.BeginEnter(this);
     }
@@ -51,6 +68,7 @@ public sealed class GameFlow : MonoBehaviour
         }
 
         SetState(ClinicFlowState.WaitingForDialog);
+        activeSanity?.BeginMonitoring();
     }
 
     public void BeginDialog(CustomerAgent customer)
@@ -96,9 +114,22 @@ public sealed class GameFlow : MonoBehaviour
             return;
         }
 
-        roomTransition?.ShowCounterRoom();
+        SetTreatmentStress(false);
+        activeSanity?.StopMonitoring();
+        activeSanity?.ResetSanity();
         SetState(ClinicFlowState.CustomerLeaving);
 
+        if (roomTransition != null)
+        {
+            roomTransition.ShowCounterRoom(BeginActiveCustomerExit);
+            return;
+        }
+
+        BeginActiveCustomerExit();
+    }
+
+    private void BeginActiveCustomerExit()
+    {
         if (activeCustomer != null)
         {
             activeCustomer.BeginExit();
@@ -116,7 +147,38 @@ public sealed class GameFlow : MonoBehaviour
             return;
         }
 
+        if (activeSanity != null)
+        {
+            activeSanity.TransformationReached -= TriggerTransformation;
+            activeSanity.StopMonitoring();
+        }
+
         SetState(ClinicFlowState.Complete);
+    }
+
+    public void SetTreatmentStress(bool active)
+    {
+        activeSanity?.SetTreatmentStress(active);
+    }
+
+    private void TickHiddenStatusSystems(float deltaTime)
+    {
+        if (candle != null && !candle.gameObject.activeInHierarchy)
+        {
+            candle.Tick(deltaTime);
+        }
+
+        if (activeSanity != null && !activeSanity.gameObject.activeInHierarchy)
+        {
+            activeSanity.Tick(deltaTime);
+        }
+    }
+
+    private void TriggerTransformation()
+    {
+        SetTreatmentStress(false);
+        SetState(ClinicFlowState.Complete);
+        Debug.Log("Sanity reached maximum. Transformation placeholder triggered.");
     }
 
     public void CompleteTestTreatment()

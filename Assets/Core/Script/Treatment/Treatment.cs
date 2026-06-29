@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public sealed class Treatment : MonoBehaviour
 {
     [SerializeField] private GameFlow flow;
     [SerializeField] private RoomTransition roomTransition;
     [SerializeField] private GameObject root;
-    [SerializeField] private Text titleText;
-    [SerializeField] private Text bodyText;
+    [SerializeField] private TMP_Text titleText;
+    [SerializeField] private TMP_Text bodyText;
     [SerializeField] private Button completeButton;
     [SerializeField] private Button returnButton;
     [SerializeField] private Button resumeButton;
@@ -42,7 +43,18 @@ public sealed class Treatment : MonoBehaviour
     {
         activeCustomer = customer;
         isAtCounter = false;
-        roomTransition?.ShowTreatmentRoom();
+        Hide();
+
+        if (roomTransition != null)
+        {
+            roomTransition.ShowTreatmentRoom(() =>
+            {
+                Show();
+                RefreshText();
+            });
+            return;
+        }
+
         Show();
         RefreshText();
     }
@@ -66,19 +78,45 @@ public sealed class Treatment : MonoBehaviour
     private void ReturnToCounter()
     {
         isAtCounter = true;
-        roomTransition?.ShowCounterRoom();
+        flow?.SetTreatmentStress(false);
+        Hide();
+
+        if (roomTransition != null)
+        {
+            roomTransition.ShowCounterRoom(() =>
+            {
+                Show();
+                RefreshText();
+            });
+            return;
+        }
+
+        Show();
         RefreshText();
     }
 
     private void ResumeTreatment()
     {
         isAtCounter = false;
-        roomTransition?.ShowTreatmentRoom();
+        Hide();
+
+        if (roomTransition != null)
+        {
+            roomTransition.ShowTreatmentRoom(() =>
+            {
+                Show();
+                RefreshText();
+            });
+            return;
+        }
+
+        Show();
         RefreshText();
     }
 
     private void CompletePlaceholderTreatment()
     {
+        flow?.SetTreatmentStress(false);
         Hide();
         flow?.CompleteTreatment(activeCustomer);
     }

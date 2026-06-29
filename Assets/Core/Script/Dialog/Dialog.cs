@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public sealed class Dialog : MonoBehaviour
 {
     [SerializeField] private GameFlow flow;
     [SerializeField] private DialogData dialogData;
     [SerializeField] private GameObject root;
-    [SerializeField] private Text speakerText;
-    [SerializeField] private Text bodyText;
+    [SerializeField] private TMP_Text speakerText;
+    [SerializeField] private TMP_Text bodyText;
     [SerializeField] private Button nextButton;
 
     private int lineIndex;
@@ -116,8 +117,8 @@ public sealed class Dialog : MonoBehaviour
         Image panel = rootObject.GetComponent<Image>();
         panel.color = new Color(0.05f, 0.045f, 0.04f, 0.9f);
 
-        speakerText = CreateText(rootObject.transform, "SpeakerText", new Vector2(0.04f, 0.68f), new Vector2(0.56f, 0.92f), 32, new Color(1f, 0.86f, 0.42f, 1f), TextAnchor.MiddleLeft);
-        bodyText = CreateText(rootObject.transform, "BodyText", new Vector2(0.04f, 0.17f), new Vector2(0.78f, 0.68f), 26, Color.white, TextAnchor.UpperLeft);
+        speakerText = CreateText(rootObject.transform, "SpeakerText", new Vector2(0.04f, 0.68f), new Vector2(0.56f, 0.92f), 32, new Color(1f, 0.86f, 0.42f, 1f), TextAlignmentOptions.MidlineLeft);
+        bodyText = CreateText(rootObject.transform, "BodyText", new Vector2(0.04f, 0.17f), new Vector2(0.78f, 0.68f), 26, Color.white, TextAlignmentOptions.TopLeft);
 
         GameObject buttonObject = new GameObject("NextButton", typeof(RectTransform), typeof(Image), typeof(Button));
         buttonObject.transform.SetParent(rootObject.transform, false);
@@ -134,13 +135,13 @@ public sealed class Dialog : MonoBehaviour
         nextButton.targetGraphic = buttonImage;
         nextButton.onClick.AddListener(Advance);
 
-        Text nextText = CreateText(buttonObject.transform, "Text", Vector2.zero, Vector2.one, 24, Color.black, TextAnchor.MiddleCenter);
+        TMP_Text nextText = CreateText(buttonObject.transform, "Text", Vector2.zero, Vector2.one, 24, Color.black, TextAlignmentOptions.Center);
         nextText.text = "Next";
     }
 
-    private static Text CreateText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, Color color, TextAnchor alignment)
+    private static TMP_Text CreateText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, Color color, TextAlignmentOptions alignment)
     {
-        GameObject textObject = new GameObject(name, typeof(RectTransform), typeof(Text));
+        GameObject textObject = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
         textObject.transform.SetParent(parent, false);
 
         RectTransform rect = textObject.GetComponent<RectTransform>();
@@ -149,13 +150,12 @@ public sealed class Dialog : MonoBehaviour
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
 
-        Text text = textObject.GetComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        TMP_Text text = textObject.GetComponent<TMP_Text>();
         text.fontSize = fontSize;
         text.color = color;
         text.alignment = alignment;
-        text.horizontalOverflow = HorizontalWrapMode.Wrap;
-        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.textWrappingMode = TextWrappingModes.Normal;
+        text.overflowMode = TextOverflowModes.Overflow;
 
         return text;
     }

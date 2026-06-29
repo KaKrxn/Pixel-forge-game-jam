@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public static class ClinicSceneSetup
 {
@@ -85,6 +86,7 @@ public static class ClinicSceneSetup
         GameObject canvasObject = FindOrCreateCanvas();
         DialogUi dialogUi = SetupDialogUi(canvasObject);
         TreatmentUi treatmentUi = SetupTreatmentUi(canvasObject);
+        CanvasGroup fadeOverlay = SetupFadeOverlay(canvasObject);
 
         DialogData dialogData = LoadOrCreateDialogData();
 
@@ -116,7 +118,7 @@ public static class ClinicSceneSetup
         Camera camera = SetupCamera();
         SetupParallaxPlaceholders(mainRoom);
         SetupParallaxPlaceholders(treatmentRoom);
-        SetupRoomTransition(roomTransition, mainRoom, treatmentRoom, camera);
+        SetupRoomTransition(roomTransition, mainRoom, treatmentRoom, camera, fadeOverlay);
         SetupTreatment(treatment, gameFlow, roomTransition, treatmentUi);
 
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
@@ -185,13 +187,18 @@ public static class ClinicSceneSetup
         return camera;
     }
 
-    private static void SetupRoomTransition(RoomTransition roomTransition, RoomLayers mainRoom, RoomLayers treatmentRoom, Camera camera)
+    private static void SetupRoomTransition(RoomTransition roomTransition, RoomLayers mainRoom, RoomLayers treatmentRoom, Camera camera, CanvasGroup fadeOverlay)
     {
         AssignObject(roomTransition, "counterRoomRoot", mainRoom.Root);
         AssignObject(roomTransition, "treatmentRoomRoot", treatmentRoom.Root);
         AssignObject(roomTransition, "targetCamera", camera);
+        AssignObject(roomTransition, "fadeCanvasGroup", fadeOverlay);
         AssignVector3(roomTransition, "counterCameraPosition", new Vector3(0f, 0f, -10f));
         AssignVector3(roomTransition, "treatmentCameraPosition", new Vector3(0f, 0f, -10f));
+        AssignFloat(roomTransition, "closeEyeDuration", 0.18f);
+        AssignFloat(roomTransition, "closedEyeHoldDuration", 0.08f);
+        AssignFloat(roomTransition, "openEyeDuration", 0.22f);
+        AssignBool(roomTransition, "useUnscaledTime", true);
 
         mainRoom.Root.SetActive(true);
         treatmentRoom.Root.SetActive(false);
@@ -300,12 +307,11 @@ public static class ClinicSceneSetup
         RectTransform labelRect = labelObject.GetComponent<RectTransform>();
         Stretch(labelRect);
 
-        Text label = GetOrAdd<Text>(labelObject);
+        TMP_Text label = GetOrAddTmpText(labelObject);
         label.text = "...";
-        label.alignment = TextAnchor.MiddleCenter;
+        label.alignment = TextAlignmentOptions.Center;
         label.fontSize = 42;
         label.color = Color.black;
-        label.font = GetDefaultFont();
 
         AssignObject(bubble, "root", bubbleObject);
         AssignObject(bubble, "button", button);
@@ -336,11 +342,10 @@ public static class ClinicSceneSetup
         speakerRect.offsetMin = Vector2.zero;
         speakerRect.offsetMax = Vector2.zero;
 
-        Text speakerText = GetOrAdd<Text>(speaker);
-        speakerText.font = GetDefaultFont();
+        TMP_Text speakerText = GetOrAddTmpText(speaker);
         speakerText.fontSize = 32;
         speakerText.color = new Color(1f, 0.86f, 0.42f, 1f);
-        speakerText.alignment = TextAnchor.MiddleLeft;
+        speakerText.alignment = TextAlignmentOptions.MidlineLeft;
 
         GameObject body = FindChild(root.transform, "BodyText") ?? new GameObject("BodyText", typeof(RectTransform));
         body.transform.SetParent(root.transform, false);
@@ -350,13 +355,12 @@ public static class ClinicSceneSetup
         bodyRect.offsetMin = Vector2.zero;
         bodyRect.offsetMax = Vector2.zero;
 
-        Text bodyText = GetOrAdd<Text>(body);
-        bodyText.font = GetDefaultFont();
+        TMP_Text bodyText = GetOrAddTmpText(body);
         bodyText.fontSize = 26;
         bodyText.color = Color.white;
-        bodyText.alignment = TextAnchor.UpperLeft;
-        bodyText.horizontalOverflow = HorizontalWrapMode.Wrap;
-        bodyText.verticalOverflow = VerticalWrapMode.Overflow;
+        bodyText.alignment = TextAlignmentOptions.TopLeft;
+        bodyText.textWrappingMode = TextWrappingModes.Normal;
+        bodyText.overflowMode = TextOverflowModes.Overflow;
 
         GameObject next = FindChild(root.transform, "NextButton") ?? new GameObject("NextButton", typeof(RectTransform));
         next.transform.SetParent(root.transform, false);
@@ -377,11 +381,10 @@ public static class ClinicSceneSetup
         RectTransform nextLabelRect = nextLabel.GetComponent<RectTransform>();
         Stretch(nextLabelRect);
 
-        Text nextText = GetOrAdd<Text>(nextLabel);
-        nextText.font = GetDefaultFont();
+        TMP_Text nextText = GetOrAddTmpText(nextLabel);
         nextText.fontSize = 24;
         nextText.color = Color.black;
-        nextText.alignment = TextAnchor.MiddleCenter;
+        nextText.alignment = TextAlignmentOptions.Center;
         nextText.text = "Next";
 
         root.SetActive(false);
@@ -403,10 +406,10 @@ public static class ClinicSceneSetup
         Image panel = GetOrAdd<Image>(root);
         panel.color = new Color(0.045f, 0.038f, 0.035f, 0.92f);
 
-        Text titleText = SetupText(root.transform, "TitleText", new Vector2(0.06f, 0.76f), new Vector2(0.94f, 0.94f), 36, new Color(1f, 0.82f, 0.36f, 1f), TextAnchor.MiddleCenter);
+        TMP_Text titleText = SetupText(root.transform, "TitleText", new Vector2(0.06f, 0.76f), new Vector2(0.94f, 0.94f), 36, new Color(1f, 0.82f, 0.36f, 1f), TextAlignmentOptions.Center);
         titleText.text = "Treatment Room";
 
-        Text bodyText = SetupText(root.transform, "BodyText", new Vector2(0.08f, 0.34f), new Vector2(0.92f, 0.74f), 26, Color.white, TextAnchor.UpperCenter);
+        TMP_Text bodyText = SetupText(root.transform, "BodyText", new Vector2(0.08f, 0.34f), new Vector2(0.92f, 0.74f), 26, Color.white, TextAlignmentOptions.Top);
         bodyText.text = "Placeholder treatment state.";
 
         Button returnButton = SetupButton(root.transform, "ReturnCounterButton", "Return Counter", new Vector2(0.08f, 0.1f), new Vector2(0.34f, 0.26f));
@@ -417,7 +420,29 @@ public static class ClinicSceneSetup
         return new TreatmentUi(root, titleText, bodyText, completeButton, returnButton, resumeButton);
     }
 
-    private static Text SetupText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, Color color, TextAnchor alignment)
+    private static CanvasGroup SetupFadeOverlay(GameObject canvasObject)
+    {
+        GameObject overlay = FindChild(canvasObject.transform, "BlinkFadeOverlay") ?? new GameObject("BlinkFadeOverlay", typeof(RectTransform));
+        overlay.transform.SetParent(canvasObject.transform, false);
+        overlay.transform.SetAsLastSibling();
+
+        RectTransform overlayRect = overlay.GetComponent<RectTransform>();
+        Stretch(overlayRect);
+
+        Image image = GetOrAdd<Image>(overlay);
+        image.color = Color.black;
+        image.raycastTarget = true;
+
+        CanvasGroup canvasGroup = GetOrAdd<CanvasGroup>(overlay);
+        canvasGroup.alpha = 0f;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+        overlay.SetActive(false);
+
+        return canvasGroup;
+    }
+
+    private static TMP_Text SetupText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, int fontSize, Color color, TextAlignmentOptions alignment)
     {
         GameObject textObject = FindChild(parent, name) ?? new GameObject(name, typeof(RectTransform));
         textObject.transform.SetParent(parent, false);
@@ -428,13 +453,12 @@ public static class ClinicSceneSetup
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
 
-        Text text = GetOrAdd<Text>(textObject);
-        text.font = GetDefaultFont();
+        TMP_Text text = GetOrAddTmpText(textObject);
         text.fontSize = fontSize;
         text.color = color;
         text.alignment = alignment;
-        text.horizontalOverflow = HorizontalWrapMode.Wrap;
-        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.textWrappingMode = TextWrappingModes.Normal;
+        text.overflowMode = TextOverflowModes.Overflow;
         return text;
     }
 
@@ -460,11 +484,10 @@ public static class ClinicSceneSetup
         RectTransform labelRect = labelObject.GetComponent<RectTransform>();
         Stretch(labelRect);
 
-        Text buttonText = GetOrAdd<Text>(labelObject);
-        buttonText.font = GetDefaultFont();
+        TMP_Text buttonText = GetOrAddTmpText(labelObject);
         buttonText.fontSize = 22;
         buttonText.color = Color.black;
-        buttonText.alignment = TextAnchor.MiddleCenter;
+        buttonText.alignment = TextAlignmentOptions.Center;
         buttonText.text = label;
 
         return button;
@@ -553,17 +576,6 @@ public static class ClinicSceneSetup
         return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().FirstOrDefault();
     }
 
-    private static Font GetDefaultFont()
-    {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        if (font == null)
-        {
-            font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        }
-
-        return font;
-    }
-
     private static GameObject FindOrCreate(string name)
     {
         GameObject found = FindSceneObject(name);
@@ -627,6 +639,29 @@ public static class ClinicSceneSetup
     {
         T component = gameObject.GetComponent<T>();
         return component != null ? component : gameObject.AddComponent<T>();
+    }
+
+    private static TMP_Text GetOrAddTmpText(GameObject gameObject)
+    {
+        Text legacyText = gameObject.GetComponent<Text>();
+        string preservedText = legacyText != null ? legacyText.text : null;
+        if (legacyText != null)
+        {
+            Object.DestroyImmediate(legacyText);
+        }
+
+        TextMeshProUGUI tmpText = gameObject.GetComponent<TextMeshProUGUI>();
+        if (tmpText == null)
+        {
+            tmpText = gameObject.AddComponent<TextMeshProUGUI>();
+        }
+
+        if (!string.IsNullOrEmpty(preservedText) && string.IsNullOrEmpty(tmpText.text))
+        {
+            tmpText.text = preservedText;
+        }
+
+        return tmpText;
     }
 
     private static void AssignObject(Object target, string propertyName, Object value)
@@ -731,7 +766,7 @@ public static class ClinicSceneSetup
 
     private readonly struct DialogUi
     {
-        public DialogUi(GameObject root, Text speakerText, Text bodyText, Button nextButton)
+        public DialogUi(GameObject root, TMP_Text speakerText, TMP_Text bodyText, Button nextButton)
         {
             Root = root;
             SpeakerText = speakerText;
@@ -740,14 +775,14 @@ public static class ClinicSceneSetup
         }
 
         public GameObject Root { get; }
-        public Text SpeakerText { get; }
-        public Text BodyText { get; }
+        public TMP_Text SpeakerText { get; }
+        public TMP_Text BodyText { get; }
         public Button NextButton { get; }
     }
 
     private readonly struct TreatmentUi
     {
-        public TreatmentUi(GameObject root, Text titleText, Text bodyText, Button completeButton, Button returnButton, Button resumeButton)
+        public TreatmentUi(GameObject root, TMP_Text titleText, TMP_Text bodyText, Button completeButton, Button returnButton, Button resumeButton)
         {
             Root = root;
             TitleText = titleText;
@@ -758,8 +793,8 @@ public static class ClinicSceneSetup
         }
 
         public GameObject Root { get; }
-        public Text TitleText { get; }
-        public Text BodyText { get; }
+        public TMP_Text TitleText { get; }
+        public TMP_Text BodyText { get; }
         public Button CompleteButton { get; }
         public Button ReturnButton { get; }
         public Button ResumeButton { get; }
