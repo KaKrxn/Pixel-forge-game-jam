@@ -313,6 +313,9 @@ Responsibilities:
 
 - Play a hover sound when the cursor enters a button.
 - Play a click sound when the button is pressed.
+- Slightly scale up the hovered button.
+- Randomly tilt the hovered button left or right each time the cursor enters it.
+- Reset the button scale and tilt when the cursor exits.
 - Use the current Game Volume setting from `PlayerPrefs`.
 - Avoid interrupting the music source.
 - Work on every main menu button and settings button.
@@ -325,15 +328,20 @@ AudioClip hoverClip
 AudioClip clickClip
 float hoverVolume = 0.6
 float clickVolume = 0.8
+float hoverScale = 1.04
+float hoverTiltAngle = 2.5
+float motionSpeed = 16
 ```
 
 Recommended implementation:
 
 - Add `MenuButtonSfx` to each Button object.
 - Implement `IPointerEnterHandler` for hover audio.
+- Implement `IPointerExitHandler` to reset the hover motion.
 - Implement `IPointerClickHandler` for click audio.
 - Play sounds through `AudioSource.PlayOneShot`.
 - Read `Settings.GameVolume` from PlayerPrefs before playing.
+- Use unscaled time for hover motion so the menu still animates even if gameplay time is paused.
 
 Recommended target buttons:
 
@@ -605,6 +613,10 @@ Implementation behavior:
 
 - On pointer hover:
   - Play `hoverClip`.
+  - Scale the button up slightly.
+  - Randomly tilt the button left or right.
+- On pointer exit:
+  - Smoothly return to the original scale and rotation.
 - On pointer click:
   - Play `clickClip`.
 - Use one shared `AudioSource` for UI sounds.
@@ -628,6 +640,10 @@ Unity setup:
 Validation:
 
 - Moving the cursor over a button plays the hover sound once per entry.
+- Moving the cursor over a button slightly enlarges it.
+- Moving the cursor over a button randomly tilts it left or right.
+- Moving the cursor out returns the button to its original scale and rotation.
+- Moving the cursor out and back in randomizes the tilt direction again.
 - Clicking a button plays the click sound.
 - Changing Game Volume changes UI sound loudness.
 - UI sounds do not restart or interrupt background music.
@@ -795,6 +811,9 @@ Mitigation:
 
 - Hovering over `Play` plays the hover sound.
 - Hovering over `Setting`, `Quit`, `Credit`, and `Back` plays the hover sound.
+- Hovering over each button slightly scales it up and tilts it left or right.
+- Exiting hover returns the button to the original transform.
+- Re-entering hover randomizes the tilt direction again.
 - Clicking each button plays the click sound.
 - Button sounds respect the saved Game Volume value.
 - Button sounds do not interrupt menu music.
@@ -840,6 +859,7 @@ The first implementation should include:
 - Music and Game volume sliders with saved values.
 - Hover sound when the cursor enters a button.
 - Click sound when a button is pressed.
+- Hover scale and random left/right tilt feedback on menu buttons.
 
 The first implementation should not include:
 
