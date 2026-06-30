@@ -12,6 +12,7 @@ public sealed class Treatment : MonoBehaviour
     [SerializeField] private Button completeButton;
     [SerializeField] private Button returnButton;
     [SerializeField] private Button resumeButton;
+    [SerializeField] private TongsMiniGame tongsMiniGame;
 
     private CustomerAgent activeCustomer;
     private bool isAtCounter;
@@ -39,6 +40,23 @@ public sealed class Treatment : MonoBehaviour
         Hide();
     }
 
+    private void OnEnable()
+    {
+        if (tongsMiniGame != null)
+        {
+            tongsMiniGame.MiniGameCompleted -= CompletePlaceholderTreatment;
+            tongsMiniGame.MiniGameCompleted += CompletePlaceholderTreatment;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (tongsMiniGame != null)
+        {
+            tongsMiniGame.MiniGameCompleted -= CompletePlaceholderTreatment;
+        }
+    }
+
     public void Begin(CustomerAgent customer)
     {
         activeCustomer = customer;
@@ -51,12 +69,14 @@ public sealed class Treatment : MonoBehaviour
             {
                 Show();
                 RefreshText();
+                BeginTreatmentContent();
             });
             return;
         }
 
         Show();
         RefreshText();
+        BeginTreatmentContent();
     }
 
     public void Hide()
@@ -79,6 +99,7 @@ public sealed class Treatment : MonoBehaviour
     {
         isAtCounter = true;
         flow?.SetTreatmentStress(false);
+        tongsMiniGame?.Pause();
         Hide();
 
         if (roomTransition != null)
@@ -106,19 +127,38 @@ public sealed class Treatment : MonoBehaviour
             {
                 Show();
                 RefreshText();
+                ResumeTreatmentContent();
             });
             return;
         }
 
         Show();
         RefreshText();
+        ResumeTreatmentContent();
     }
 
     private void CompletePlaceholderTreatment()
     {
         flow?.SetTreatmentStress(false);
+        tongsMiniGame?.Stop();
         Hide();
         flow?.CompleteTreatment(activeCustomer);
+    }
+
+    private void BeginTreatmentContent()
+    {
+        if (tongsMiniGame != null)
+        {
+            tongsMiniGame.Begin(activeCustomer);
+        }
+    }
+
+    private void ResumeTreatmentContent()
+    {
+        if (tongsMiniGame != null)
+        {
+            tongsMiniGame.Resume();
+        }
     }
 
     private void RefreshText()
@@ -132,12 +172,14 @@ public sealed class Treatment : MonoBehaviour
         {
             bodyText.text = isAtCounter
                 ? "Placeholder return state. Refill candle will be connected here later. Press Resume to go back to treatment."
-                : "Placeholder treatment state. Minigame is not designed yet, so this screen only proves the room transition and cure flow.";
+                : tongsMiniGame != null
+                    ? "Use the tongs to extract every parasite. Release to let pain drain before it spikes Sanity."
+                    : "Placeholder treatment state. Minigame is not designed yet, so this screen only proves the room transition and cure flow.";
         }
 
         if (completeButton != null)
         {
-            completeButton.gameObject.SetActive(!isAtCounter);
+            completeButton.gameObject.SetActive(!isAtCounter && tongsMiniGame == null);
         }
 
         if (returnButton != null)
