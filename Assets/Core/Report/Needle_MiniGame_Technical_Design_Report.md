@@ -218,6 +218,46 @@ public class Pustule : MonoBehaviour
 }
 ```
 
+### 8.2 Integration Contract (match Tongs & Knife exactly)
+
+`AnatomyController` already drives mini games, but only knows `Tongs` and `Knife`. Wiring Needle in
+has **three required pieces**:
+
+**A. `NeedleMiniGame` must expose the same public surface as `TongsMiniGame` / `KnifeMiniGame`:**
+
+| Member | Purpose |
+|---|---|
+| `void Begin(CustomerAgent customer)` | Start; find `Sanity` from the customer; `flow.SetTreatmentStress(true)`; `overlay.Activate(CompleteMiniGame, HandleToolSelected)`. |
+| `void Stop()` | End and hide; `flow.SetTreatmentStress(false)`; `overlay.Deactivate(CompleteMiniGame)`. |
+| `void Pause()` / `void Resume()` | Used when the player leaves to the counter and returns. |
+| `event Action MiniGameCompleted` | **No argument** — the controller tracks which area is active and marks it treated. |
+| meters | Drive `overlay.SetMeters(progress, pain)`; show the shared complete button via `overlay.SetCompleteVisible(...)`. |
+| tool | `overlayToolId = "Needle"` + `HandleToolSelected(string)` (see Section 7). |
+
+**B. Add the enum value.** `Assets/Core/Script/Treatment/Case/TreatmentMiniGameType.cs` currently has
+`None, Tongs, Knife` — add `Needle`. `TreatmentCaseData` can then map body areas to `Needle`.
+
+**C. Extend `AnatomyController`** (do not fork the flow):
+
+```csharp
+[SerializeField] private NeedleMiniGame needleMiniGame;
+
+// GetMiniGameTypeForArea already checks activeCaseRuntime first, then falls back to
+// tongsArea / knifeAreas. Add a needleAreas fallback (or rely on TreatmentCaseData).
+
+// EnterInfectedArea(area): switch on GetMiniGameTypeForArea(area):
+//   Tongs  -> tongsMiniGame.Begin(customer)
+//   Knife  -> knifeMiniGame.Begin(customer)
+//   Needle -> needleMiniGame.Begin(customer)   // new branch
+
+// SubscribeMiniGames(): also  needleMiniGame.MiniGameCompleted += HandleNeedleCompleted;
+// HandleNeedleCompleted(): if (isMiniGameRunning && activeMiniGameType == Needle) MarkAreaTreated(activeArea);
+```
+
+All completion handlers converge on the existing `MarkAreaTreated(area)` path, so case completion and
+`Sanity` reset through `Treatment` / `GameFlow.CompleteTreatment` stay unchanged. Subscription lives in
+`Awake`/`OnDestroy` so completion still fires while the Anatomy screen is folded away during the mini game.
+
 ---
 
 ## 9. Debug Gizmos (Editor Visualization)
@@ -259,7 +299,7 @@ Reading the gizmos: keep the yellow jitter circle inside the green pustule circl
 - `NeedleMiniGame`, `Pustule`, `PustuleType`, `ToolState`.
 - Needle tool select (bare hand → needle).
 - One Small pustule: click-hold to pierce (short), then put needle down, bare-hand squeeze to full.
-- Draw the pustule gizmo. Run `dotnet build`.
+- Draw the pustule gizmo. Run `dotnet build "Pixel-forge-game-jam.slnx"`.
 
 ### Phase 2 — Pain
 - Local pain bar in phase 2 only (squeeze), draining while paused.
@@ -275,8 +315,8 @@ Reading the gizmos: keep the yellow jitter circle inside the green pustule circl
 
 ### Phase 5 — Multi-Pustule & Integration
 - Spawn 3–7 pustules at anchors (shuffle bag).
-- Complete when all are done; hand back to `Treatment` / `AnatomyController`.
-- Route the appropriate body areas to Needle via `TreatmentCaseData`.
+- Complete when all are done; raise `MiniGameCompleted` so `AnatomyController` marks the area treated (see Section 8.2 for the required contract, enum value, and controller changes).
+- Route the appropriate body areas to Needle via `TreatmentMiniGameType.Needle` in `TreatmentCaseData` (add the enum value first).
 
 ### Phase 6 — Feedback
 - Final art, pierce/squeeze/drain SFX, pus VFX, pain heartbeat tie-in, success/fail feedback.
