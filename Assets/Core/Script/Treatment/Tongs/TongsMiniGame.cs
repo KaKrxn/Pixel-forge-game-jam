@@ -122,7 +122,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         overlay?.Activate(CompleteMiniGame, HandleToolSelected);
         RefreshCompletionState();
         RefreshMeters();
-        flow?.SetTreatmentStress(true);
+        flow?.SetTreatmentStress(false);
     }
 
     public void Stop()
@@ -156,7 +156,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
         isRunning = true;
         RefreshMeters();
-        flow?.SetTreatmentStress(true);
+        flow?.SetTreatmentStress(false);
     }
 
     private void HandleToolSelected(string toolId)
@@ -239,6 +239,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         }
 
         activeParasite = null;
+        flow?.SetTreatmentStress(false);
         RefreshMeters();
     }
 

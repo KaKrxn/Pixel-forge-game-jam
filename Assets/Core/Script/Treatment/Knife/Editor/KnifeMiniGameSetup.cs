@@ -12,8 +12,7 @@ public static class KnifeMiniGameSetup
         KnifeMiniGame miniGame = FindSelectedOrSceneMiniGame();
         if (miniGame == null)
         {
-            Debug.LogWarning("Knife setup skipped because no KnifeMiniGame was found in the open scene.");
-            return;
+            miniGame = CreateKnifeMiniGameRoot();
         }
 
         Undo.IncrementCurrentGroup();
@@ -58,6 +57,24 @@ public static class KnifeMiniGameSetup
         }
 
         return FindSceneObject<KnifeMiniGame>();
+    }
+
+    private static KnifeMiniGame CreateKnifeMiniGameRoot()
+    {
+        GameObject root = new GameObject("KnifeMiniGameRoot");
+        Undo.RegisterCreatedObjectUndo(root, "Create KnifeMiniGameRoot");
+
+        Transform treatmentRoot = FindSceneTransform("Treatment RoomRoot");
+        if (treatmentRoot != null)
+        {
+            Transform gameplayRoot = FindDeepChild(treatmentRoot, "03_Gameplay");
+            root.transform.SetParent(gameplayRoot != null ? gameplayRoot : treatmentRoot, false);
+        }
+
+        root.transform.localPosition = Vector3.zero;
+        root.transform.localRotation = Quaternion.identity;
+        root.transform.localScale = Vector3.one;
+        return Undo.AddComponent<KnifeMiniGame>(root);
     }
 
     private static void AssignMiniGame(KnifeMiniGame miniGame, Transform lesionRoot, Transform spawnRoot)
@@ -296,6 +313,12 @@ public static class KnifeMiniGameSetup
         }
 
         return null;
+    }
+
+    private static Transform FindSceneTransform(string objectName)
+    {
+        GameObject found = GameObject.Find(objectName);
+        return found != null ? found.transform : null;
     }
 
     private static T FindSceneObject<T>() where T : Object

@@ -22,3 +22,6 @@ MonoBehaviour:
   - area: 1
     miniGameType: 2
     designerNote: Torso treatment uses Knife for a wound or growth.
+  - area: 3
+    miniGameType: 3
+    designerNote: Leg treatment uses Needle for pus piercing and draining.

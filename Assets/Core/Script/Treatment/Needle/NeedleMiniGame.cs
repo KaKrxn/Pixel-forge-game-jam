@@ -2,56 +2,55 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
 
-public sealed class KnifeMiniGame : MonoBehaviour
+public sealed class NeedleMiniGame : MonoBehaviour
 {
     [SerializeField] private GameFlow flow;
     [SerializeField] private GameObject root;
-    [SerializeField] private Transform lesionRoot;
-    [SerializeField] private List<Lesion> lesions = new List<Lesion>();
+    [SerializeField] private Transform pustuleRoot;
+    [SerializeField] private List<Pustule> pustules = new List<Pustule>();
     [Header("Spawn")]
-    [SerializeField] private List<Lesion> lesionPrefabs = new List<Lesion>();
+    [SerializeField] private List<Pustule> pustulePrefabs = new List<Pustule>();
     [SerializeField] private List<Transform> spawnAnchors = new List<Transform>();
-    [SerializeField] private bool spawnLesionsOnBegin;
-    [SerializeField, Min(1)] private int minLesions = 2;
-    [SerializeField, Min(1)] private int maxLesions = 5;
+    [SerializeField] private bool spawnPustulesOnBegin;
+    [SerializeField, Min(1)] private int minPustules = 3;
+    [SerializeField, Min(1)] private int maxPustules = 7;
     [Header("Input")]
     [SerializeField] private Camera inputCamera;
     [SerializeField] private float worldInputPlaneZ;
     [Header("UI")]
     [SerializeField] private MiniGameOverlay overlay;
-    [SerializeField] private string overlayToolId = "Knife";
+    [SerializeField] private string overlayToolId = "Needle";
     [Header("Rules")]
-    [SerializeField] private bool autoCompleteWhenAllLesionsDone = true;
+    [SerializeField] private bool autoCompleteWhenAllPustulesDone = true;
     [SerializeField] private bool startHidden = true;
     [SerializeField] private bool useUnscaledTime;
 
-    private readonly List<Lesion> spawnedLesions = new List<Lesion>();
+    private readonly List<Pustule> spawnedPustules = new List<Pustule>();
     private CustomerAgent activeCustomer;
     private Sanity activeSanity;
-    private Lesion activeLesion;
-    private Lesion meterLesion;
-    private KnifeActionMode activeActionMode = KnifeActionMode.None;
-    private KnifeToolState toolState = KnifeToolState.None;
+    private Pustule activePustule;
+    private Pustule meterPustule;
+    private NeedleToolState toolState = NeedleToolState.None;
+    private NeedleActionMode activeActionMode = NeedleActionMode.None;
     private bool isRunning;
     private bool isComplete;
     private bool completionRaised;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
-    public KnifeToolState ToolState => toolState;
+    public NeedleToolState ToolState => toolState;
 
     public event Action MiniGameCompleted;
 
     private void Awake()
     {
-        RefreshLesionList();
-        SubscribeLesions();
+        RefreshPustuleList();
+        SubscribePustules();
 
         if (startHidden)
         {
@@ -61,7 +60,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnsubscribeLesions();
+        UnsubscribePustules();
     }
 
     private void Update()
@@ -77,18 +76,14 @@ public sealed class KnifeMiniGame : MonoBehaviour
         }
 
         float deltaTime = useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
+        UpdateNeedleTipPreview(worldPointer);
 
-        UpdateKnifeTipPreview(worldPointer);
-
-        if (WasPrimaryPointerPressedThisFrame())
+        if (WasPrimaryPointerPressedThisFrame() && !IsPointerOverUi())
         {
-            if (!IsPointerOverUi())
-            {
-                BeginActionAt(worldPointer);
-            }
+            BeginActionAt(worldPointer);
         }
 
-        TickLesions(worldPointer, deltaTime);
+        TickPustules(worldPointer, deltaTime);
 
         if (WasPrimaryPointerReleasedThisFrame())
         {
@@ -100,17 +95,17 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         activeCustomer = customer;
         activeSanity = customer != null ? customer.GetComponent<Sanity>() : null;
-        activeLesion = null;
-        meterLesion = null;
-        activeActionMode = KnifeActionMode.None;
-        toolState = KnifeToolState.None;
+        activePustule = null;
+        meterPustule = null;
+        toolState = NeedleToolState.None;
+        activeActionMode = NeedleActionMode.None;
         isRunning = true;
         isComplete = false;
         completionRaised = false;
 
-        PrepareLesions();
-        SubscribeLesions();
-        ResetLesions();
+        PreparePustules();
+        SubscribePustules();
+        ResetPustules();
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected);
         RefreshCompletionState();
@@ -151,27 +146,15 @@ public sealed class KnifeMiniGame : MonoBehaviour
         flow?.SetTreatmentStress(false);
     }
 
-    public void EquipKnife()
+    public void EquipNeedle()
     {
-        toolState = KnifeToolState.Knife;
+        toolState = NeedleToolState.Needle;
     }
 
-    public void PutKnifeDown()
+    public void PutNeedleDown()
     {
-        toolState = KnifeToolState.None;
+        toolState = NeedleToolState.None;
         EndAction();
-    }
-
-    private void HandleToolSelected(string toolId)
-    {
-        if (toolId == overlayToolId)
-        {
-            EquipKnife();
-        }
-        else
-        {
-            PutKnifeDown();
-        }
     }
 
     public void CompleteMiniGame()
@@ -184,60 +167,81 @@ public sealed class KnifeMiniGame : MonoBehaviour
         RaiseCompleted();
     }
 
+    private void HandleToolSelected(string toolId)
+    {
+        if (toolId == overlayToolId)
+        {
+            EquipNeedle();
+        }
+        else
+        {
+            PutNeedleDown();
+        }
+    }
+
     private void BeginActionAt(Vector2 pointerPosition)
     {
-        Lesion target = FindLesionAt(pointerPosition);
+        Pustule target = FindPustuleAt(pointerPosition);
         if (target == null)
         {
             return;
         }
 
-        bool canUseTool = toolState == KnifeToolState.Knife && target.CanSlice;
-        bool canUseHand = toolState == KnifeToolState.None && target.CanPull;
-        if (!canUseTool && !canUseHand)
+        bool canPierce = toolState == NeedleToolState.Needle && target.CanPierce;
+        bool canSqueeze = toolState == NeedleToolState.None && target.CanSqueeze;
+        bool canDrain = toolState == NeedleToolState.Needle && target.CanDrain;
+        if (!canPierce && !canSqueeze && !canDrain)
         {
             return;
         }
 
-        activeLesion = target;
-        activeActionMode = canUseTool ? KnifeActionMode.Slice : KnifeActionMode.Pull;
-        meterLesion = target;
+        activePustule = target;
+        meterPustule = target;
+        activeActionMode = canPierce
+            ? NeedleActionMode.Pierce
+            : canSqueeze
+                ? NeedleActionMode.Squeeze
+                : NeedleActionMode.Drain;
         RefreshMeters();
-        flow?.SetTreatmentStress(true);
+        flow?.SetTreatmentStress(activeActionMode != NeedleActionMode.Pierce);
     }
 
     private void EndAction()
     {
-        activeLesion = null;
-        activeActionMode = KnifeActionMode.None;
+        activePustule = null;
+        activeActionMode = NeedleActionMode.None;
         flow?.SetTreatmentStress(false);
         RefreshMeters();
     }
 
-    private void TickLesions(Vector2 worldPointer, float deltaTime)
+    private void TickPustules(Vector2 worldPointer, float deltaTime)
     {
-        for (int i = 0; i < lesions.Count; i++)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            Lesion lesion = lesions[i];
-            if (lesion == null || lesion.IsCompleted)
+            Pustule pustule = pustules[i];
+            if (pustule == null || pustule.IsCompleted)
             {
                 continue;
             }
 
-            if (lesion == activeLesion)
+            if (pustule == activePustule)
             {
-                if (activeActionMode == KnifeActionMode.Slice)
+                switch (activeActionMode)
                 {
-                    lesion.TickSlice(worldPointer, deltaTime, activeSanity);
-                }
-                else if (activeActionMode == KnifeActionMode.Pull)
-                {
-                    lesion.TickPull(worldPointer, deltaTime, activeSanity);
+                    case NeedleActionMode.Pierce:
+                        pustule.TickPierce(deltaTime);
+                        break;
+                    case NeedleActionMode.Squeeze:
+                        pustule.TickSqueeze(deltaTime, activeSanity);
+                        break;
+                    case NeedleActionMode.Drain:
+                        pustule.TickDrain(worldPointer, deltaTime, activeSanity);
+                        break;
                 }
             }
             else
             {
-                lesion.TickIdle(deltaTime);
+                pustule.TickIdle(deltaTime);
             }
         }
     }
@@ -303,90 +307,83 @@ public sealed class KnifeMiniGame : MonoBehaviour
         return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
     }
 
-    private Lesion FindLesionAt(Vector2 pointerPosition)
+    private Pustule FindPustuleAt(Vector2 pointerPosition)
     {
-        for (int i = lesions.Count - 1; i >= 0; i--)
+        for (int i = pustules.Count - 1; i >= 0; i--)
         {
-            Lesion lesion = lesions[i];
-            if (lesion == null || lesion.IsCompleted)
+            Pustule pustule = pustules[i];
+            if (pustule != null && !pustule.IsCompleted && pustule.ContainsPoint(pointerPosition))
             {
-                continue;
-            }
-
-            bool containsPointer = lesion.ContainsPoint(pointerPosition);
-            bool canStartSlice = toolState == KnifeToolState.Knife && lesion.CanBeginSliceAt(pointerPosition);
-            if (containsPointer || canStartSlice)
-            {
-                return lesion;
+                return pustule;
             }
         }
 
         return null;
     }
 
-    private void UpdateKnifeTipPreview(Vector2 worldPointer)
+    private void UpdateNeedleTipPreview(Vector2 worldPointer)
     {
-        if (toolState != KnifeToolState.Knife)
+        if (toolState != NeedleToolState.Needle)
         {
             return;
         }
 
-        for (int i = 0; i < lesions.Count; i++)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            Lesion lesion = lesions[i];
-            if (lesion != null && !lesion.IsCompleted && lesion.CanSlice)
+            Pustule pustule = pustules[i];
+            if (pustule != null && !pustule.IsCompleted)
             {
-                lesion.SetKnifeTipPreview(worldPointer);
+                pustule.SetNeedleTipPreview(worldPointer);
             }
         }
     }
 
-    private void PrepareLesions()
+    private void PreparePustules()
     {
-        if (spawnLesionsOnBegin && lesionPrefabs.Count > 0 && spawnAnchors.Count > 0)
+        if (spawnPustulesOnBegin && pustulePrefabs.Count > 0 && spawnAnchors.Count > 0)
         {
-            SpawnLesions();
+            SpawnPustules();
             return;
         }
 
-        RefreshLesionList();
+        RefreshPustuleList();
     }
 
-    private void SpawnLesions()
+    private void SpawnPustules()
     {
-        ClearSpawnedLesions();
-        lesions.Clear();
+        ClearSpawnedPustules();
+        pustules.Clear();
 
         List<Transform> anchors = GetShuffledAnchors();
-        int low = Mathf.Max(1, minLesions);
-        int high = Mathf.Max(low, maxLesions);
+        int low = Mathf.Max(1, minPustules);
+        int high = Mathf.Max(low, maxPustules);
         int count = Mathf.Min(UnityEngine.Random.Range(low, high + 1), anchors.Count);
-        Transform parent = lesionRoot != null ? lesionRoot : transform;
-        List<Lesion> prefabBag = new List<Lesion>();
+        Transform parent = pustuleRoot != null ? pustuleRoot : transform;
+        List<Pustule> prefabBag = new List<Pustule>();
 
         for (int i = 0; i < count; i++)
         {
-            if (!TryGetNextPrefab(prefabBag, out Lesion prefab))
+            if (!TryGetNextPrefab(prefabBag, out Pustule prefab))
             {
                 break;
             }
 
-            Lesion lesion = Instantiate(prefab, anchors[i].position, anchors[i].rotation, parent);
-            lesion.name = $"{prefab.name}_{i + 1:00}";
-            lesions.Add(lesion);
-            spawnedLesions.Add(lesion);
+            Pustule pustule = Instantiate(prefab, anchors[i].position, anchors[i].rotation, parent);
+            pustule.name = $"{prefab.name}_{i + 1:00}";
+            pustules.Add(pustule);
+            spawnedPustules.Add(pustule);
         }
     }
 
-    private bool TryGetNextPrefab(List<Lesion> prefabBag, out Lesion prefab)
+    private bool TryGetNextPrefab(List<Pustule> prefabBag, out Pustule prefab)
     {
         if (prefabBag.Count == 0)
         {
-            for (int i = 0; i < lesionPrefabs.Count; i++)
+            for (int i = 0; i < pustulePrefabs.Count; i++)
             {
-                if (lesionPrefabs[i] != null)
+                if (pustulePrefabs[i] != null)
                 {
-                    prefabBag.Add(lesionPrefabs[i]);
+                    prefabBag.Add(pustulePrefabs[i]);
                 }
             }
 
@@ -428,72 +425,72 @@ public sealed class KnifeMiniGame : MonoBehaviour
         return anchors;
     }
 
-    private void RefreshLesionList()
+    private void RefreshPustuleList()
     {
-        Transform searchRoot = lesionRoot != null ? lesionRoot : transform;
-        lesions.Clear();
-        searchRoot.GetComponentsInChildren(includeInactive: true, lesions);
+        Transform searchRoot = pustuleRoot != null ? pustuleRoot : transform;
+        pustules.Clear();
+        searchRoot.GetComponentsInChildren(includeInactive: true, pustules);
     }
 
-    private void ClearSpawnedLesions()
+    private void ClearSpawnedPustules()
     {
-        for (int i = spawnedLesions.Count - 1; i >= 0; i--)
+        for (int i = spawnedPustules.Count - 1; i >= 0; i--)
         {
-            if (spawnedLesions[i] != null)
+            if (spawnedPustules[i] != null)
             {
-                Destroy(spawnedLesions[i].gameObject);
+                Destroy(spawnedPustules[i].gameObject);
             }
         }
 
-        spawnedLesions.Clear();
+        spawnedPustules.Clear();
     }
 
-    private void ResetLesions()
+    private void ResetPustules()
     {
-        for (int i = 0; i < lesions.Count; i++)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            lesions[i]?.ResetRuntimeState();
+            pustules[i]?.ResetRuntimeState();
         }
     }
 
-    private void SubscribeLesions()
+    private void SubscribePustules()
     {
-        for (int i = 0; i < lesions.Count; i++)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            if (lesions[i] == null)
-            {
-                continue;
-            }
-
-            lesions[i].Completed -= HandleLesionCompleted;
-            lesions[i].PainChanged -= HandleMeterChanged;
-            lesions[i].ProgressChanged -= HandleMeterChanged;
-            lesions[i].Completed += HandleLesionCompleted;
-            lesions[i].PainChanged += HandleMeterChanged;
-            lesions[i].ProgressChanged += HandleMeterChanged;
-        }
-    }
-
-    private void UnsubscribeLesions()
-    {
-        for (int i = 0; i < lesions.Count; i++)
-        {
-            if (lesions[i] == null)
+            if (pustules[i] == null)
             {
                 continue;
             }
 
-            lesions[i].Completed -= HandleLesionCompleted;
-            lesions[i].PainChanged -= HandleMeterChanged;
-            lesions[i].ProgressChanged -= HandleMeterChanged;
+            pustules[i].Completed -= HandlePustuleCompleted;
+            pustules[i].PainChanged -= HandleMeterChanged;
+            pustules[i].ProgressChanged -= HandleMeterChanged;
+            pustules[i].Completed += HandlePustuleCompleted;
+            pustules[i].PainChanged += HandleMeterChanged;
+            pustules[i].ProgressChanged += HandleMeterChanged;
         }
     }
 
-    private void HandleLesionCompleted(Lesion lesion)
+    private void UnsubscribePustules()
     {
-        if (meterLesion == lesion)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            meterLesion = null;
+            if (pustules[i] == null)
+            {
+                continue;
+            }
+
+            pustules[i].Completed -= HandlePustuleCompleted;
+            pustules[i].PainChanged -= HandleMeterChanged;
+            pustules[i].ProgressChanged -= HandleMeterChanged;
+        }
+    }
+
+    private void HandlePustuleCompleted(Pustule pustule)
+    {
+        if (meterPustule == pustule)
+        {
+            meterPustule = null;
         }
 
         RefreshCompletionState();
@@ -507,20 +504,20 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     private void RefreshCompletionState()
     {
-        isComplete = HasAnyLesion() && AreAllLesionsCompleted();
+        isComplete = HasAnyPustule() && AreAllPustulesCompleted();
         SetCompleteButtonVisible(isComplete);
 
-        if (isComplete && autoCompleteWhenAllLesionsDone)
+        if (isComplete && autoCompleteWhenAllPustulesDone)
         {
             RaiseCompleted();
         }
     }
 
-    private bool HasAnyLesion()
+    private bool HasAnyPustule()
     {
-        for (int i = 0; i < lesions.Count; i++)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            if (lesions[i] != null)
+            if (pustules[i] != null)
             {
                 return true;
             }
@@ -529,11 +526,11 @@ public sealed class KnifeMiniGame : MonoBehaviour
         return false;
     }
 
-    private bool AreAllLesionsCompleted()
+    private bool AreAllPustulesCompleted()
     {
-        for (int i = 0; i < lesions.Count; i++)
+        for (int i = 0; i < pustules.Count; i++)
         {
-            if (lesions[i] != null && !lesions[i].IsCompleted)
+            if (pustules[i] != null && !pustules[i].IsCompleted)
             {
                 return false;
             }
@@ -556,14 +553,14 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     private void RefreshMeters()
     {
-        float progress = meterLesion != null ? meterLesion.OverallProgress : 0f;
-        float pain = meterLesion != null ? meterLesion.PainLevel : 0f;
+        float progress = meterPustule != null ? meterPustule.OverallProgress : 0f;
+        float pain = meterPustule != null ? meterPustule.PainLevel : 0f;
         overlay?.SetMeters(progress, pain);
     }
 
     private void SetCompleteButtonVisible(bool visible)
     {
-        overlay?.SetCompleteVisible(visible && !autoCompleteWhenAllLesionsDone);
+        overlay?.SetCompleteVisible(visible && !autoCompleteWhenAllPustulesDone);
     }
 
     private void SetRootVisible(bool visible)
@@ -571,11 +568,4 @@ public sealed class KnifeMiniGame : MonoBehaviour
         GameObject target = root != null ? root : gameObject;
         target.SetActive(visible);
     }
-}
-
-public enum KnifeActionMode
-{
-    None,
-    Slice,
-    Pull
 }

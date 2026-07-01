@@ -34,12 +34,14 @@ public sealed class AnatomyController : MonoBehaviour
     [SerializeField] private BodyArea tongsArea = BodyArea.Arm;
     [SerializeField] private TongsMiniGame tongsMiniGame;
     [SerializeField] private KnifeMiniGame knifeMiniGame;
+    [SerializeField] private NeedleMiniGame needleMiniGame;
     [SerializeField] private List<BodyArea> knifeAreas = new List<BodyArea>
     {
         BodyArea.Head,
         BodyArea.Torso,
         BodyArea.Leg
     };
+    [SerializeField] private List<BodyArea> needleAreas = new List<BodyArea>();
     [SerializeField] private bool autoTreatInfectedAreasWithoutMiniGame = true;
 
     private readonly Dictionary<BodyArea, PartState> areaStates = new Dictionary<BodyArea, PartState>();
@@ -124,6 +126,7 @@ public sealed class AnatomyController : MonoBehaviour
         {
             tongsMiniGame?.Pause();
             knifeMiniGame?.Pause();
+            needleMiniGame?.Pause();
         }
 
         SetRootVisible(false);
@@ -138,6 +141,7 @@ public sealed class AnatomyController : MonoBehaviour
         activeCaseRuntime = null;
         tongsMiniGame?.Stop();
         knifeMiniGame?.Stop();
+        needleMiniGame?.Stop();
         SetRootVisible(false);
         SetPartMessageVisible(false);
         NavigationStateChanged?.Invoke();
@@ -209,6 +213,12 @@ public sealed class AnatomyController : MonoBehaviour
                 knifeMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
+
+            case TreatmentMiniGameType.Needle when needleMiniGame != null:
+                StartMiniGame(TreatmentMiniGameType.Needle);
+                needleMiniGame.Begin(activeCustomer);
+                FoldForMiniGame();
+                return;
         }
 
         SetBodyVisible(false);
@@ -246,6 +256,7 @@ public sealed class AnatomyController : MonoBehaviour
         activeMiniGameType = TreatmentMiniGameType.None;
         tongsMiniGame?.Stop();
         knifeMiniGame?.Stop();
+        needleMiniGame?.Stop();
         SetRootVisible(true);       // un-fold the screen when returning to the anatomy level
         SetBodyVisible(true);
         SetPartMessageVisible(false);
@@ -369,6 +380,16 @@ public sealed class AnatomyController : MonoBehaviour
         CompleteActiveMiniGameArea();
     }
 
+    private void HandleNeedleCompleted()
+    {
+        if (!isMiniGameRunning || activeMiniGameType != TreatmentMiniGameType.Needle)
+        {
+            return;
+        }
+
+        CompleteActiveMiniGameArea();
+    }
+
     private void StartMiniGame(TreatmentMiniGameType miniGameType)
     {
         activeMiniGameType = miniGameType;
@@ -397,6 +418,11 @@ public sealed class AnatomyController : MonoBehaviour
         if (knifeAreas != null && knifeAreas.Contains(area))
         {
             return TreatmentMiniGameType.Knife;
+        }
+
+        if (needleAreas != null && needleAreas.Contains(area))
+        {
+            return TreatmentMiniGameType.Needle;
         }
 
         return TreatmentMiniGameType.None;
@@ -478,6 +504,12 @@ public sealed class AnatomyController : MonoBehaviour
             knifeMiniGame.MiniGameCompleted -= HandleKnifeCompleted;
             knifeMiniGame.MiniGameCompleted += HandleKnifeCompleted;
         }
+
+        if (needleMiniGame != null)
+        {
+            needleMiniGame.MiniGameCompleted -= HandleNeedleCompleted;
+            needleMiniGame.MiniGameCompleted += HandleNeedleCompleted;
+        }
     }
 
     private void UnsubscribeMiniGames()
@@ -490,6 +522,11 @@ public sealed class AnatomyController : MonoBehaviour
         if (knifeMiniGame != null)
         {
             knifeMiniGame.MiniGameCompleted -= HandleKnifeCompleted;
+        }
+
+        if (needleMiniGame != null)
+        {
+            needleMiniGame.MiniGameCompleted -= HandleNeedleCompleted;
         }
     }
 
