@@ -45,8 +45,6 @@ public sealed class Treatment : MonoBehaviour
     {
         if (anatomyController != null)
         {
-            anatomyController.TreatmentCompleted -= CompleteTreatmentCase;
-            anatomyController.TreatmentCompleted += CompleteTreatmentCase;
             anatomyController.NavigationStateChanged -= RefreshText;
             anatomyController.NavigationStateChanged += RefreshText;
         }
@@ -62,7 +60,6 @@ public sealed class Treatment : MonoBehaviour
     {
         if (anatomyController != null)
         {
-            anatomyController.TreatmentCompleted -= CompleteTreatmentCase;
             anatomyController.NavigationStateChanged -= RefreshText;
         }
 
@@ -207,7 +204,9 @@ public sealed class Treatment : MonoBehaviour
             bodyText.text = isAtCounter
                 ? "Placeholder return state. Refill candle will be connected here later. Press Resume to go back to treatment."
                 : anatomyController != null
-                    ? "Select the body part to inspect. The screen gives no infection hints, so use the customer's dialog clues."
+                    ? anatomyController.CanCompleteTreatment
+                        ? "All required treatment areas are cured. Press Complete to finish the case."
+                        : "Select the body part to inspect. The screen gives no infection hints, so use the customer's dialog clues."
                     : tongsMiniGame != null
                     ? "Use the tongs to extract every parasite. Release to let pain drain before it spikes Sanity."
                     : "Placeholder treatment state. Minigame is not designed yet, so this screen only proves the room transition and cure flow.";
@@ -215,7 +214,8 @@ public sealed class Treatment : MonoBehaviour
 
         if (completeButton != null)
         {
-            completeButton.gameObject.SetActive(!isAtCounter && anatomyController == null && tongsMiniGame == null);
+            bool canCompleteFromAnatomy = anatomyController != null && anatomyController.CanCompleteTreatment;
+            completeButton.gameObject.SetActive(!isAtCounter && (canCompleteFromAnatomy || (anatomyController == null && tongsMiniGame == null)));
         }
 
         if (returnButton != null)

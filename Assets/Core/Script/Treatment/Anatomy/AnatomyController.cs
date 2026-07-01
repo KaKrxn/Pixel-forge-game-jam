@@ -14,7 +14,11 @@ public sealed class AnatomyController : MonoBehaviour
     [SerializeField] private TMP_Text partMessageText;
     [SerializeField] private Button exitPartButton;
 
-    [Header("Infection Setup")]
+    [Header("Case Source")]
+    [SerializeField] private TreatmentCaseSource caseSource = TreatmentCaseSource.CustomerCase;
+    [SerializeField] private bool fallbackToManualIfCustomerCaseMissing = true;
+
+    [Header("Fallback Infection Setup")]
     [SerializeField] private InfectionMode infectionMode = InfectionMode.Manual;
     [SerializeField] private bool headInfected;
     [SerializeField] private bool torsoInfected;
@@ -29,20 +33,29 @@ public sealed class AnatomyController : MonoBehaviour
     [Header("Mini Games")]
     [SerializeField] private BodyArea tongsArea = BodyArea.Arm;
     [SerializeField] private TongsMiniGame tongsMiniGame;
+    [SerializeField] private KnifeMiniGame knifeMiniGame;
+    [SerializeField] private List<BodyArea> knifeAreas = new List<BodyArea>
+    {
+        BodyArea.Head,
+        BodyArea.Torso,
+        BodyArea.Leg
+    };
     [SerializeField] private bool autoTreatInfectedAreasWithoutMiniGame = true;
 
     private readonly Dictionary<BodyArea, PartState> areaStates = new Dictionary<BodyArea, PartState>();
     private CustomerAgent activeCustomer;
+    private TreatmentCaseRuntime activeCaseRuntime;
     private BodyArea activeArea;
+    private TreatmentMiniGameType activeMiniGameType = TreatmentMiniGameType.None;
     private bool isInsidePart;
     private bool isMiniGameRunning;
     private bool hasBegun;
 
     public bool CanReturnToCounter => hasBegun && !isInsidePart;
     public bool IsInsidePart => isInsidePart;
+    public bool CanCompleteTreatment => hasBegun && !isInsidePart && AreAllInfectedAreasTreated();
 
     public event Action NavigationStateChanged;
-    public event Action TreatmentCompleted;
 
     private void Awake()
     {
@@ -55,14 +68,14 @@ public sealed class AnatomyController : MonoBehaviour
         }
 
         SetPartMessageVisible(false);
-    }
 
-    private void OnEnable()
-    {
+        // Subscribe here (not in OnEnable) so the mini-game completion callback survives
+        // this GameObject being deactivated while the Anatomy screen is folded away during
+        // a running mini game. See EnterInfectedArea / ShowAnatomyLevel.
         SubscribeMiniGames();
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         UnsubscribeMiniGames();
     }
@@ -79,6 +92,7 @@ public sealed class AnatomyController : MonoBehaviour
     {
         activeCustomer = customer;
         activeArea = BodyArea.Arm;
+        activeMiniGameType = TreatmentMiniGameType.None;
         isInsidePart = false;
         isMiniGameRunning = false;
         hasBegun = true;
@@ -109,6 +123,7 @@ public sealed class AnatomyController : MonoBehaviour
         if (isMiniGameRunning)
         {
             tongsMiniGame?.Pause();
+            knifeMiniGame?.Pause();
         }
 
         SetRootVisible(false);
@@ -119,7 +134,10 @@ public sealed class AnatomyController : MonoBehaviour
         hasBegun = false;
         isInsidePart = false;
         isMiniGameRunning = false;
+        activeMiniGameType = TreatmentMiniGameType.None;
+        activeCaseRuntime = null;
         tongsMiniGame?.Stop();
+        knifeMiniGame?.Stop();
         SetRootVisible(false);
         SetPartMessageVisible(false);
         NavigationStateChanged?.Invoke();
@@ -164,30 +182,39 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void MarkAreaTreated(BodyArea area)
     {
+        activeCaseRuntime?.MarkTreated(area);
         MarkAreaState(area, PartState.Treated);
         RefreshAllPartVisuals();
-        ShowAnatomyLevel($"{FormatArea(area)} treatment complete.");
 
-        if (AreAllInfectedAreasTreated())
-        {
-            TreatmentCompleted?.Invoke();
-        }
+        string message = AreAllInfectedAreasTreated()
+            ? "All required treatments are complete. Press Complete when ready."
+            : $"{FormatArea(area)} treatment complete. Select another treatment area.";
+
+        ShowAnatomyLevel(message);
     }
 
     private void EnterInfectedArea(BodyArea area)
     {
+        TreatmentMiniGameType miniGameType = GetMiniGameTypeForArea(area);
+        switch (miniGameType)
+        {
+            case TreatmentMiniGameType.Tongs when tongsMiniGame != null:
+                StartMiniGame(TreatmentMiniGameType.Tongs);
+                tongsMiniGame.Begin(activeCustomer);
+                FoldForMiniGame();
+                return;
+
+            case TreatmentMiniGameType.Knife when knifeMiniGame != null:
+                StartMiniGame(TreatmentMiniGameType.Knife);
+                knifeMiniGame.Begin(activeCustomer);
+                FoldForMiniGame();
+                return;
+        }
+
         SetBodyVisible(false);
         SetPartMessageVisible(false);
 
-        if (area == tongsArea && tongsMiniGame != null)
-        {
-            isMiniGameRunning = true;
-            tongsMiniGame.Begin(activeCustomer);
-            SetStatusText($"Treating {FormatArea(area)}.");
-            return;
-        }
-
-        Debug.LogWarning($"No mini game is assigned for infected area {area}.");
+        Debug.LogWarning($"No mini game is assigned for infected area {area}. Requested mini game: {miniGameType}.");
         if (autoTreatInfectedAreasWithoutMiniGame)
         {
             MarkAreaTreated(area);
@@ -203,11 +230,23 @@ public sealed class AnatomyController : MonoBehaviour
         ShowPartMessage($"{FormatArea(area)} looks clean. Nothing to treat here.");
     }
 
+    // Fold the entire Anatomy screen away while a world-space mini game plays.
+    // The controller keeps its completion subscription (see Awake/OnDestroy), so the
+    // mini game still calls back here even though this GameObject is inactive.
+    private void FoldForMiniGame()
+    {
+        SetPartMessageVisible(false);
+        SetRootVisible(false);
+    }
+
     private void ShowAnatomyLevel(string message)
     {
         isInsidePart = false;
         isMiniGameRunning = false;
+        activeMiniGameType = TreatmentMiniGameType.None;
         tongsMiniGame?.Stop();
+        knifeMiniGame?.Stop();
+        SetRootVisible(true);       // un-fold the screen when returning to the anatomy level
         SetBodyVisible(true);
         SetPartMessageVisible(false);
         SetStatusText(message);
@@ -217,18 +256,52 @@ public sealed class AnatomyController : MonoBehaviour
     private void ResolveInfection()
     {
         areaStates.Clear();
+        activeCaseRuntime = null;
         foreach (BodyArea area in Enum.GetValues(typeof(BodyArea)))
         {
             areaStates[area] = PartState.Untouched;
         }
 
-        if (infectionMode == InfectionMode.Manual)
+        if (caseSource == TreatmentCaseSource.CustomerCase && TryApplyCustomerCase())
+        {
+            return;
+        }
+
+        if (caseSource == TreatmentCaseSource.CustomerCase && !fallbackToManualIfCustomerCaseMissing)
+        {
+            Debug.LogWarning("No TreatmentCaseData was found on the active customer. AnatomyController will start with no infected areas.");
+            return;
+        }
+
+        if (caseSource == TreatmentCaseSource.Random || (caseSource == TreatmentCaseSource.CustomerCase && infectionMode == InfectionMode.Random))
+        {
+            ApplyRandomInfection();
+            return;
+        }
+
+        if (caseSource == TreatmentCaseSource.Manual || caseSource == TreatmentCaseSource.CustomerCase || infectionMode == InfectionMode.Manual)
         {
             ApplyManualInfection();
             return;
         }
+    }
 
-        ApplyRandomInfection();
+    private bool TryApplyCustomerCase()
+    {
+        CustomerCaseProvider caseProvider = activeCustomer != null ? activeCustomer.GetComponent<CustomerCaseProvider>() : null;
+        TreatmentCaseData caseData = caseProvider != null ? caseProvider.CaseData : null;
+        if (caseData == null || caseData.RequiredTreatmentCount == 0)
+        {
+            return false;
+        }
+
+        activeCaseRuntime = new TreatmentCaseRuntime(caseData);
+        foreach (BodyArea area in activeCaseRuntime.GetRequiredAreas())
+        {
+            areaStates[area] = PartState.Infected;
+        }
+
+        return activeCaseRuntime.HasRequirements;
     }
 
     private void ApplyManualInfection()
@@ -278,17 +351,64 @@ public sealed class AnatomyController : MonoBehaviour
 
     private void HandleTongsCompleted()
     {
-        if (!isMiniGameRunning || activeArea != tongsArea)
+        if (!isMiniGameRunning || activeMiniGameType != TreatmentMiniGameType.Tongs)
         {
             return;
         }
 
+        CompleteActiveMiniGameArea();
+    }
+
+    private void HandleKnifeCompleted()
+    {
+        if (!isMiniGameRunning || activeMiniGameType != TreatmentMiniGameType.Knife)
+        {
+            return;
+        }
+
+        CompleteActiveMiniGameArea();
+    }
+
+    private void StartMiniGame(TreatmentMiniGameType miniGameType)
+    {
+        activeMiniGameType = miniGameType;
+        isMiniGameRunning = true;
+    }
+
+    private void CompleteActiveMiniGameArea()
+    {
         isMiniGameRunning = false;
+        activeMiniGameType = TreatmentMiniGameType.None;
         MarkAreaTreated(activeArea);
+    }
+
+    private TreatmentMiniGameType GetMiniGameTypeForArea(BodyArea area)
+    {
+        if (activeCaseRuntime != null && activeCaseRuntime.TryGetMiniGameType(area, out TreatmentMiniGameType miniGameType))
+        {
+            return miniGameType;
+        }
+
+        if (area == tongsArea)
+        {
+            return TreatmentMiniGameType.Tongs;
+        }
+
+        if (knifeAreas != null && knifeAreas.Contains(area))
+        {
+            return TreatmentMiniGameType.Knife;
+        }
+
+        return TreatmentMiniGameType.None;
     }
 
     private bool AreAllInfectedAreasTreated()
     {
+        if (activeCaseRuntime != null)
+        {
+            return activeCaseRuntime.AreAllRequiredAreasTreated();
+        }
+
         bool hasAnyTreated = false;
         foreach (KeyValuePair<BodyArea, PartState> pair in areaStates)
         {
@@ -352,6 +472,12 @@ public sealed class AnatomyController : MonoBehaviour
             tongsMiniGame.MiniGameCompleted -= HandleTongsCompleted;
             tongsMiniGame.MiniGameCompleted += HandleTongsCompleted;
         }
+
+        if (knifeMiniGame != null)
+        {
+            knifeMiniGame.MiniGameCompleted -= HandleKnifeCompleted;
+            knifeMiniGame.MiniGameCompleted += HandleKnifeCompleted;
+        }
     }
 
     private void UnsubscribeMiniGames()
@@ -359,6 +485,11 @@ public sealed class AnatomyController : MonoBehaviour
         if (tongsMiniGame != null)
         {
             tongsMiniGame.MiniGameCompleted -= HandleTongsCompleted;
+        }
+
+        if (knifeMiniGame != null)
+        {
+            knifeMiniGame.MiniGameCompleted -= HandleKnifeCompleted;
         }
     }
 

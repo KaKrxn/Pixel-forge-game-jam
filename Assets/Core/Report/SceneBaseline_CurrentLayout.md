@@ -1,100 +1,203 @@
-# Scene Baseline - Current Layout and Sprite References
+# Current Game Snapshot - Scene Baseline and Implemented Systems
 
-This baseline records the current saved `Assets/Scenes/SampleScene.unity` layout that should be treated as the user's authored setup.
+Snapshot date: 2026-06-30
 
-Future implementation work should preserve these existing object positions, parent hierarchy, sprite references, sorting layers, and sorting orders unless the user explicitly asks to change them. New systems should add new objects, components, or child objects instead of rebuilding or repositioning the existing scene layout.
+This file records the current saved state of `Assets/Core/Scene/GameScene.unity` and the major implemented systems in `Assets/Core/Script`.
+
+Use this document as the current baseline when making future Unity scene or gameplay changes. Existing hierarchy positions, sprite references, room roots, and authored object setup should be preserved unless the user explicitly asks to change them.
 
 ## Baseline Rule
 
 - Do not overwrite the user's current room composition.
 - Do not reset existing transform positions or sprite assignments.
-- Do not rerun setup logic in a way that replaces manually arranged objects.
+- Do not rerun editor setup logic in a way that replaces manually arranged objects.
 - Add new objects as children or separate helpers when more functionality is needed.
-- If a required change affects an existing object below, confirm the reason before changing it.
+- If a required change affects an existing object below, explain the reason before changing it.
 
-## Room Roots
+## Current Root-Level Scene State
 
-| Object | Parent | Active | Local Position | Local Scale |
-|---|---|---:|---|---|
-| `Main RoomRoot` | Scene Root | 1 | `{x: 0, y: 0, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `Treatment RoomRoot` | Scene Root | 0 | `{x: 0, y: 0, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `Main Camera` | Scene Root | 1 | `{x: 0, y: 0, z: -10}` | `{x: 1, y: 1, z: 1}` |
-| `DialogCanvas` | Scene Root | 1 | `{x: 0, y: 0, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `GameFlowManager` | Scene Root | 1 | `{x: 0, y: 0, z: 0}` | `{x: 1, y: 1, z: 1}` |
+| Object | Active | Current Notes |
+|---|---:|---|
+| `=== Manager ===` | 1 | Manager grouping object in the current scene. |
+| `GameFlowManager` | 1 | Holds game flow references, dialog, room transition, treatment, candle, and first customer flow links. |
+| `Main Camera` | 1 | Main camera at `{x: 0, y: 0, z: -10}` with Pixel Perfect Camera and CameraSway. |
+| `DialogCanvas` | 1 | Main dialog/fade UI canvas. Contains inactive `DialogRoot` and inactive `BlinkFadeOverlay`. |
+| `EventSystem` | 1 | UI event input. |
+| `=== Canvas ===  ` | 1 | Current authored UI grouping object. |
+| `=== Room === ` | 1 | Current authored room grouping object. |
+| `Main RoomRoot` | 1 | Counter/main shop room. This is the visible starting room. |
+| `Treatment RoomRoot` | 0 | Treatment room root. Inactive by default and shown through room transition. |
+| `Global Light 2D` | 1 | Global 2D lighting. |
+| `Global Volume` | 1 | Current post-processing/global volume object. |
 
-## Main Room Hierarchy
+## Core Room Roots
 
-```text
-Main RoomRoot
-|-- 00_Background
-|   `-- BG_Far_Placeholder
-|-- 01_Midground
-|   `-- BG_Mid_Placeholder
-|-- 02_MainArea
-|   `-- Main_Room_Placeholder
-|-- 03_Gameplay
-|   |-- Customer
-|   `-- Door
-|       |-- Door Open
-|       `-- Door Close
-|-- 04_Foreground
-|   |-- Foreground_Placeholder
-|   |-- Counter
-|   `-- Candle
-`-- 05_VFX
-```
+| Object | Active | Local Position | Preserve |
+|---|---:|---|---|
+| `Main RoomRoot` | 1 | `{x: 0, y: 0, z: 0}` | Yes |
+| `Treatment RoomRoot` | 0 | `{x: 0, y: 0, z: 0}` | Yes |
+| `Main Camera` | 1 | `{x: 0, y: 0, z: -10}` | Yes |
+| `DialogCanvas` | 1 | `{x: 0, y: 0, z: 0}` | Yes |
+| `GameFlowManager` | 1 | `{x: 0, y: 0, z: 0}` | Yes |
 
-## Treatment Room Hierarchy
+## Main Room Authored Layout
 
-```text
-Treatment RoomRoot
-|-- 00_Background
-|   `-- BG_Far_Placeholder
-|-- 01_Midground
-|   `-- BG_Mid_Placeholder
-|-- 02_MainArea
-|   `-- Main_Room_Placeholder
-|-- 03_Gameplay
-|-- 04_Foreground
-|   `-- Foreground_Placeholder
-`-- 05_VFX
-```
+Current important main room objects that should not be repositioned or have sprites replaced without approval:
 
-## Important Gameplay Objects
+| Object | Active | Local Position | Sorting / Sprite Notes |
+|---|---:|---|---|
+| `Customer` | 1 | `{x: -5.9300003, y: -2, z: 0}` | Sorting layer `Customer`, order `-10`; has `CustomerAgent` and `CustomerLayer`. |
+| `Door` | 1 | `{x: 4.51, y: -2, z: 0}` | Parent for door visuals. |
+| `Door Open` | 0 | `{x: -12.0354, y: 1.9457, z: 0}` | Door open visual. Preserve sprite reference. |
+| `Door Close` | 1 | `{x: -14.18, y: 1.966, z: 0}` | Door closed visual. Preserve sprite reference. |
+| `Counter` | 1 | `{x: -3.66, y: -4.53, z: 0}` | Sorting layer id `23284193`, order `0`; preserve counter sprite. |
+| `Candle` | 1 | `{x: 4.8, y: -4.37, z: 0}` | Sorting layer id `23284193`, order `1`; has `Candle` script. |
+| `CandleFlame` | 1 | `{x: 4.798, y: -3.39, z: 0}` | Current flame helper/VFX. |
+| `CandleGlow` | 1 | `{x: 4.804, y: -3.613, z: 0}` | Current glow helper/VFX. |
+| `Bubble` | 0 | `{x: 0, y: 0, z: 0}` | Customer interaction bubble. |
+| `Wall` | 1 | `{x: 0.3, y: 0.0125, z: 2.42}` | Room wall sprite object. |
+| `Wall (1)` | 1 | `{x: 0.09, y: 0.0125, z: 2.42}` | Additional wall/current authored room object. |
 
-| Object | Parent | Active | Local Position | Local Scale | Sorting | Sprite |
-|---|---|---:|---|---|---|---|
-| `Customer` | `03_Gameplay` | 1 | `{x: -5.9300003, y: -2, z: 0}` | `{x: 2.2, y: 2.2, z: 1}` | layer id `-913042597`, index `3`, order `-10` | `{fileID: 1446532583643695378, guid: ed66159c32b3404478de7c6c25e106b8, type: 3}` |
-| `Door` | `03_Gameplay` | 1 | `{x: 4.51, y: -2, z: 0}` | `{x: 1, y: 1, z: 1}` | none | none |
-| `Door Open` | `Door` | 0 | `{x: -12.0354, y: 1.9457, z: 0}` | `{x: 3.9078, y: 3.7673402, z: 1}` | layer id `-2108703231`, index `4`, order `0` | `{fileID: -873048637846740066, guid: 446aa78f295cf084892a9751d15dc1f1, type: 3}` |
-| `Door Close` | `Door` | 1 | `{x: -14.18, y: 1.966, z: 0}` | `{x: 5.6763945, y: 4.5566444, z: 1}` | layer id `-2108703231`, index `4`, order `0` | `{fileID: -8146606374147342073, guid: 2265da6b7d4771f47beaa15d6ee86cd3, type: 3}` |
-| `Counter` | `04_Foreground` | 1 | `{x: -3.66, y: -4.53, z: 0}` | `{x: 6, y: 6, z: 1}` | layer id `23284193`, index `7`, order `0` | `{fileID: -7908872469103156650, guid: b3b5d40f6d8eb1041a6e024724ebd37a, type: 3}` |
-| `Candle` | `04_Foreground` | 1 | `{x: 4.8, y: -4.37, z: 0}` | `{x: 1.2, y: 1.2, z: 1}` | layer id `23284193`, index `7`, order `1` | `{fileID: 1768679433190182986, guid: bd4dcda62867aa2489b2af984eeaa278, type: 3}` |
+## Treatment Room Current State
 
-## Placeholder Layer Objects
+| Object | Active | Current Notes |
+|---|---:|---|
+| `Treatment RoomRoot` | 0 | Room root inactive by default. |
+| `TreatmentRoot` | 0 | Treatment UI/state root. |
+| `ReturnCounterButton` | 1 | Button used to return to counter room during treatment flow. |
+| `CompleteTreatmentButton` | 1 | Current placeholder treatment completion button. |
+| `ResumeTreatmentButton` | 1 | Current placeholder resume treatment button. |
+| `TitleText` | 1 | Treatment title text. |
+| `BodyText` | 1 | Treatment body/description text. |
+| `Candle (2)` | 0 | Treatment room candle sprite helper, inactive in saved scene. |
+| `CandleFlame (1)` | 0 | Treatment room flame helper, inactive in saved scene. |
+| `CandleGlow (1)` | 0 | Treatment room glow helper, inactive in saved scene. |
 
-| Object | Parent | Active | Local Position | Local Scale | Sorting | Sprite |
-|---|---|---:|---|---|---|---|
-| `BG_Far_Placeholder` | `00_Background` | 1 | `{x: 0, y: 0.55, z: 0}` | `{x: 8, y: 8, z: 1}` | layer id `101301`, index `1`, order `0` | `{fileID: -8599495245105734691, guid: dffe161826b99fe43ac8b63721ef53bc, type: 3}` |
-| `BG_Mid_Placeholder` | `01_Midground` | 1 | `{x: 0, y: 0.15, z: 0}` | `{x: 7, y: 7, z: 1}` | layer id `101302`, index `2`, order `0` | `{fileID: -8599495245105734691, guid: dffe161826b99fe43ac8b63721ef53bc, type: 3}` |
-| `Main_Room_Placeholder` | `02_MainArea` | 1 | `{x: 0, y: -0.25, z: 0}` | `{x: 6.2, y: 6.2, z: 1}` | layer id `101303`, index `5`, order `0` | `{fileID: -8599495245105734691, guid: dffe161826b99fe43ac8b63721ef53bc, type: 3}` |
-| `Foreground_Placeholder` | `04_Foreground` | 1 | `{x: 0, y: -2.85, z: 0}` | `{x: 6.5, y: 6.5, z: 1}` | layer id `101304`, index `8`, order `0` | `{fileID: -8599495245105734691, guid: dffe161826b99fe43ac8b63721ef53bc, type: 3}` |
+## Waypoints and Customer Flow Points
 
-## Waypoints
+| Object | Active | Local Position | Notes |
+|---|---:|---|---|
+| `Point Manager` | 1 | `{x: -11.84, y: -2.89, z: 0}` | Parent/manager for current points. |
+| `Door Point` | 1 | `{x: 0, y: 0, z: 0}` | Door waypoint parent. |
+| `OutsideDoorPoint` | 1 | `{x: 0.8500004, y: -0.75, z: 0}` | Outside door waypoint. |
+| `InsideDoorPoint` | 1 | `{x: 2.2, y: -0.75, z: 0}` | Inside door waypoint. |
+| `CounterPoint` | 1 | `{x: 10.9, y: -0.83, z: 0}` | Counter stop waypoint. |
+| `Customer point` | 1 | `{x: 14.950001, y: 2.02, z: 0}` | Customer point parent. |
+| `CustomerSpawnPoint` | 1 | `{x: 0.63, y: -1.02, z: 0}` | Spawn waypoint. |
+| `CustomerExitPoint` | 1 | `{x: -0.03999996, y: -1.02, z: 0}` | Exit waypoint. |
 
-| Object | Parent | Active | Local Position | Local Scale |
-|---|---|---:|---|---|
-| `CounterPoint` | `Point Manager` | 1 | `{x: 10.9, y: -0.83, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `OutsideDoorPoint` | `Door Point` | 1 | `{x: 0.8500004, y: -0.75, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `InsideDoorPoint` | `Door Point` | 1 | `{x: 2.2, y: -0.75, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `CustomerSpawnPoint` | `Customer point` | 1 | `{x: 0.63, y: -1.02, z: 0}` | `{x: 1, y: 1, z: 1}` |
-| `CustomerExitPoint` | `Customer point` | 1 | `{x: -0.03999996, y: -1.02, z: 0}` | `{x: 1, y: 1, z: 1}` |
+## UI Snapshot
+
+| UI Object | Active | Current Notes |
+|---|---:|---|
+| `DialogRoot` | 0 | Dialog panel root, hidden by default. |
+| `SpeakerText` | 1 | TMP speaker name field. |
+| `BodyText` | 1 | TMP dialog body/typewriter text field. |
+| `NextButton` | 1 | Hidden/shown by dialog logic depending on typewriter completion. |
+| `BlinkFadeOverlay` | 0 | Fade overlay for blink-style room transition. |
+| `BasicStatusHud` | 1 | Current candle/sanity HUD root. |
+| `CandleMeter` | 1 | Candle slider/meter. |
+| `CandleLabel` | 1 | Current label text starts as `Candle: Bright`. |
+| `SanityMeter` | 1 | Sanity slider/meter. |
+| `SanityLabel` | 1 | Current sanity state label. |
+| `BubbleButton` | 1 | Button under bubble UI. |
+
+## Implemented Gameplay Systems
+
+### Customer Flow
+
+- `CustomerAgent` supports spawn, outside door, inside door, counter, and exit point movement.
+- `CustomerLayer` switches customer sorting state for outside/inside visual flow.
+- `Door` controls open/closed visuals.
+- Current post-dialog behavior can send customer through flow depending on `GameFlow`.
+
+### Dialog
+
+- `DialogData` is a ScriptableObject with:
+  - `playerDisplayName`
+  - `customerDisplayName`
+  - `customerBlipClip`
+  - `customerBlipClips`
+  - `List<DialogLine> lines`
+- `Dialog` now supports:
+  - TMP speaker names.
+  - Typewriter reveal.
+  - Next button hidden while text is typing.
+  - Text blip SFX.
+  - Customer blip variation list.
+  - Customer clip randomized once per Customer line, then reused for every blip in that line.
+  - Stop blip playback when the line completes.
+- `DialogDataTest.asset` currently contains 20 English test lines:
+  - 10 Customer lines.
+  - 10 Player lines.
+  - Customer name `Rinna`.
+
+### Candle
+
+- `Candle` has max/current light, drain, refill, low light, flickering, and drain-on-play fields.
+- `CandleFlame` and `CandleGlow` exist as helper/VFX objects in the main room.
+- Candle is part of the game loop and affects sanity pacing.
+
+### Sanity
+
+- `Sanity` has protected increase rate, candle-out increase rate, treatment stress rate, warning threshold, critical threshold, and monitoring state.
+- Sanity is designed to reset after a cured customer and increase again for a new customer.
+
+### Treatment and Room Transition
+
+- `RoomTransition` controls:
+  - Counter room root.
+  - Treatment room root.
+  - Target camera.
+  - Fade canvas group.
+  - Blink-style close/open timing.
+- `Treatment` currently has placeholder treatment UI, complete button, return button, and resume button.
+- Treatment room is intentionally separate so the player cannot directly watch the counter candle while treating.
+
+### Camera and Parallax
+
+- `Main Camera` has Pixel Perfect Camera.
+- `CameraSway` exists on the main camera.
+- `MouseParallax` and `ParallaxLayer` scripts exist for pixel-art-friendly parallax motion.
+
+### Main Menu
+
+Current Main Menu scripts exist under `Assets/Core/Script/MainMenu`:
+
+- `MainMenuController`
+- `MenuAudioSettings`
+- `MenuButtonSfx`
+
+These support play/settings/quit/credit flow, audio sliders through AudioMixer parameters, button hover/click sounds, hover scale, and random left/right tilt.
+
+## Current Dialog Data Snapshot
+
+`Assets/Core/Data/Dialog/DialogDataTest.asset`
+
+| Field | Current Value |
+|---|---|
+| `playerDisplayName` | `Player` |
+| `customerDisplayName` | `Rinna` |
+| `customerBlipClip` | Assigned |
+| `customerBlipClips` | Empty list in saved asset |
+| `lines` | 20 total lines |
+
+## Current Reports
+
+Important planning/report files in `Assets/Core/Report` include:
+
+- `SceneBaseline_CurrentLayout.md`
+- `DialogSpeakerNameTypewriterSfx_Report.md`
+- `MainMenuUIImplementation_Report.md`
 
 ## Future Work Note
 
-When adding Sanity, Candle logic, Treatment placeholder improvements, or future minigame systems, keep these objects stable and add new helper objects/components around them. For example:
+When adding Sanity tuning, Candle refill interaction, treatment minigames, customer data, or additional room art, keep the existing authored objects stable and add new helper objects/components around them.
 
-- Add `CandleFlame` or `CandleGlow` under `05_VFX` instead of replacing `Candle`.
-- Add treatment UI under `DialogCanvas` instead of moving room art.
-- Add room state controllers on `GameFlowManager` instead of rebuilding `Main RoomRoot`.
-- Add new treatment room art under `Treatment RoomRoot` without changing `Main RoomRoot` object positions.
+Recommended safe additions:
+
+- Add new candle interaction helpers under the existing candle/VFX setup.
+- Add new treatment minigame UI under treatment UI roots.
+- Add new customer case data as assets instead of hardcoding it into scene objects.
+- Add new room art under `Treatment RoomRoot` without moving or replacing `Main RoomRoot`.
+- Extend dialog and customer data without resetting `DialogDataTest.asset` unless requested.

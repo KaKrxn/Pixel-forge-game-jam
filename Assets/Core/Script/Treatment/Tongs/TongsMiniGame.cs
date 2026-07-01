@@ -37,9 +37,8 @@ public sealed class TongsMiniGame : MonoBehaviour
     [SerializeField] private Camera inputCamera;
     [SerializeField] private float worldInputPlaneZ;
     [Header("UI")]
-    [SerializeField] private Slider pullProgressSlider;
-    [SerializeField] private Slider painSlider;
-    [SerializeField] private Button completeButton;
+    [SerializeField] private MiniGameOverlay overlay;
+    [SerializeField] private string overlayToolId = "Tongs";
     [Header("Rules")]
     [SerializeField] private bool requireTongsEquipped = true;
     [SerializeField] private bool autoFindParasitesInChildren = true;
@@ -65,16 +64,8 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     private void Awake()
     {
-        if (completeButton != null)
-        {
-            completeButton.onClick.RemoveListener(CompleteMiniGame);
-            completeButton.onClick.AddListener(CompleteMiniGame);
-        }
-
         RefreshParasiteList();
         SubscribeParasites();
-        SetCompleteButtonVisible(false);
-        RefreshMeters();
 
         if (startHidden)
         {
@@ -85,11 +76,6 @@ public sealed class TongsMiniGame : MonoBehaviour
     private void OnDestroy()
     {
         UnsubscribeParasites();
-
-        if (completeButton != null)
-        {
-            completeButton.onClick.RemoveListener(CompleteMiniGame);
-        }
     }
 
     private void Update()
@@ -133,7 +119,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         SubscribeParasites();
         ResetParasites();
         SetRootVisible(true);
-        SetCompleteButtonVisible(false);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
         RefreshCompletionState();
         RefreshMeters();
         flow?.SetTreatmentStress(true);
@@ -144,6 +130,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         EndActiveHold();
         isRunning = false;
         SetRootVisible(false);
+        overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
     }
 
@@ -152,20 +139,34 @@ public sealed class TongsMiniGame : MonoBehaviour
         EndActiveHold();
         isRunning = false;
         SetRootVisible(false);
+        overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
     }
 
     public void Resume()
     {
+        SetRootVisible(true);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+
         if (isComplete)
         {
-            SetRootVisible(true);
+            SetCompleteButtonVisible(true);
             return;
         }
 
         isRunning = true;
-        SetRootVisible(true);
+        RefreshMeters();
         flow?.SetTreatmentStress(true);
+    }
+
+    private void HandleToolSelected(string toolId)
+    {
+        if (!requireTongsEquipped)
+        {
+            return;
+        }
+
+        SetTongsEquipped(toolId == overlayToolId);
     }
 
     public void EquipTongs()
@@ -667,23 +668,14 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     private void RefreshMeters()
     {
-        if (pullProgressSlider != null)
-        {
-            pullProgressSlider.value = meterParasite != null ? meterParasite.PullProgress : 0f;
-        }
-
-        if (painSlider != null)
-        {
-            painSlider.value = meterParasite != null ? meterParasite.PainLevel : 0f;
-        }
+        float progress = meterParasite != null ? meterParasite.PullProgress : 0f;
+        float pain = meterParasite != null ? meterParasite.PainLevel : 0f;
+        overlay?.SetMeters(progress, pain);
     }
 
     private void SetCompleteButtonVisible(bool visible)
     {
-        if (completeButton != null)
-        {
-            completeButton.gameObject.SetActive(visible);
-        }
+        overlay?.SetCompleteVisible(visible);
     }
 
     private void SetRootVisible(bool visible)

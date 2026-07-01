@@ -48,19 +48,23 @@ public static class TongsMiniGameSetup
         GameObject parasiteSpawnAnchor = CreateWorldObject("SpawnAnchor", parasiteObject.transform, new Vector3(0f, 0.68f, 0f));
         Parasite parasite = Undo.AddComponent<Parasite>(parasiteObject);
 
-        GameObject overlayCanvas = CreateOverlayCanvas("TongsOverlayCanvas", root.transform);
-        GameObject progressSliderObject = CreateSlider("PullProgressSlider", overlayCanvas.transform, new Vector2(0.5f, 0.14f), new Vector2(420f, 22f));
+        GameObject overlayCanvas = CreateOverlayCanvas("TreatmentMiniGameOverlay", root.transform);
+        MiniGameOverlay overlay = Undo.AddComponent<MiniGameOverlay>(overlayCanvas);
+        GameObject overlayContent = CreateOverlayContent("OverlayContent", overlayCanvas.transform);
+
+        GameObject progressSliderObject = CreateSlider("ProgressSlider", overlayContent.transform, new Vector2(0.5f, 0.14f), new Vector2(420f, 22f));
         Slider progressSlider = progressSliderObject.GetComponent<Slider>();
 
-        GameObject painSliderObject = CreateSlider("PainSlider", overlayCanvas.transform, new Vector2(0.5f, 0.09f), new Vector2(420f, 22f));
+        GameObject painSliderObject = CreateSlider("PainSlider", overlayContent.transform, new Vector2(0.5f, 0.09f), new Vector2(420f, 22f));
         Slider painSlider = painSliderObject.GetComponent<Slider>();
 
-        GameObject completeButtonObject = CreateButton("CompleteTreatmentButton_Tongs", overlayCanvas.transform, "Complete", new Vector2(0.82f, 0.09f), new Vector2(150f, 52f));
+        GameObject completeButtonObject = CreateButton("CompleteButton", overlayContent.transform, "Complete", new Vector2(0.82f, 0.09f), new Vector2(150f, 52f));
         Button completeButton = completeButtonObject.GetComponent<Button>();
 
-        GameObject toolButtonObject = CreateTongsToolButton(overlayCanvas.transform, miniGame);
+        GameObject toolButtonObject = CreateOverlayToolButton(overlayContent.transform, "Tongs", new Vector2(0.16f, 0.09f), new Vector2(150f, 52f), out GameObject toolSelectedIndicator);
 
-        AssignMiniGame(miniGame, root, parasiteRoot.transform, progressSlider, painSlider, completeButton, parasiteTypes);
+        AssignOverlay(overlay, overlayContent, progressSlider, painSlider, completeButton, "Tongs", toolButtonObject.GetComponent<Toggle>(), toolButtonObject.GetComponent<Button>(), toolSelectedIndicator);
+        AssignMiniGame(miniGame, root, parasiteRoot.transform, overlay, parasiteTypes);
         AssignParasite(parasite, smallType, parasiteRenderer, parasiteSpawnAnchor.transform);
         TryAssignTreatment(parent, miniGame);
 
@@ -198,6 +202,27 @@ public static class TongsMiniGameSetup
         Debug.Log("Assigned Small, Long, and Big parasite spawn options to the selected Tongs mini game.");
     }
 
+    [MenuItem("Tools/Pixel Forge/Treatment/Convert MiniGame Tool Buttons To Toggles")]
+    public static void ConvertMiniGameToolButtonsToToggles()
+    {
+        MiniGameOverlay overlay = FindSelectedOrSceneOverlay();
+        if (overlay == null)
+        {
+            Debug.LogWarning("No MiniGameOverlay was selected or found in the open scene.");
+            return;
+        }
+
+        SerializedObject overlayObject = new SerializedObject(overlay);
+        SerializedProperty toolButtons = overlayObject.FindProperty("toolButtons");
+        AssignOverlayToolToggle(toolButtons, overlay.transform, "Tongs", "TongsToolButton");
+        AssignOverlayToolToggle(toolButtons, overlay.transform, "Knife", "KnifeToolButton");
+        overlayObject.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorUtility.SetDirty(overlay);
+        Selection.activeGameObject = overlay.gameObject;
+        Debug.Log("Converted MiniGame overlay tool controls to toggles.");
+    }
+
     private static TongsMiniGame FindSelectedMiniGame()
     {
         for (int i = 0; i < Selection.gameObjects.Length; i++)
@@ -218,6 +243,102 @@ public static class TongsMiniGameSetup
             if (miniGame != null)
             {
                 return miniGame;
+            }
+        }
+
+        return null;
+    }
+
+    private static MiniGameOverlay FindSelectedOrSceneOverlay()
+    {
+        for (int i = 0; i < Selection.gameObjects.Length; i++)
+        {
+            GameObject selected = Selection.gameObjects[i];
+            if (selected == null)
+            {
+                continue;
+            }
+
+            MiniGameOverlay inParent = selected.GetComponentInParent<MiniGameOverlay>(true);
+            if (inParent != null)
+            {
+                return inParent;
+            }
+
+            MiniGameOverlay inChildren = selected.GetComponentInChildren<MiniGameOverlay>(true);
+            if (inChildren != null)
+            {
+                return inChildren;
+            }
+        }
+
+        return Object.FindFirstObjectByType<MiniGameOverlay>(FindObjectsInactive.Include);
+    }
+
+    private static void AssignOverlayToolToggle(SerializedProperty toolButtons, Transform overlayRoot, string id, string objectName)
+    {
+        Transform control = FindChildRecursive(overlayRoot, objectName);
+        if (control == null)
+        {
+            return;
+        }
+
+        Toggle toggle = EnsureToggle(control.gameObject);
+        Button button = control.GetComponent<Button>();
+        GameObject indicator = FindSelectedIndicator(control);
+        Image indicatorImage = indicator != null ? indicator.GetComponent<Image>() : null;
+        if (indicatorImage != null)
+        {
+            toggle.graphic = indicatorImage;
+        }
+
+        SerializedProperty entry = FindOrCreateToolEntry(toolButtons, id);
+        entry.FindPropertyRelative("id").stringValue = id;
+        entry.FindPropertyRelative("toggle").objectReferenceValue = toggle;
+        entry.FindPropertyRelative("button").objectReferenceValue = button;
+        entry.FindPropertyRelative("selectedIndicator").objectReferenceValue = indicator;
+    }
+
+    private static SerializedProperty FindOrCreateToolEntry(SerializedProperty toolButtons, string id)
+    {
+        for (int i = 0; i < toolButtons.arraySize; i++)
+        {
+            SerializedProperty entry = toolButtons.GetArrayElementAtIndex(i);
+            if (entry.FindPropertyRelative("id").stringValue == id)
+            {
+                return entry;
+            }
+        }
+
+        int index = toolButtons.arraySize;
+        toolButtons.InsertArrayElementAtIndex(index);
+        return toolButtons.GetArrayElementAtIndex(index);
+    }
+
+    private static GameObject FindSelectedIndicator(Transform control)
+    {
+        Transform indicator = FindChildRecursive(control, "SelectedIndicator");
+        return indicator != null ? indicator.gameObject : null;
+    }
+
+    private static Transform FindChildRecursive(Transform root, string childName)
+    {
+        if (root == null)
+        {
+            return null;
+        }
+
+        if (root.name == childName)
+        {
+            return root;
+        }
+
+        for (int i = 0; i < root.childCount; i++)
+        {
+            Transform result = FindChildRecursive(root.GetChild(i), childName);
+            if (result != null)
+            {
+                return result;
             }
         }
 
@@ -431,10 +552,12 @@ public static class TongsMiniGameSetup
     {
         GameObject toolButtonObject = CreateButton("TongsToolButton", parent, "Tongs", new Vector2(0.16f, 0.09f), new Vector2(150f, 52f));
         Button toolButton = toolButtonObject.GetComponent<Button>();
+        Toggle toolToggle = EnsureToggle(toolButtonObject);
 
         GameObject selectedIndicator = CreateUiObject("SelectedIndicator", toolButtonObject.transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(18f, 18f));
         Image selectedImage = Undo.AddComponent<Image>(selectedIndicator);
         selectedImage.color = new Color(1f, 0.78f, 0.2f, 1f);
+        toolToggle.graphic = selectedImage;
 
         TongsTool tool = Undo.AddComponent<TongsTool>(toolButtonObject);
         AssignTool(tool, miniGame, toolButton, selectedIndicator);
@@ -461,6 +584,8 @@ public static class TongsMiniGameSetup
             button = Undo.AddComponent<Button>(toolButtonObject);
         }
 
+        Toggle toggle = EnsureToggle(toolButtonObject);
+
         Transform selectedIndicatorTransform = toolButtonObject.transform.Find("SelectedIndicator");
         GameObject selectedIndicator = selectedIndicatorTransform != null ? selectedIndicatorTransform.gameObject : null;
         if (selectedIndicator == null)
@@ -468,6 +593,12 @@ public static class TongsMiniGameSetup
             selectedIndicator = CreateUiObject("SelectedIndicator", toolButtonObject.transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(18f, 18f));
             Image selectedImage = Undo.AddComponent<Image>(selectedIndicator);
             selectedImage.color = new Color(1f, 0.78f, 0.2f, 1f);
+        }
+
+        Image indicatorImage = selectedIndicator.GetComponent<Image>();
+        if (indicatorImage != null)
+        {
+            toggle.graphic = indicatorImage;
         }
 
         TongsTool tool = toolButtonObject.GetComponent<TongsTool>();
@@ -514,7 +645,7 @@ public static class TongsMiniGameSetup
         }
     }
 
-    private static void AssignMiniGame(TongsMiniGame miniGame, GameObject root, Transform parasiteRoot, Slider progressSlider, Slider painSlider, Button completeButton, ParasiteType[] parasiteTypes)
+    private static void AssignMiniGame(TongsMiniGame miniGame, GameObject root, Transform parasiteRoot, MiniGameOverlay overlay, ParasiteType[] parasiteTypes)
     {
         SerializedObject serializedObject = new SerializedObject(miniGame);
         serializedObject.FindProperty("root").objectReferenceValue = root;
@@ -522,15 +653,80 @@ public static class TongsMiniGameSetup
         serializedObject.FindProperty("inputCamera").objectReferenceValue = Camera.main;
         serializedObject.FindProperty("worldInputPlaneZ").floatValue = 0f;
         serializedObject.FindProperty("alignParasiteAnchorToSpawnPoint").boolValue = true;
-        serializedObject.FindProperty("pullProgressSlider").objectReferenceValue = progressSlider;
-        serializedObject.FindProperty("painSlider").objectReferenceValue = painSlider;
-        serializedObject.FindProperty("completeButton").objectReferenceValue = completeButton;
+        serializedObject.FindProperty("overlay").objectReferenceValue = overlay;
+        serializedObject.FindProperty("overlayToolId").stringValue = "Tongs";
         serializedObject.FindProperty("autoFindParasitesInChildren").boolValue = true;
         serializedObject.FindProperty("startHidden").boolValue = true;
         serializedObject.FindProperty("requireTongsEquipped").boolValue = true;
         serializedObject.FindProperty("completeTreatmentOnButton").boolValue = false;
         AssignParasiteSpawnOptionList(serializedObject, GetDefaultSpawnOptions());
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static GameObject CreateOverlayContent(string name, Transform parent)
+    {
+        GameObject content = new GameObject(name, typeof(RectTransform));
+        Undo.RegisterCreatedObjectUndo(content, $"Create {name}");
+        content.transform.SetParent(parent, false);
+
+        RectTransform rectTransform = content.GetComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localScale = Vector3.one;
+        return content;
+    }
+
+    private static void AssignOverlay(MiniGameOverlay overlay, GameObject content, Slider progressSlider, Slider painSlider, Button completeButton, string toolId, Toggle toolToggle, Button toolButton, GameObject selectedIndicator)
+    {
+        SerializedObject serializedObject = new SerializedObject(overlay);
+        serializedObject.FindProperty("content").objectReferenceValue = content;
+        serializedObject.FindProperty("progressSlider").objectReferenceValue = progressSlider;
+        serializedObject.FindProperty("painSlider").objectReferenceValue = painSlider;
+        serializedObject.FindProperty("completeButton").objectReferenceValue = completeButton;
+
+        SerializedProperty toolButtons = serializedObject.FindProperty("toolButtons");
+        toolButtons.ClearArray();
+        toolButtons.InsertArrayElementAtIndex(0);
+        SerializedProperty tool = toolButtons.GetArrayElementAtIndex(0);
+        tool.FindPropertyRelative("id").stringValue = toolId;
+        tool.FindPropertyRelative("toggle").objectReferenceValue = toolToggle;
+        tool.FindPropertyRelative("button").objectReferenceValue = toolButton;
+        tool.FindPropertyRelative("selectedIndicator").objectReferenceValue = selectedIndicator;
+
+        serializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static GameObject CreateOverlayToolButton(Transform parent, string id, Vector2 anchor, Vector2 size, out GameObject selectedIndicator)
+    {
+        GameObject buttonObject = CreateButton($"{id}ToolButton", parent, id, anchor, size);
+        Toggle toggle = EnsureToggle(buttonObject);
+
+        selectedIndicator = CreateUiObject("SelectedIndicator", buttonObject.transform, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(18f, 18f));
+        Image indicatorImage = Undo.AddComponent<Image>(selectedIndicator);
+        indicatorImage.color = new Color(1f, 0.78f, 0.2f, 1f);
+        toggle.graphic = indicatorImage;
+        selectedIndicator.SetActive(false);
+        return buttonObject;
+    }
+
+    private static Toggle EnsureToggle(GameObject controlObject)
+    {
+        Toggle toggle = controlObject.GetComponent<Toggle>();
+        if (toggle == null)
+        {
+            toggle = Undo.AddComponent<Toggle>(controlObject);
+        }
+
+        Image image = controlObject.GetComponent<Image>();
+        if (image != null)
+        {
+            toggle.targetGraphic = image;
+        }
+
+        toggle.isOn = false;
+        return toggle;
     }
 
     private static void AssignParasiteSpawnOptionList(SerializedObject serializedObject, ParasiteSpawnOptionData[] spawnOptions)

@@ -33,6 +33,7 @@ public sealed class Dialog : MonoBehaviour
     private float lastBlipTime;
     private AudioClip lastCustomerBlipClip;
     private AudioClip currentLineBlipClip;
+    private DialogData activeDialogData;
 
     private void Awake()
     {
@@ -49,9 +50,10 @@ public sealed class Dialog : MonoBehaviour
         lineIndex = 0;
         lastCustomerBlipClip = null;
         currentLineBlipClip = null;
+        activeDialogData = ResolveDialogData(customer);
         StopTypewriter(resetTextVisibility: true);
 
-        if (dialogData == null || dialogData.Count == 0)
+        if (activeDialogData == null || activeDialogData.Count == 0)
         {
             Complete();
             return;
@@ -76,7 +78,7 @@ public sealed class Dialog : MonoBehaviour
 
         lineIndex++;
 
-        if (dialogData == null || lineIndex >= dialogData.Count)
+        if (activeDialogData == null || lineIndex >= activeDialogData.Count)
         {
             Complete();
             return;
@@ -87,7 +89,7 @@ public sealed class Dialog : MonoBehaviour
 
     private void ShowCurrentLine()
     {
-        if (dialogData == null || !dialogData.TryGetLine(lineIndex, out DialogLine line))
+        if (activeDialogData == null || !activeDialogData.TryGetLine(lineIndex, out DialogLine line))
         {
             Complete();
             return;
@@ -95,7 +97,7 @@ public sealed class Dialog : MonoBehaviour
 
         if (speakerText != null)
         {
-            speakerText.text = dialogData.GetDisplayName(line.Speaker);
+            speakerText.text = activeDialogData.GetDisplayName(line.Speaker);
         }
 
         currentSpeaker = line.Speaker;
@@ -107,6 +109,7 @@ public sealed class Dialog : MonoBehaviour
     {
         StopTypewriter(resetTextVisibility: true);
         Hide();
+        activeDialogData = null;
 
         if (flow != null)
         {
@@ -272,14 +275,25 @@ public sealed class Dialog : MonoBehaviour
 
     private void SelectLineBlipClip()
     {
-        currentLineBlipClip = dialogData != null
-            ? dialogData.GetBlipClip(currentSpeaker, playerBlipClip, customerBlipClip, lastCustomerBlipClip)
+        currentLineBlipClip = activeDialogData != null
+            ? activeDialogData.GetBlipClip(currentSpeaker, playerBlipClip, customerBlipClip, lastCustomerBlipClip)
             : (currentSpeaker == DialogSpeaker.Player ? playerBlipClip : customerBlipClip);
 
         if (currentSpeaker == DialogSpeaker.Customer && currentLineBlipClip != null)
         {
             lastCustomerBlipClip = currentLineBlipClip;
         }
+    }
+
+    private DialogData ResolveDialogData(CustomerAgent customer)
+    {
+        CustomerCaseProvider caseProvider = customer != null ? customer.GetComponent<CustomerCaseProvider>() : null;
+        if (caseProvider != null && caseProvider.CaseData != null && caseProvider.CaseData.DialogData != null)
+        {
+            return caseProvider.CaseData.DialogData;
+        }
+
+        return dialogData;
     }
 
     private void FinishTypewriter()

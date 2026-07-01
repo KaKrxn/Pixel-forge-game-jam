@@ -12,6 +12,13 @@ public sealed class TongsTool : MonoBehaviour
 
     private void Awake()
     {
+        if (GetComponentInParent<MiniGameOverlay>() != null)
+        {
+            SetSelected(false);
+            enabled = false;
+            return;
+        }
+
         if (button == null)
         {
             button = GetComponent<Button>();
