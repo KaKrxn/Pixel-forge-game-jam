@@ -103,16 +103,17 @@ Implemented or partially implemented:
 | `ParasiteReveal` | Implemented baseline | Supports visible head, masked body, runtime reveal mask, and pull-driven reveal behavior. |
 | `KnifeMiniGame` | Implemented baseline | Has its own root/spawn setup and is ready to receive body-specific lesion anchors later. |
 | `NeedleMiniGame` | Implemented baseline | Has its own root/spawn setup and is ready to receive body-specific pustule anchors later. |
+| `TreatmentBodyPrefab` | Implemented core component | Exposes body prefab metadata, roots, and mini-game-specific anchor lists. |
+| `TreatmentBodyPrefabCatalog` | Implemented core ScriptableObject | Maps `TreatmentMiniGameType + BodyArea` to a `TreatmentBodyPrefab`. |
+| `TreatmentBodyPrefabSpawner` | Implemented core component | Spawns/clears the active body prefab and falls back safely when catalog data is missing. |
 
 Not implemented yet:
 
 | System | Needed for this report |
 |---|---|
-| `TreatmentBodyPrefab` root component | Exposes body prefab metadata, body area, mini game type, roots, and authored anchors. |
-| `TreatmentBodyPrefabCatalog` ScriptableObject | Maps `TreatmentMiniGameType + BodyArea` to a prefab. |
-| `TreatmentBodyPrefabSpawner` | Instantiates the correct body prefab when a treatment area starts. |
 | Anatomy-to-body-prefab hook | Lets `AnatomyController` spawn and pass the body prefab before mini game begin. |
 | Mini game body binding methods | Lets Tongs, Knife, and Needle consume roots/anchors from the spawned body prefab. |
+| Real body prefab assets | Needed after the runtime hook exists; first recommended asset is `Tongs_Arm_BodyPrefab`. |
 
 The current Tongs scene setup should be treated as the live prototype for what a future `Tongs_Arm_BodyPrefab` needs to contain.
 
@@ -604,17 +605,46 @@ Validation:
 - `dotnet build "Pixel-forge-game-jam.slnx"` passes.
 - A catalog asset can be created in Unity.
 
+Status:
+
+```text
+Implemented on July 3, 2026.
+```
+
+Implemented scripts:
+
+```text
+Assets/Core/Script/Treatment/BodyPrefab/TreatmentBodyPrefab.cs
+Assets/Core/Script/Treatment/BodyPrefab/TreatmentBodyPrefabEntry.cs
+Assets/Core/Script/Treatment/BodyPrefab/TreatmentBodyPrefabCatalog.cs
+Assets/Core/Script/Treatment/BodyPrefab/TreatmentBodyPrefabSpawner.cs
+```
+
+Created folders:
+
+```text
+Assets/Core/Script/Treatment/BodyPrefab
+Assets/Core/Data/Treatment/BodyPrefabs
+Assets/Core/Prefab/TreatmentBodies
+```
+
+Build status:
+
+```text
+dotnet build "Pixel-forge-game-jam.slnx" passes.
+```
+
+The phase stayed low risk because it added new scripts and folders without changing current mini game flow.
+
+### Phase 3 - AnatomyController Hook
+
+Goal: Spawn the body prefab when the player enters an infected area.
+
 Recommended next implementation step:
 
 ```text
 Start here next.
 ```
-
-This phase is low risk because it adds new scripts and data assets without changing current mini game flow.
-
-### Phase 3 - AnatomyController Hook
-
-Goal: Spawn the body prefab when the player enters an infected area.
 
 Tasks:
 
@@ -856,6 +886,12 @@ The first code checkpoint should stop after Phase 2 if needed:
 ```text
 Catalog + body prefab component + spawner compile successfully.
 No current scene behavior changes yet.
+```
+
+Status:
+
+```text
+Completed on July 3, 2026.
 ```
 
 The first playable checkpoint should stop after Phase 4:
