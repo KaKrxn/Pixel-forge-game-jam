@@ -3,8 +3,8 @@
 **Project:** Cure Me, Please  
 **Module:** Treatment System - Mini Game Body Prefab Routing  
 **Engine:** Unity 6000.3.17f1, 2D, World-space Treatment Mini Games  
-**Document status:** Design specification for a new system  
-**Last updated:** July 2, 2026
+**Document status:** Active design specification and next implementation target  
+**Last updated:** July 3, 2026
 
 ---
 
@@ -87,6 +87,35 @@ TreatmentMiniGameType miniGameType;
 
 That means this system does **not** need a new case-routing concept. It only needs to resolve the visual/gameplay body prefab from the existing treatment requirement.
 
+### 3.1 Current Implementation Snapshot
+
+As of July 3, 2026, the project already has several systems that this catalog should reuse rather than replace.
+
+Implemented or partially implemented:
+
+| System | Current status | Notes |
+|---|---|---|
+| `TreatmentCaseData` / `TreatmentAreaRequirement` | Implemented | Stores `BodyArea + TreatmentMiniGameType` per required treatment area. |
+| `TreatmentCaseRuntime` | Implemented | Tracks required areas and treated areas during the active customer case. |
+| `AnatomyController` | Implemented | Resolves the selected body area into the required mini game and returns to Anatomy after mini game completion. |
+| `TongsMiniGame` | Implemented baseline | Supports parasite prefab/type options, runtime spawn anchors, non-repeating spawn points, tool selection, and completion state. |
+| `ParasiteSpawnAnchor` | Implemented baseline | Provides optional wound mask, spawn point, pull direction, and required direction data. |
+| `ParasiteReveal` | Implemented baseline | Supports visible head, masked body, runtime reveal mask, and pull-driven reveal behavior. |
+| `KnifeMiniGame` | Implemented baseline | Has its own root/spawn setup and is ready to receive body-specific lesion anchors later. |
+| `NeedleMiniGame` | Implemented baseline | Has its own root/spawn setup and is ready to receive body-specific pustule anchors later. |
+
+Not implemented yet:
+
+| System | Needed for this report |
+|---|---|
+| `TreatmentBodyPrefab` root component | Exposes body prefab metadata, body area, mini game type, roots, and authored anchors. |
+| `TreatmentBodyPrefabCatalog` ScriptableObject | Maps `TreatmentMiniGameType + BodyArea` to a prefab. |
+| `TreatmentBodyPrefabSpawner` | Instantiates the correct body prefab when a treatment area starts. |
+| Anatomy-to-body-prefab hook | Lets `AnatomyController` spawn and pass the body prefab before mini game begin. |
+| Mini game body binding methods | Lets Tongs, Knife, and Needle consume roots/anchors from the spawned body prefab. |
+
+The current Tongs scene setup should be treated as the live prototype for what a future `Tongs_Arm_BodyPrefab` needs to contain.
+
 ---
 
 ## 4. Core Design
@@ -118,6 +147,20 @@ BodyPrefabSpawner instantiates that body prefab under the active mini game root.
 Mini game reads its roots / anchors from the spawned body prefab.
 Mini game begins.
 ```
+
+### 4.3 Current Fallback Requirement
+
+The first implementation must keep all existing scene-authored mini game roots working.
+
+If no body prefab catalog is assigned, or if a catalog entry is missing, the mini game should continue using its current serialized scene references:
+
+```text
+TongsMiniGame.parasiteRoot + spawnAnchors
+KnifeMiniGame existing lesion roots/anchors
+NeedleMiniGame existing pustule roots/anchors
+```
+
+This is important because the current test scene already has working manually authored objects, and the project should migrate gradually.
 
 ---
 
@@ -211,6 +254,42 @@ public sealed class TreatmentBodyPrefab : MonoBehaviour
 ```
 
 The first implementation can keep the references simple. It does not need to be fully generic on day one.
+
+### 6.1 Minimum First Version
+
+The first version should expose only what is needed by the current mini games.
+
+Minimum required fields:
+
+```text
+TreatmentMiniGameType MiniGameType
+BodyArea Area
+Transform GameplayRoot
+Transform BodySpriteRoot
+```
+
+Tongs-specific fields:
+
+```text
+Transform ParasiteRoot
+List<Transform> ParasiteSpawnAnchors
+```
+
+Knife-specific fields:
+
+```text
+Transform LesionRoot
+List<Transform> LesionSpawnAnchors
+```
+
+Needle-specific fields:
+
+```text
+Transform PustuleRoot
+List<Transform> PustuleSpawnAnchors
+```
+
+The lists can use `Transform` first because the current mini games already accept transform anchors. Specific anchor components can be added later where needed.
 
 ---
 
@@ -378,6 +457,7 @@ Longer term, mini games could share an interface, but that is optional.
 - `parasiteRoot`
 - parasite spawn anchors
 - optional `ParasiteSpawnAnchor` data
+- optional wound mask / reveal anchor data through child `ParasiteSpawnAnchor` components
 
 Current `TongsMiniGame` already has:
 
@@ -398,6 +478,14 @@ public void SetBodyPrefab(TreatmentBodyPrefab body)
 }
 ```
 
+Current Tongs-specific behavior to preserve:
+
+- Runtime parasite prefab selection through parasite spawn options.
+- Non-repeating spawn anchors per run.
+- `ParasiteSpawnAnchor` optional component lookup.
+- `ParasiteReveal` mask binding.
+- Existing fallback anchors if no body prefab is provided.
+
 ### 10.2 KnifeMiniGame
 
 `KnifeMiniGame` should receive:
@@ -414,6 +502,12 @@ List<Transform> spawnAnchors;
 
 The new body prefab can populate these at runtime.
 
+Current Knife behavior to preserve:
+
+- Knife-only tool gating.
+- Lesion/bulge interaction flow.
+- Existing scene-authored roots if no body prefab is available.
+
 ### 10.3 NeedleMiniGame
 
 `NeedleMiniGame` should receive:
@@ -429,6 +523,12 @@ List<Transform> spawnAnchors;
 ```
 
 The new body prefab can populate these at runtime.
+
+Current Needle behavior to preserve:
+
+- Needle-only tool gating.
+- Pustule pierce/squeeze/drain flow.
+- Existing scene-authored roots if no body prefab is available.
 
 ---
 
@@ -475,6 +575,12 @@ Validation:
 - The team can name every needed prefab using `MiniGameType_BodyArea_BodyPrefab`.
 - The catalog can represent all current combinations.
 
+Status:
+
+```text
+In progress / this report updated on July 3, 2026.
+```
+
 ### Phase 2 - Core Runtime Components
 
 Goal: Add the runtime system without changing mini game behavior yet.
@@ -498,6 +604,14 @@ Validation:
 - `dotnet build "Pixel-forge-game-jam.slnx"` passes.
 - A catalog asset can be created in Unity.
 
+Recommended next implementation step:
+
+```text
+Start here next.
+```
+
+This phase is low risk because it adds new scripts and data assets without changing current mini game flow.
+
 ### Phase 3 - AnatomyController Hook
 
 Goal: Spawn the body prefab when the player enters an infected area.
@@ -515,6 +629,16 @@ Validation:
 - Existing scenes still work if no catalog is assigned.
 - Missing body prefab logs a warning and does not hard crash.
 
+Implementation note:
+
+`AnatomyController.EnterInfectedArea(area)` currently resolves:
+
+```text
+TreatmentMiniGameType miniGameType = GetMiniGameTypeForArea(area);
+```
+
+The body prefab spawn should happen immediately after that lookup and before `StartMiniGame(miniGameType)`.
+
 ### Phase 4 - Mini Game Body Binding
 
 Goal: Let each mini game consume body-specific roots and anchors.
@@ -531,6 +655,16 @@ Validation:
 - Tongs can use anchors from `Tongs_Arm_BodyPrefab`.
 - Knife can use anchors from `Knife_Leg_BodyPrefab`.
 - Needle can use anchors from `Needle_Arm_BodyPrefab`.
+
+Implementation note:
+
+Each mini game binding method should be optional and fallback-safe:
+
+```text
+If body == null -> keep current serialized scene references.
+If body lacks needed anchors -> log warning and keep current serialized scene references.
+If body has valid roots/anchors -> replace runtime references for this mini game run.
+```
 
 ### Phase 5 - Prefab Authoring
 
@@ -555,6 +689,16 @@ Validation:
 
 - Selecting Arm with Tongs spawns the Tongs arm body prefab.
 - Parasites spawn from that prefab's anchors.
+
+Current prototype source:
+
+The existing scene-authored Tongs arm setup can be used as the reference for the first prefab:
+
+```text
+Treatment RoomRoot / 03_Gameplay / TongsMiniGameRoot
+```
+
+The prefab should preserve the authored body sprite placement, parasite root, spawn points, wound markers, and reveal mask behavior.
 
 ### Phase 6 - Expand To Other Mini Games
 
@@ -644,6 +788,14 @@ Recommended fallback behavior:
 
 This prevents the new system from breaking current test scenes while it is being built.
 
+Additional migration rule:
+
+```text
+Do not move or replace the current scene-authored treatment room layout while introducing this system.
+```
+
+Create body prefabs as new assets first, then connect them through the catalog.
+
 ---
 
 ## 15. Risks
@@ -696,6 +848,23 @@ The first implementation is complete when:
 - Missing catalog/prefab data does not break existing scene tests.
 - The system works with existing `TreatmentCaseData` requirements.
 - `dotnet build "Pixel-forge-game-jam.slnx"` passes.
+
+Development checkpoint:
+
+The first code checkpoint should stop after Phase 2 if needed:
+
+```text
+Catalog + body prefab component + spawner compile successfully.
+No current scene behavior changes yet.
+```
+
+The first playable checkpoint should stop after Phase 4:
+
+```text
+Anatomy can spawn a body prefab.
+Tongs can consume spawned body anchors.
+Existing scene fallback still works.
+```
 
 ---
 
