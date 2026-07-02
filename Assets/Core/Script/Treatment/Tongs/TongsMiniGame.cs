@@ -33,6 +33,9 @@ public sealed class TongsMiniGame : MonoBehaviour
     [SerializeField] private bool spawnParasitesOnBegin;
     [SerializeField, Min(1)] private int minParasites = 3;
     [SerializeField, Min(1)] private int maxParasites = 7;
+    [SerializeField] private int parasiteSortingOrderStart = 27;
+    [SerializeField, Min(2)] private int parasiteSortingOrderStep = 4;
+    [SerializeField] private bool debugSpawn = true;
     [Header("Input")]
     [SerializeField] private Camera inputCamera;
     [SerializeField] private float worldInputPlaneZ;
@@ -351,7 +354,21 @@ public sealed class TongsMiniGame : MonoBehaviour
     private static bool ContainsPointer(Parasite parasite, Vector2 worldPointer)
     {
         Collider2D collider = parasite.GetComponent<Collider2D>();
-        return collider != null && collider.OverlapPoint(worldPointer);
+        if (collider != null && collider.OverlapPoint(worldPointer))
+        {
+            return true;
+        }
+
+        Collider2D[] childColliders = parasite.GetComponentsInChildren<Collider2D>(false);
+        for (int i = 0; i < childColliders.Length; i++)
+        {
+            if (childColliders[i] != null && childColliders[i].OverlapPoint(worldPointer))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void RefreshParasiteList()
@@ -368,7 +385,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     private void PrepareParasites()
     {
-        if (spawnParasitesOnBegin && HasSpawnSource())
+        if (ShouldSpawnParasitesOnBegin())
         {
             SpawnParasites();
             return;
@@ -393,25 +410,36 @@ public sealed class TongsMiniGame : MonoBehaviour
             count = Mathf.Min(count, shuffledAnchors.Count);
         }
 
+        LogSpawn($"Begin spawn. validOptions={validSpawnOptions.Count}, rawAnchors={CountConfiguredSpawnAnchors()}, effectiveAnchors={shuffledAnchors.Count}, min={minParasites}, max={maxParasites}, finalCount={count}, alignAnchor={alignParasiteAnchorToSpawnPoint}.");
+        LogSpawnAnchors(shuffledAnchors);
+
         Transform parent = parasiteRoot != null ? parasiteRoot : transform;
 
         for (int i = 0; i < count; i++)
         {
             if (!TryGetSpawnData(validSpawnOptions, spawnOptionBag, out ParasiteType type, out Parasite prefab))
             {
+                LogSpawnWarning($"Spawn stopped at index {i}. No valid parasite type/prefab pair was available.");
                 break;
             }
 
             Parasite parasite = Instantiate(prefab, parent);
             parasite.name = $"{type.ParasiteVariant}_Parasite_{i + 1:00}";
+            Transform selectedAnchor = i < shuffledAnchors.Count ? shuffledAnchors[i] : null;
+            ParasiteSpawnAnchor spawnAnchor = GetSpawnAnchorData(selectedAnchor);
+            int direction = spawnAnchor != null ? spawnAnchor.RequiredDirection : UnityEngine.Random.value < 0.5f ? -1 : 1;
+            parasite.Configure(type, direction);
 
-            if (i < shuffledAnchors.Count)
+            if (selectedAnchor != null)
             {
-                ApplySpawnAnchor(parasite, shuffledAnchors[i]);
+                LogSpawn($"Spawn #{i + 1}: prefab='{prefab.name}', type='{type.name}', selectedAnchor='{GetTransformPath(selectedAnchor)}', selectedAnchorPosition={FormatVector(selectedAnchor.position)}, spawnAnchorComponent={(spawnAnchor != null ? spawnAnchor.name : "none")}, resolvedSpawnPosition={(spawnAnchor != null ? FormatVector(spawnAnchor.SpawnPosition) : FormatVector(selectedAnchor.position))}, requiredDirection={direction}.", selectedAnchor);
+                ApplySpawnAnchor(parasite, selectedAnchor, i);
+            }
+            else
+            {
+                LogSpawnWarning($"Spawn #{i + 1}: no selected anchor. Parasite remains at instantiated local/default position {FormatVector(parasite.transform.position)}.", parasite);
             }
 
-            int direction = UnityEngine.Random.value < 0.5f ? -1 : 1;
-            parasite.Configure(type, direction);
             parasites.Add(parasite);
             spawnedParasites.Add(parasite);
         }
@@ -420,6 +448,34 @@ public sealed class TongsMiniGame : MonoBehaviour
     private bool HasSpawnSource()
     {
         return HasValidSpawnOptions();
+    }
+
+    private bool ShouldSpawnParasitesOnBegin()
+    {
+        if (!HasSpawnSource())
+        {
+            return false;
+        }
+
+        return spawnParasitesOnBegin || HasConfiguredSpawnAnchors();
+    }
+
+    private bool HasConfiguredSpawnAnchors()
+    {
+        if (spawnAnchors == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < spawnAnchors.Count; i++)
+        {
+            if (spawnAnchors[i] != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool HasValidSpawnOptions()
@@ -497,6 +553,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         List<Transform> validAnchors = new List<Transform>();
         if (spawnAnchors == null || spawnAnchors.Count == 0)
         {
+            LogSpawnWarning("No spawn anchors are assigned in TongsMiniGame.Spawn Anchors.");
             return validAnchors;
         }
 
@@ -504,7 +561,11 @@ public sealed class TongsMiniGame : MonoBehaviour
         {
             if (spawnAnchors[i] != null)
             {
-                validAnchors.Add(spawnAnchors[i]);
+                AddSpawnAnchorOrChildren(spawnAnchors[i], validAnchors);
+            }
+            else
+            {
+                LogSpawnWarning($"Spawn Anchors element {i} is null.");
             }
         }
 
@@ -519,15 +580,171 @@ public sealed class TongsMiniGame : MonoBehaviour
         return validAnchors;
     }
 
-    private void ApplySpawnAnchor(Parasite parasite, Transform anchor)
+    private static void AddSpawnAnchorOrChildren(Transform anchor, List<Transform> validAnchors)
     {
-        if (alignParasiteAnchorToSpawnPoint)
+        if (anchor == null)
         {
-            parasite.AlignSpawnAnchorToWorld(anchor.position);
             return;
         }
 
-        parasite.transform.position = anchor.position;
+        if (GetSpawnAnchorData(anchor) != null || anchor.childCount == 0 || !IsSpawnAnchorGroup(anchor))
+        {
+            AddUniqueSpawnAnchor(anchor, validAnchors);
+            return;
+        }
+
+        for (int i = 0; i < anchor.childCount; i++)
+        {
+            Transform child = anchor.GetChild(i);
+            if (child != null)
+            {
+                AddUniqueSpawnAnchor(child, validAnchors);
+            }
+        }
+    }
+
+    private static void AddUniqueSpawnAnchor(Transform anchor, List<Transform> validAnchors)
+    {
+        if (anchor != null && !validAnchors.Contains(anchor))
+        {
+            validAnchors.Add(anchor);
+        }
+    }
+
+    private static bool IsSpawnAnchorGroup(Transform anchor)
+    {
+        string anchorName = anchor.name.ToLowerInvariant();
+        return anchorName.Contains("spawn points")
+            || anchorName.Contains("spawn anchors")
+            || anchorName.Contains("spawnanchors");
+    }
+
+    private void ApplySpawnAnchor(Parasite parasite, Transform anchor, int spawnIndex)
+    {
+        ParasiteSpawnAnchor spawnAnchor = GetSpawnAnchorData(anchor);
+        parasite.BindSpawnAnchor(spawnAnchor, anchor, GetFallbackMaskSprite(anchor), parasiteSortingOrderStart + spawnIndex * parasiteSortingOrderStep);
+        Vector3 spawnPosition = spawnAnchor != null ? spawnAnchor.SpawnPosition : anchor.position;
+        Vector3 beforeRootPosition = parasite.transform.position;
+        Vector3 beforePrefabAnchorPosition = parasite.SpawnAnchorWorldPosition;
+
+        if (alignParasiteAnchorToSpawnPoint)
+        {
+            parasite.AlignSpawnAnchorToWorld(spawnPosition);
+            LogSpawn($"Applied anchor alignment for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, beforePrefabSpawnAnchor={FormatVector(beforePrefabAnchorPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, afterPrefabSpawnAnchor={FormatVector(parasite.SpawnAnchorWorldPosition)}, rootDelta={FormatVector(parasite.transform.position - beforeRootPosition)}.", parasite);
+            return;
+        }
+
+        parasite.transform.position = spawnPosition;
+        parasite.RebaseVisualPosition();
+        LogSpawn($"Applied root-position spawn for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, prefabSpawnAnchorNow={FormatVector(parasite.SpawnAnchorWorldPosition)}.", parasite);
+    }
+
+    private static ParasiteSpawnAnchor GetSpawnAnchorData(Transform anchor)
+    {
+        if (anchor == null)
+        {
+            return null;
+        }
+
+        ParasiteSpawnAnchor spawnAnchor = anchor.GetComponent<ParasiteSpawnAnchor>();
+        return spawnAnchor != null ? spawnAnchor : anchor.GetComponentInParent<ParasiteSpawnAnchor>();
+    }
+
+    private static Sprite GetFallbackMaskSprite(Transform anchor)
+    {
+        if (anchor == null)
+        {
+            return null;
+        }
+
+        SpriteRenderer spriteRenderer = anchor.GetComponentInChildren<SpriteRenderer>(true);
+        return spriteRenderer != null ? spriteRenderer.sprite : null;
+    }
+
+    private int CountConfiguredSpawnAnchors()
+    {
+        if (spawnAnchors == null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        for (int i = 0; i < spawnAnchors.Count; i++)
+        {
+            if (spawnAnchors[i] != null)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private void LogSpawnAnchors(List<Transform> anchors)
+    {
+        if (!debugSpawn)
+        {
+            return;
+        }
+
+        if (anchors == null || anchors.Count == 0)
+        {
+            LogSpawnWarning("Effective anchor list is empty. Parasites will not align to authored spawn points.");
+            return;
+        }
+
+        for (int i = 0; i < anchors.Count; i++)
+        {
+            Transform anchor = anchors[i];
+            ParasiteSpawnAnchor spawnAnchor = GetSpawnAnchorData(anchor);
+            string source = spawnAnchor != null
+                ? $"ParasiteSpawnAnchor='{spawnAnchor.name}', spawnPosition={FormatVector(spawnAnchor.SpawnPosition)}, usesCustomSpawnPoint={(spawnAnchor.transform != anchor ? "parent/child lookup" : "direct")}"
+                : "Transform fallback";
+            LogSpawn($"Effective anchor {i}: '{GetTransformPath(anchor)}', transformPosition={FormatVector(anchor.position)}, {source}.", anchor);
+        }
+    }
+
+    private void LogSpawn(string message, UnityEngine.Object context = null)
+    {
+        if (!debugSpawn)
+        {
+            return;
+        }
+
+        Debug.Log($"[TongsSpawn] {message}", context != null ? context : this);
+    }
+
+    private void LogSpawnWarning(string message, UnityEngine.Object context = null)
+    {
+        if (!debugSpawn)
+        {
+            return;
+        }
+
+        Debug.LogWarning($"[TongsSpawn] {message}", context != null ? context : this);
+    }
+
+    private static string FormatVector(Vector3 value)
+    {
+        return $"({value.x:0.###}, {value.y:0.###}, {value.z:0.###})";
+    }
+
+    private static string GetTransformPath(Transform transform)
+    {
+        if (transform == null)
+        {
+            return "null";
+        }
+
+        string path = transform.name;
+        Transform parent = transform.parent;
+        while (parent != null)
+        {
+            path = $"{parent.name}/{path}";
+            parent = parent.parent;
+        }
+
+        return path;
     }
 
     private void ClearSpawnedParasites()

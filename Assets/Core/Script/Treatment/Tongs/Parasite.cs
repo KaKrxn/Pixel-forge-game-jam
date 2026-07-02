@@ -14,6 +14,7 @@ public sealed class Parasite : MonoBehaviour
     [SerializeField] private Transform spawnAnchor;
     [SerializeField] private SpriteRenderer targetRenderer;
     [SerializeField] private Transform visualRoot;
+    [SerializeField] private ParasiteReveal parasiteReveal;
     [SerializeField] private bool moveVisualWithPull;
     [SerializeField, Min(0f)] private float maxVisualFollowDistance = 0.65f;
     [SerializeField, Range(0f, 1f)] private float visualFollowStrength = 0.85f;
@@ -42,6 +43,7 @@ public sealed class Parasite : MonoBehaviour
     public bool IsExtracted => isExtracted;
     public bool EdgeContact => edgeContact;
     public int RequiredDirection => requiredDirection < 0 ? -1 : 1;
+    public Vector3 SpawnAnchorWorldPosition => GetSpawnAnchorWorldPosition();
 
     public event Action<Parasite> Extracted;
     public event Action<float> PullProgressChanged;
@@ -81,6 +83,7 @@ public sealed class Parasite : MonoBehaviour
         currentTipX = pointerPosition.x;
         jitterSeed = UnityEngine.Random.value * 1000f;
         UpdatePullVisual(pointerPosition);
+        UpdateRevealMask(pointerPosition);
     }
 
     public void EndHold()
@@ -88,6 +91,7 @@ public sealed class Parasite : MonoBehaviour
         isHeld = false;
         edgeContact = false;
         ResetVisualPosition();
+        UpdateRevealProgress();
         UpdateVisualState();
     }
 
@@ -122,6 +126,7 @@ public sealed class Parasite : MonoBehaviour
         jitterSeed = 0f;
         gameObject.SetActive(true);
         ResetVisualPosition();
+        UpdateRevealProgress();
         UpdateVisualState();
         PullProgressChanged?.Invoke(pullProgress);
         PainChanged?.Invoke(painLevel);
@@ -139,11 +144,33 @@ public sealed class Parasite : MonoBehaviour
     {
         Vector3 currentAnchor = GetSpawnAnchorWorldPosition();
         transform.position += anchorWorldPosition - currentAnchor;
+        RebaseVisualPosition();
     }
 
     public void AlignTopToWorld(Vector3 topWorldPosition)
     {
         AlignSpawnAnchorToWorld(topWorldPosition);
+    }
+
+    public void RebaseVisualPosition()
+    {
+        CacheVisualBasePosition();
+    }
+
+    public void BindSpawnAnchor(ParasiteSpawnAnchor anchor)
+    {
+        BindSpawnAnchor(anchor, anchor != null ? anchor.transform : null, null, 0);
+    }
+
+    public void BindSpawnAnchor(ParasiteSpawnAnchor anchor, Transform anchorTransform, Sprite fallbackMaskSprite, int bodySortingOrder)
+    {
+        ResolveRenderer();
+
+        if (parasiteReveal != null)
+        {
+            parasiteReveal.Bind(anchor != null ? anchor.WoundMask : null, anchorTransform, fallbackMaskSprite, bodySortingOrder);
+            parasiteReveal.ResetReveal();
+        }
     }
 
     private void TickHeld(Vector2 pointerPosition, float deltaTime)
@@ -155,6 +182,7 @@ public sealed class Parasite : MonoBehaviour
         ApplyPain(deltaTime);
         ApplyEdgeAndJitter(pointerPosition, deltaTime);
         UpdatePullVisual(pointerPosition);
+        UpdateRevealMask(pointerPosition);
     }
 
     private void ApplyPullProgress(Vector2 pointerDelta)
@@ -170,6 +198,7 @@ public sealed class Parasite : MonoBehaviour
 
         if (!Mathf.Approximately(previousProgress, pullProgress))
         {
+            UpdateRevealProgress();
             PullProgressChanged?.Invoke(pullProgress);
         }
 
@@ -277,6 +306,7 @@ public sealed class Parasite : MonoBehaviour
         isExtracted = true;
         isHeld = false;
         edgeContact = false;
+        UpdateRevealProgress();
         UpdateVisualState();
         UpdatePullVisual(holdStartPointerPosition + Vector2.up * type.RequiredDistance);
 
@@ -314,6 +344,27 @@ public sealed class Parasite : MonoBehaviour
         if (targetRenderer == null)
         {
             targetRenderer = GetComponentInChildren<SpriteRenderer>();
+        }
+
+        if (parasiteReveal == null)
+        {
+            parasiteReveal = GetComponentInChildren<ParasiteReveal>(true);
+        }
+    }
+
+    private void UpdateRevealProgress()
+    {
+        if (parasiteReveal != null)
+        {
+            parasiteReveal.SetProgress(pullProgress);
+        }
+    }
+
+    private void UpdateRevealMask(Vector2 pointerPosition)
+    {
+        if (parasiteReveal != null)
+        {
+            parasiteReveal.UpdateDynamicMask(pointerPosition);
         }
     }
 

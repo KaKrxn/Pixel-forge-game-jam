@@ -176,6 +176,7 @@ public static class TongsMiniGameSetup
             }
 
             Transform spawnAnchor = FindOrCreateParasiteSpawnAnchor(parasite);
+            EnsureParasiteSpawnAnchorComponent(spawnAnchor);
             SerializedObject serializedObject = new SerializedObject(parasite);
             serializedObject.FindProperty("spawnAnchor").objectReferenceValue = spawnAnchor;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
@@ -788,6 +789,19 @@ public static class TongsMiniGameSetup
         Vector3 localPosition = GetDefaultSpawnAnchorLocalPosition(parasite);
         GameObject spawnAnchor = CreateWorldObject("SpawnAnchor", parasite.transform, localPosition);
         return spawnAnchor.transform;
+    }
+
+    private static void EnsureParasiteSpawnAnchorComponent(Transform spawnAnchor)
+    {
+        if (spawnAnchor == null)
+        {
+            return;
+        }
+
+        if (spawnAnchor.GetComponent<ParasiteSpawnAnchor>() == null)
+        {
+            Undo.AddComponent<ParasiteSpawnAnchor>(spawnAnchor.gameObject);
+        }
     }
 
     private static Vector3 GetDefaultSpawnAnchorLocalPosition(Parasite parasite)
