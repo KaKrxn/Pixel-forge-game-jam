@@ -119,7 +119,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         SubscribeParasites();
         ResetParasites();
         SetRootVisible(true);
-        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
         flow?.SetTreatmentStress(false);
@@ -146,7 +146,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     public void Resume()
     {
         SetRootVisible(true);
-        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
 
         if (isComplete)
         {

@@ -37,6 +37,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     private Pustule meterPustule;
     private NeedleToolState toolState = NeedleToolState.None;
     private NeedleActionMode activeActionMode = NeedleActionMode.None;
+    private bool unsupportedToolSelected;
     private bool isRunning;
     private bool isComplete;
     private bool completionRaised;
@@ -99,6 +100,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
         meterPustule = null;
         toolState = NeedleToolState.None;
         activeActionMode = NeedleActionMode.None;
+        unsupportedToolSelected = false;
         isRunning = true;
         isComplete = false;
         completionRaised = false;
@@ -107,7 +109,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
         SubscribePustules();
         ResetPustules();
         SetRootVisible(true);
-        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
         flow?.SetTreatmentStress(false);
@@ -134,7 +136,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     public void Resume()
     {
         SetRootVisible(true);
-        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
 
         if (isComplete)
         {
@@ -148,11 +150,13 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     public void EquipNeedle()
     {
+        unsupportedToolSelected = false;
         toolState = NeedleToolState.Needle;
     }
 
     public void PutNeedleDown()
     {
+        unsupportedToolSelected = false;
         toolState = NeedleToolState.None;
         EndAction();
     }
@@ -169,13 +173,19 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     private void HandleToolSelected(string toolId)
     {
-        if (toolId == overlayToolId)
+        if (string.IsNullOrWhiteSpace(toolId))
+        {
+            PutNeedleDown();
+        }
+        else if (toolId == overlayToolId)
         {
             EquipNeedle();
         }
         else
         {
-            PutNeedleDown();
+            unsupportedToolSelected = true;
+            toolState = NeedleToolState.None;
+            EndAction();
         }
     }
 
@@ -188,7 +198,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
         }
 
         bool canPierce = toolState == NeedleToolState.Needle && target.CanPierce;
-        bool canSqueeze = toolState == NeedleToolState.None && target.CanSqueeze;
+        bool canSqueeze = !unsupportedToolSelected && toolState == NeedleToolState.None && target.CanSqueeze;
         bool canDrain = toolState == NeedleToolState.Needle && target.CanDrain;
         if (!canPierce && !canSqueeze && !canDrain)
         {

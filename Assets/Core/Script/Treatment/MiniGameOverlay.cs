@@ -102,6 +102,29 @@ public sealed class MiniGameOverlay : MonoBehaviour
             }
         }
 
+        public void SetAvailable(bool available)
+        {
+            if (toggle != null)
+            {
+                toggle.interactable = available;
+                toggle.gameObject.SetActive(available);
+            }
+
+            if (button != null)
+            {
+                button.interactable = available;
+                if (toggle == null || button.gameObject != toggle.gameObject)
+                {
+                    button.gameObject.SetActive(available);
+                }
+            }
+
+            if (!available && selectedIndicator != null)
+            {
+                selectedIndicator.SetActive(false);
+            }
+        }
+
         private void UnbindToggle()
         {
             if (toggle != null && toggleListener != null)
@@ -186,8 +209,15 @@ public sealed class MiniGameOverlay : MonoBehaviour
     /// <summary>Called by a mini game when it becomes the active one. Starts with no tool selected.</summary>
     public void Activate(Action completeHandler, Action<string> toolSelectedHandler)
     {
+        Activate(completeHandler, toolSelectedHandler, null);
+    }
+
+    /// <summary>Called by a mini game when it becomes active. Only listed tools are shown.</summary>
+    public void Activate(Action completeHandler, Action<string> toolSelectedHandler, params string[] allowedToolIds)
+    {
         activeCompleteHandler = completeHandler;
         activeToolSelectedHandler = toolSelectedHandler;
+        SetAllToolsAvailable(true);
         SetOverlayVisible(true);
         SetMeters(0f, 0f);
         SetCompleteVisible(false);
@@ -208,6 +238,7 @@ public sealed class MiniGameOverlay : MonoBehaviour
         activeCompleteHandler = null;
         activeToolSelectedHandler = null;
         selectedToolId = null;
+        SetAllToolsAvailable(true);
         UpdateToolHighlights();
         SetCompleteVisible(false);
         SetMeters(0f, 0f);
@@ -343,6 +374,20 @@ public sealed class MiniGameOverlay : MonoBehaviour
         if (overlayRaycaster == null)
         {
             overlayRaycaster = GetComponent<GraphicRaycaster>();
+        }
+    }
+
+    private void SetAllToolsAvailable(bool available)
+    {
+        for (int i = 0; i < toolButtons.Count; i++)
+        {
+            ToolButton tool = toolButtons[i];
+            if (tool == null)
+            {
+                continue;
+            }
+
+            tool.SetAvailable(available);
         }
     }
 

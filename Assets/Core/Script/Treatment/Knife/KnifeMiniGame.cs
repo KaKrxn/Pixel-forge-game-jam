@@ -38,6 +38,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     private Lesion meterLesion;
     private KnifeActionMode activeActionMode = KnifeActionMode.None;
     private KnifeToolState toolState = KnifeToolState.None;
+    private bool unsupportedToolSelected;
     private bool isRunning;
     private bool isComplete;
     private bool completionRaised;
@@ -104,6 +105,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         meterLesion = null;
         activeActionMode = KnifeActionMode.None;
         toolState = KnifeToolState.None;
+        unsupportedToolSelected = false;
         isRunning = true;
         isComplete = false;
         completionRaised = false;
@@ -112,7 +114,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         SubscribeLesions();
         ResetLesions();
         SetRootVisible(true);
-        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
         flow?.SetTreatmentStress(false);
@@ -139,7 +141,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     public void Resume()
     {
         SetRootVisible(true);
-        overlay?.Activate(CompleteMiniGame, HandleToolSelected);
+        overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
 
         if (isComplete)
         {
@@ -153,24 +155,32 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     public void EquipKnife()
     {
+        unsupportedToolSelected = false;
         toolState = KnifeToolState.Knife;
     }
 
     public void PutKnifeDown()
     {
+        unsupportedToolSelected = false;
         toolState = KnifeToolState.None;
         EndAction();
     }
 
     private void HandleToolSelected(string toolId)
     {
-        if (toolId == overlayToolId)
+        if (string.IsNullOrWhiteSpace(toolId))
+        {
+            PutKnifeDown();
+        }
+        else if (toolId == overlayToolId)
         {
             EquipKnife();
         }
         else
         {
-            PutKnifeDown();
+            unsupportedToolSelected = true;
+            toolState = KnifeToolState.None;
+            EndAction();
         }
     }
 
@@ -193,7 +203,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         }
 
         bool canUseTool = toolState == KnifeToolState.Knife && target.CanSlice;
-        bool canUseHand = toolState == KnifeToolState.None && target.CanPull;
+        bool canUseHand = !unsupportedToolSelected && toolState == KnifeToolState.None && target.CanPull;
         if (!canUseTool && !canUseHand)
         {
             return;
