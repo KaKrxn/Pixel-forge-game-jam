@@ -73,6 +73,7 @@ public sealed class Treatment : MonoBehaviour
     {
         activeCustomer = customer;
         isAtCounter = false;
+        flow?.SetCandleAtCounter(false);
         Hide();
 
         if (roomTransition != null)
@@ -124,12 +125,14 @@ public sealed class Treatment : MonoBehaviour
         {
             roomTransition.ShowCounterRoom(() =>
             {
+                flow?.SetCandleAtCounter(true);
                 Show();
                 RefreshText();
             });
             return;
         }
 
+        flow?.SetCandleAtCounter(true);
         Show();
         RefreshText();
     }
@@ -137,6 +140,7 @@ public sealed class Treatment : MonoBehaviour
     private void ResumeTreatment()
     {
         isAtCounter = false;
+        flow?.SetCandleAtCounter(false);
         Hide();
 
         if (roomTransition != null)
@@ -158,6 +162,7 @@ public sealed class Treatment : MonoBehaviour
     private void CompleteTreatmentCase()
     {
         flow?.SetTreatmentStress(false);
+        flow?.SetCandleAtCounter(false);
         anatomyController?.Stop();
         tongsMiniGame?.Stop();
         Hide();
@@ -202,7 +207,7 @@ public sealed class Treatment : MonoBehaviour
         if (bodyText != null)
         {
             bodyText.text = isAtCounter
-                ? "Placeholder return state. Refill candle will be connected here later. Press Resume to go back to treatment."
+                ? "Refill the candle at the counter, then press Resume to return to treatment."
                 : anatomyController != null
                     ? anatomyController.CanCompleteTreatment
                         ? "All required treatment areas are cured. Press Complete to finish the case."

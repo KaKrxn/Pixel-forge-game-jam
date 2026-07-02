@@ -98,7 +98,7 @@ The guide line is an ordered list of world-space points. Curves are approximated
 [SerializeField] private float pathHalfWidth;     // max distance from path before "outside"
 ```
 
-The dotted guide line is rendered from this same path (e.g. a `LineRenderer` or repeated dot sprites), so the visual and the logic always match.
+The dotted guide line is rendered from this same path using a **`LineRenderer`** (see Section 5.5), so the visual and the logic always match — and the line can be dynamically shortened to show cut progress.
 
 ### 5.2 Straying Check (Outside The Frame)
 
@@ -138,6 +138,84 @@ static float DistancePointToSegment(Vector2 p, Vector2 a, Vector2 b)
     return Vector2.Distance(p, proj);
 }
 ```
+
+### 5.5 Guide Line Rendering (LineRenderer, Dotted)
+
+> **Status:** `KnifeMiniGame` / `Lesion` already exist in the project; `CutGuideLine` below is **not yet implemented** — it is the next piece to add under `Assets/Core/Script/Treatment/Knife/`.
+
+**Decision: render the dotted guide line with a single `LineRenderer` using a dot texture in Tile mode.** Chosen over placing individual dot sprites because the line's positions can be updated dynamically — enabling the "line shrinks as you cut" progress effect — and one renderer is cheaper than dozens of sprite objects.
+
+`LineRenderer` works fine in a 2D project, but its 2D-relevant settings (sorting layer/order) are **not shown in the Inspector**, so the component below exposes them as serialized fields and applies them in `Awake`/`OnValidate`.
+
+```csharp
+using UnityEngine;
+
+[RequireComponent(typeof(LineRenderer))]
+public class CutGuideLine : MonoBehaviour
+{
+    [Header("Sorting (2D)")]
+    [SerializeField] private string sortingLayerName = "Default"; // match body/lesion sprites
+    [SerializeField] private int sortingOrder = 10;               // above the body sprite
+
+    [Header("Line Look")]
+    [SerializeField] private float lineWidth = 0.06f;             // world units
+    [SerializeField] private float dotsPerUnit = 4f;              // dot texture tiling density
+    [SerializeField] private Color lineColor = Color.white;
+
+    private LineRenderer line;
+
+    void Awake()
+    {
+        line = GetComponent<LineRenderer>();
+        Apply();
+    }
+
+    void OnValidate()   // live-update in the editor when values change
+    {
+        if (line == null) line = GetComponent<LineRenderer>();
+        if (line != null) Apply();
+    }
+
+    private void Apply()
+    {
+        line.sortingLayerName = sortingLayerName;   // not exposed by default — set from code
+        line.sortingOrder     = sortingOrder;
+        line.startWidth = line.endWidth = lineWidth;
+        line.startColor = line.endColor = lineColor;
+        line.textureMode = LineTextureMode.Tile;    // dot texture repeats along the length
+        line.alignment   = LineAlignment.View;      // face the camera (2D default)
+        line.useWorldSpace = true;
+    }
+
+    /// Show the remaining (uncut) part of the path, from waypoint startIndex to the end.
+    public void ShowRemaining(System.Collections.Generic.List<Vector2> cutPath, int startIndex)
+    {
+        int count = cutPath.Count - startIndex;
+        if (count < 2) { line.positionCount = 0; return; }   // fully cut -> line gone
+
+        line.positionCount = count;
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 p = cutPath[startIndex + i];
+            line.SetPosition(i, new Vector3(p.x, p.y, 0f));   // keep z = 0 for 2D
+        }
+
+        // keep dot density constant regardless of remaining length
+        float remainingLength = 0f;
+        for (int i = startIndex; i < cutPath.Count - 1; i++)
+            remainingLength += Vector2.Distance(cutPath[i], cutPath[i + 1]);
+        line.material.mainTextureScale = new Vector2(remainingLength * dotsPerUnit, 1f);
+    }
+}
+```
+
+Setup notes:
+
+- **Material:** a simple material (e.g. `Sprites/Default`) with a small **dot texture** whose Wrap Mode is **Repeat** (required for tiling). One dot on a transparent background.
+- **Sorting:** set `sortingLayerName`/`sortingOrder` so the line draws **above** the body and lesion sprites — this is the most common "my line is invisible" cause in 2D, since the fields are hidden in the Inspector and default to `Default`/0.
+- **Z position:** all points at z = 0 (same plane as the sprites and the orthographic camera).
+
+**Progress effect ("line disappears as you cut"):** the `Lesion` already tracks `passedWaypoints` (Section 5.3). Each time it advances, call `guideLine.ShowRemaining(cutPath, passedWaypoints)` — the dotted line visually shrinks from the start end toward the finish, and vanishes when the cut completes. Because ordered progress rolls back slightly when the knife strays (Section 2), calling `ShowRemaining` after a rollback also makes the line grow back a little, giving the player immediate feedback that they lost progress.
 
 ---
 
@@ -312,7 +390,7 @@ Reading the gizmos: keep the yellow jitter band roughly within the green corrido
 - Knife tool select (bare hand → knife).
 - Slice along the path in order; `cutProgress` reaches 1 → removed.
 - Distance-to-path stray check → roll back + `Sanity.AddSanity`.
-- Draw the path gizmo. Run `dotnet build "Pixel-forge-game-jam.slnx"`.
+- Draw the path gizmo. Add the `CutGuideLine` LineRenderer (dotted, Tile mode) with Inspector sorting fields, wired to `ShowRemaining` as progress advances. Run `dotnet build "Pixel-forge-game-jam.slnx"`.
 
 ### Phase 2 — Pain
 - Local pain bar rising while slicing, draining while paused.
@@ -370,6 +448,7 @@ Order of tuning: cut feel first, then pain, then Bulge phase 2, then jitter last
 
 - **Legacy input will not compile:** use `Mouse.current`; add `using UnityEngine.InputSystem;`. `OnMouseDown` does not fire — select via `Physics2D.OverlapPoint`.
 - **Path authoring effort:** curved paths need enough waypoints to feel smooth but not so many that authoring is tedious. Consider a small editor tool to place/curve points (similar to the existing Tongs/Anatomy setup tools).
+- **LineRenderer 2D setup:** the sorting layer/order fields are hidden in the Inspector and default to `Default`/0, so the line silently renders behind body sprites if not set from code (`CutGuideLine` exposes them). The dot texture's Wrap Mode must be **Repeat** or Tile mode shows a stretched single dot. Keep all line points at z = 0.
 - **Ordered progress vs. player freedom:** strict ordering prevents cheating but can feel punishing if `pathHalfWidth` is too tight around curves. Widen the corridor on sharp bends.
 - **Rollback severity:** `rollbackPerSecond` that is too high makes straying feel like a full reset; too low makes the corridor meaningless. Tune with playtests.
 - **Tool-switch clarity:** since bare hand = "no tool," make it obvious when the knife is down vs held (cursor art, tool highlight) so players understand why the pull won't start.

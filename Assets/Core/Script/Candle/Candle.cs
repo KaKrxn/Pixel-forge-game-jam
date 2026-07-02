@@ -1,6 +1,10 @@
 using System;
 using UnityEngine;
 
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
 public enum CandleLightState
 {
     Bright,
@@ -15,15 +19,20 @@ public sealed class Candle : MonoBehaviour
     [SerializeField] private float maxLight = 100f;
     [SerializeField] private float currentLight = 100f;
     [SerializeField] private float drainRate = 2f;
-    [SerializeField] private float refillRate = 30f;
-    [SerializeField] private float lowLightThreshold = 30f;
-    [SerializeField] private float flickeringThreshold = 10f;
+    [SerializeField] private float refillRate = 8f;
+    [SerializeField] private float clickRefillAmount = 3f;
+    [SerializeField] private int clickRefillCapPerSecond = 8;
+    [SerializeField] private float lowLightThreshold = 60f;
+    [SerializeField] private float flickeringThreshold = 25f;
     [SerializeField] private bool drainOnPlay = true;
+    [SerializeField] private Collider2D refillHitArea;
 
     public float CurrentLight => currentLight;
     public float MaxLight => maxLight;
     public float NormalizedLight => maxLight <= 0f ? 0f : Mathf.Clamp01(currentLight / maxLight);
     public bool IsLit => currentLight > 0f;
+    public bool IsAtCounter => isAtCounter;
+    public bool IsRefilling => isRefilling;
     public CandleLightState CurrentState { get; private set; }
 
     public event Action<float, float> LightChanged;
@@ -32,6 +41,9 @@ public sealed class Candle : MonoBehaviour
     public event Action Relit;
 
     private bool isRefilling;
+    private bool isAtCounter = true;
+    private int clicksThisSecond;
+    private float clickWindowTimer;
 
     private void Awake()
     {
@@ -52,10 +64,12 @@ public sealed class Candle : MonoBehaviour
             return;
         }
 
-        if (isRefilling)
+        UpdateClickWindow(deltaTime);
+        HandleCounterRefillInput(deltaTime);
+
+        if (isRefilling && isAtCounter)
         {
             ChangeLight(refillRate * deltaTime);
-            return;
         }
 
         if (drainOnPlay)
@@ -66,14 +80,17 @@ public sealed class Candle : MonoBehaviour
 
     public void StartRefill()
     {
-        isRefilling = true;
-        SetState(CandleLightState.Refilling, notify: true);
+        if (!isAtCounter)
+        {
+            return;
+        }
+
+        SetRefilling(true);
     }
 
     public void StopRefill()
     {
-        isRefilling = false;
-        SetState(EvaluateState(), notify: true);
+        SetRefilling(false);
     }
 
     public void AddLight(float amount)
@@ -89,6 +106,97 @@ public sealed class Candle : MonoBehaviour
     public void SetDrainEnabled(bool enabled)
     {
         drainOnPlay = enabled;
+    }
+
+    public void SetAtCounter(bool atCounter)
+    {
+        if (isAtCounter == atCounter)
+        {
+            return;
+        }
+
+        isAtCounter = atCounter;
+
+        if (!isAtCounter)
+        {
+            clicksThisSecond = 0;
+            clickWindowTimer = 0f;
+            SetRefilling(false);
+        }
+    }
+
+    private void UpdateClickWindow(float deltaTime)
+    {
+        clickWindowTimer += deltaTime;
+        if (clickWindowTimer < 1f)
+        {
+            return;
+        }
+
+        clickWindowTimer = 0f;
+        clicksThisSecond = 0;
+    }
+
+    private void HandleCounterRefillInput(float deltaTime)
+    {
+        if (!isAtCounter || !IsPointerInRefillArea())
+        {
+            SetRefilling(false);
+            return;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        Mouse mouse = Mouse.current;
+        if (mouse == null)
+        {
+            SetRefilling(false);
+            return;
+        }
+
+        SetRefilling(mouse.leftButton.isPressed);
+
+        if (mouse.leftButton.wasPressedThisFrame && clicksThisSecond < clickRefillCapPerSecond)
+        {
+            clicksThisSecond++;
+            ChangeLight(clickRefillAmount);
+        }
+#else
+        SetRefilling(false);
+#endif
+    }
+
+    private bool IsPointerInRefillArea()
+    {
+        if (refillHitArea == null)
+        {
+            return true;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        Mouse mouse = Mouse.current;
+        Camera camera = Camera.main;
+        if (mouse == null || camera == null)
+        {
+            return false;
+        }
+
+        Vector2 screenPosition = mouse.position.ReadValue();
+        Vector2 worldPosition = camera.ScreenToWorldPoint(screenPosition);
+        return refillHitArea.OverlapPoint(worldPosition);
+#else
+        return false;
+#endif
+    }
+
+    private void SetRefilling(bool refilling)
+    {
+        if (isRefilling == refilling)
+        {
+            return;
+        }
+
+        isRefilling = refilling;
+        SetState(isRefilling ? CandleLightState.Refilling : EvaluateState(), notify: true);
     }
 
     private void ChangeLight(float amount)

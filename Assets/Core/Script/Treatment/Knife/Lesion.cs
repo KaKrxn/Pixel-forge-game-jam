@@ -31,6 +31,8 @@ public sealed class Lesion : MonoBehaviour
     [SerializeField] private Color normalColor = Color.white;
     [SerializeField] private Color woundOpenColor = new Color(1f, 0.55f, 0.45f, 1f);
     [SerializeField] private Color completedColor = new Color(1f, 1f, 1f, 0.25f);
+    [Header("Cut Guide")]
+    [SerializeField] private CutGuideLine guideLine;
     [Header("Pull Visual")]
     [SerializeField] private Transform pullVisualRoot;
     [SerializeField] private bool followPointerWhilePulling = true;
@@ -93,6 +95,7 @@ public sealed class Lesion : MonoBehaviour
         ResetPullVisualPosition();
         gameObject.SetActive(true);
         ApplyVisualState();
+        RefreshGuideLine();
         PainChanged?.Invoke(painLevel);
         ProgressChanged?.Invoke(GetOverallProgress());
     }
@@ -231,6 +234,7 @@ public sealed class Lesion : MonoBehaviour
         cutProgress = Mathf.Clamp01((nextWaypointIndex - 1f) / Mathf.Max(1f, worldPath.Count - 1f));
         if (!Mathf.Approximately(previousProgress, cutProgress))
         {
+            RefreshGuideLine();
             ProgressChanged?.Invoke(GetOverallProgress());
         }
 
@@ -243,6 +247,7 @@ public sealed class Lesion : MonoBehaviour
     private void CompleteCut()
     {
         cutProgress = 1f;
+        RefreshGuideLine();
         ProgressChanged?.Invoke(GetOverallProgress());
 
         if (type == LesionType.Bulge && !woundOpen)
@@ -250,6 +255,7 @@ public sealed class Lesion : MonoBehaviour
             woundOpen = true;
             sliceStarted = false;
             ApplyVisualState();
+            RefreshGuideLine();
             return;
         }
 
@@ -269,6 +275,7 @@ public sealed class Lesion : MonoBehaviour
 
         if (!Mathf.Approximately(previousProgress, cutProgress))
         {
+            RefreshGuideLine();
             ProgressChanged?.Invoke(GetOverallProgress());
         }
     }
@@ -320,6 +327,7 @@ public sealed class Lesion : MonoBehaviour
         pullProgress = type == LesionType.Bulge ? 1f : pullProgress;
         painLevel = 0f;
         ApplyVisualState();
+        RefreshGuideLine();
         ProgressChanged?.Invoke(GetOverallProgress());
         PainChanged?.Invoke(painLevel);
 
@@ -384,6 +392,11 @@ public sealed class Lesion : MonoBehaviour
         if (pullVisualRoot == null && targetRenderer != null)
         {
             pullVisualRoot = targetRenderer.transform;
+        }
+
+        if (guideLine == null)
+        {
+            guideLine = GetComponentInChildren<CutGuideLine>(true);
         }
 
         if (pullVisualRoot != null && !hasInitialPullVisualPosition)
@@ -460,6 +473,24 @@ public sealed class Lesion : MonoBehaviour
         {
             targetRenderer.color = normalColor;
         }
+    }
+
+    private void RefreshGuideLine()
+    {
+        if (guideLine == null)
+        {
+            return;
+        }
+
+        RefreshWorldPath();
+
+        if (completed || (type == LesionType.Bulge && woundOpen))
+        {
+            guideLine.Hide();
+            return;
+        }
+
+        guideLine.ShowRemaining(worldPath, cutProgress);
     }
 
     private void OnDrawGizmos()

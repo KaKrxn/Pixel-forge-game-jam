@@ -59,15 +59,21 @@ public static class ClinicAdditiveStatusSetup
         AssignFloat(candle, "maxLight", 100f);
         AssignFloat(candle, "currentLight", 100f);
         AssignFloat(candle, "drainRate", 2f);
-        AssignFloat(candle, "refillRate", 30f);
-        AssignFloat(candle, "lowLightThreshold", 30f);
-        AssignFloat(candle, "flickeringThreshold", 10f);
+        AssignFloat(candle, "refillRate", 8f);
+        AssignFloat(candle, "clickRefillAmount", 3f);
+        AssignInt(candle, "clickRefillCapPerSecond", 8);
+        AssignFloat(candle, "lowLightThreshold", 60f);
+        AssignFloat(candle, "flickeringThreshold", 25f);
         AssignBool(candle, "drainOnPlay", true);
 
         AssignFloat(sanity, "maxSanity", 100f);
         AssignFloat(sanity, "currentSanity", 0f);
         AssignFloat(sanity, "candleProtectedIncreaseRate", 0.35f);
         AssignFloat(sanity, "candleOutIncreaseRate", 5f);
+        AssignBool(sanity, "useCandleTierMultipliers", true);
+        AssignFloat(sanity, "lowLightSanityMultiplier", 1.5f);
+        AssignFloat(sanity, "flickeringSanityMultiplier", 2.5f);
+        AssignFloat(sanity, "extinguishedSanityMultiplier", 4f);
         AssignFloat(sanity, "treatmentStressIncreaseRate", 1.5f);
         AssignFloat(sanity, "warningThreshold", 50f);
         AssignFloat(sanity, "criticalThreshold", 80f);
@@ -315,6 +321,18 @@ public static class ClinicAdditiveStatusSetup
         if (property != null)
         {
             property.floatValue = value;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(target);
+        }
+    }
+
+    private static void AssignInt(Object target, string propertyName, int value)
+    {
+        SerializedObject serializedObject = new SerializedObject(target);
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+        if (property != null)
+        {
+            property.intValue = value;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(target);
         }

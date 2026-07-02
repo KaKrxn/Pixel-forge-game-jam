@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2a96d29ff0b7d5b479388c871a062648
+guid: 3f541065e50365343af3101e728a7d5f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7226794585929221438
-    second: Test1_0
+      213: 1133851151302593710
+    second: Tools_Knife1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Test1_0
+      name: Tools_Knife1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 480
-        height: 270
+        x: 44
+        y: 3
+        width: 45
+        height: 119
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2caf8f00d9445bb90800000000000000
-      internalID: -7226794585929221438
+      spriteID: eac0f8d5d9f3cbf00800000000000000
+      internalID: 1133851151302593710
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Test1_0: -7226794585929221438
+      Tools_Knife1_0: 1133851151302593710
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

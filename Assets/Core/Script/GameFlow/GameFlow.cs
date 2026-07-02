@@ -32,6 +32,8 @@ public sealed class GameFlow : MonoBehaviour
 
     private void Start()
     {
+        SetCandleAtCounter(true);
+
         if (startOnPlay && firstCustomer != null)
         {
             StartFirstCustomer();
@@ -95,6 +97,7 @@ public sealed class GameFlow : MonoBehaviour
         }
 
         SetState(ClinicFlowState.TransitionToTreatment);
+        SetCandleAtCounter(false);
 
         if (treatment != null)
         {
@@ -130,6 +133,8 @@ public sealed class GameFlow : MonoBehaviour
 
     private void BeginActiveCustomerExit()
     {
+        SetCandleAtCounter(true);
+
         if (activeCustomer != null)
         {
             activeCustomer.BeginExit();
@@ -159,6 +164,11 @@ public sealed class GameFlow : MonoBehaviour
     public void SetTreatmentStress(bool active)
     {
         activeSanity?.SetTreatmentStress(active);
+    }
+
+    public void SetCandleAtCounter(bool atCounter)
+    {
+        candle?.SetAtCounter(atCounter);
     }
 
     private void TickHiddenStatusSystems(float deltaTime)

@@ -124,6 +124,8 @@ public sealed class MiniGameOverlay : MonoBehaviour
     [Header("Content")]
     [Tooltip("Root object shown while a mini game is active. Must NOT be this GameObject.")]
     [SerializeField] private GameObject content;
+    [SerializeField] private Canvas overlayCanvas;
+    [SerializeField] private GraphicRaycaster overlayRaycaster;
 
     [Header("Shared Meters")]
     [SerializeField] private Slider progressSlider;
@@ -142,6 +144,7 @@ public sealed class MiniGameOverlay : MonoBehaviour
 
     private void Awake()
     {
+        ResolveCanvasReferences();
         ResolveMissingToolReferences();
 
         if (completeButton != null)
@@ -163,7 +166,7 @@ public sealed class MiniGameOverlay : MonoBehaviour
 
         selectedToolId = null;
         UpdateToolHighlights();
-        SetContentVisible(false);
+        SetOverlayVisible(false);
         SetCompleteVisible(false);
     }
 
@@ -185,7 +188,7 @@ public sealed class MiniGameOverlay : MonoBehaviour
     {
         activeCompleteHandler = completeHandler;
         activeToolSelectedHandler = toolSelectedHandler;
-        SetContentVisible(true);
+        SetOverlayVisible(true);
         SetMeters(0f, 0f);
         SetCompleteVisible(false);
         ClearToolSelection();
@@ -208,7 +211,7 @@ public sealed class MiniGameOverlay : MonoBehaviour
         UpdateToolHighlights();
         SetCompleteVisible(false);
         SetMeters(0f, 0f);
-        SetContentVisible(false);
+        SetOverlayVisible(false);
     }
 
     /// <summary>Selects a tool by id and notifies the active mini game. Wired to each tool toggle.</summary>
@@ -303,6 +306,21 @@ public sealed class MiniGameOverlay : MonoBehaviour
         activeCompleteHandler?.Invoke();
     }
 
+    private void SetOverlayVisible(bool visible)
+    {
+        if (overlayCanvas != null)
+        {
+            overlayCanvas.enabled = visible;
+        }
+
+        if (overlayRaycaster != null)
+        {
+            overlayRaycaster.enabled = visible;
+        }
+
+        SetContentVisible(visible);
+    }
+
     private void SetContentVisible(bool visible)
     {
         GameObject target = content != null ? content : gameObject;
@@ -313,6 +331,19 @@ public sealed class MiniGameOverlay : MonoBehaviour
         }
 
         target.SetActive(visible);
+    }
+
+    private void ResolveCanvasReferences()
+    {
+        if (overlayCanvas == null)
+        {
+            overlayCanvas = GetComponent<Canvas>();
+        }
+
+        if (overlayRaycaster == null)
+        {
+            overlayRaycaster = GetComponent<GraphicRaycaster>();
+        }
     }
 
     private void ResolveMissingToolReferences()

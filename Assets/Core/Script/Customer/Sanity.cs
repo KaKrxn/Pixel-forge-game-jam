@@ -16,6 +16,10 @@ public sealed class Sanity : MonoBehaviour
     [SerializeField] private float currentSanity;
     [SerializeField] private float candleProtectedIncreaseRate = 0.35f;
     [SerializeField] private float candleOutIncreaseRate = 5f;
+    [SerializeField] private bool useCandleTierMultipliers = true;
+    [SerializeField] private float lowLightSanityMultiplier = 1.5f;
+    [SerializeField] private float flickeringSanityMultiplier = 2.5f;
+    [SerializeField] private float extinguishedSanityMultiplier = 4f;
     [SerializeField] private float treatmentStressIncreaseRate = 1.5f;
     [SerializeField] private float warningThreshold = 50f;
     [SerializeField] private float criticalThreshold = 80f;
@@ -59,9 +63,7 @@ public sealed class Sanity : MonoBehaviour
             return;
         }
 
-        float rate = candle == null || candle.IsLit
-            ? candleProtectedIncreaseRate
-            : candleOutIncreaseRate;
+        float rate = GetCandlePressureRate();
 
         if (treatmentStressActive)
         {
@@ -103,6 +105,33 @@ public sealed class Sanity : MonoBehaviour
     public void AddSanity(float amount)
     {
         ChangeSanity(amount);
+    }
+
+    private float GetCandlePressureRate()
+    {
+        if (candle == null)
+        {
+            return candleProtectedIncreaseRate;
+        }
+
+        if (!useCandleTierMultipliers)
+        {
+            return candle.IsLit ? candleProtectedIncreaseRate : candleOutIncreaseRate;
+        }
+
+        switch (candle.CurrentState)
+        {
+            case CandleLightState.Low:
+                return candleProtectedIncreaseRate * lowLightSanityMultiplier;
+            case CandleLightState.Flickering:
+                return candleProtectedIncreaseRate * flickeringSanityMultiplier;
+            case CandleLightState.Extinguished:
+                return candleProtectedIncreaseRate * extinguishedSanityMultiplier;
+            case CandleLightState.Bright:
+            case CandleLightState.Refilling:
+            default:
+                return candleProtectedIncreaseRate;
+        }
     }
 
     private void ChangeSanity(float amount)

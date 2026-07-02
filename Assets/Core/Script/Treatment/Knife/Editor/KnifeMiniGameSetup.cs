@@ -21,6 +21,7 @@ public static class KnifeMiniGameSetup
         Transform lesionRoot = FindOrCreateChild(miniGame.transform, "LesionRoot");
         Transform spawnRoot = FindOrCreateChild(miniGame.transform, "Spawn Anchor Manger");
         EnsureSampleLesions(lesionRoot);
+        EnsureGuideLines(lesionRoot);
         EnsureSpawnAnchors(spawnRoot);
 
         AssignMiniGame(miniGame, lesionRoot, spawnRoot);
@@ -214,6 +215,45 @@ public static class KnifeMiniGameSetup
         serializedObject.FindProperty("pathHalfWidth").floatValue = 0.28f;
         serializedObject.FindProperty("startRadius").floatValue = 0.45f;
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
+
+        CutGuideLine guideLine = CreateGuideLine(lesionObject.transform);
+        SerializedObject lesionSerializedObject = new SerializedObject(lesion);
+        lesionSerializedObject.FindProperty("guideLine").objectReferenceValue = guideLine;
+        lesionSerializedObject.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void EnsureGuideLines(Transform lesionRoot)
+    {
+        Lesion[] lesions = lesionRoot.GetComponentsInChildren<Lesion>(true);
+        for (int i = 0; i < lesions.Length; i++)
+        {
+            if (lesions[i] == null)
+            {
+                continue;
+            }
+
+            CutGuideLine guideLine = lesions[i].GetComponentInChildren<CutGuideLine>(true);
+            if (guideLine == null)
+            {
+                guideLine = CreateGuideLine(lesions[i].transform);
+            }
+
+            SerializedObject serializedObject = new SerializedObject(lesions[i]);
+            serializedObject.FindProperty("guideLine").objectReferenceValue = guideLine;
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(lesions[i]);
+        }
+    }
+
+    private static CutGuideLine CreateGuideLine(Transform parent)
+    {
+        GameObject guideObject = new GameObject("CutGuideLine", typeof(LineRenderer), typeof(CutGuideLine));
+        Undo.RegisterCreatedObjectUndo(guideObject, "Create CutGuideLine");
+        guideObject.transform.SetParent(parent, false);
+        guideObject.transform.localPosition = Vector3.zero;
+        guideObject.transform.localRotation = Quaternion.identity;
+        guideObject.transform.localScale = Vector3.one;
+        return guideObject.GetComponent<CutGuideLine>();
     }
 
     private static void EnsureSpawnAnchors(Transform spawnRoot)
