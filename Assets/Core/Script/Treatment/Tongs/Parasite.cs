@@ -416,10 +416,6 @@ public sealed class Parasite : MonoBehaviour
         }
 
         Vector2 worldOffset = pointerPosition - holdStartPointerPosition;
-        if (worldOffset.y < 0f)
-        {
-            worldOffset.y = 0f;
-        }
 
         if (!type.NeedsDirection)
         {
@@ -427,7 +423,8 @@ public sealed class Parasite : MonoBehaviour
         }
 
         float maxDistance = maxVisualFollowDistance > 0f ? maxVisualFollowDistance : type.RequiredDistance;
-        Vector2 clampedOffset = Vector2.ClampMagnitude(worldOffset * visualFollowStrength, maxDistance);
+        Vector2 followOffset = new Vector2(worldOffset.x, 0f);
+        Vector2 clampedOffset = Vector2.ClampMagnitude(followOffset * visualFollowStrength, maxDistance);
         Vector3 localOffset = transform.InverseTransformVector(new Vector3(clampedOffset.x, clampedOffset.y, 0f));
         visual.localPosition = visualBaseLocalPosition + localOffset;
 
