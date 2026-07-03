@@ -161,9 +161,18 @@ Current features:
 - Each required treatment defines a body area and the mini game type needed for that area.
 - Runtime case state tracks which required areas are treated.
 - Anatomy can read the active customer's case and only complete treatment after all required areas are treated.
-- Current sample case requires more than one treatment area.
+- Current focused playtest case routes Arm to Tongs and completes the full customer exit flow.
+- A mixed sample case remains available for multi-area treatment testing.
 
-Current sample case:
+Current focused playtest case:
+
+- `Assets/Core/Data/Treatment/Cases/Case_Test_Arm_Tongs.asset`
+- Case id: `test_arm_tongs`
+- Customer display name: `Tongs Test Customer`
+- Required treatments:
+  - Arm -> Tongs
+
+Mixed sample case:
 
 - `Assets/Core/Data/Treatment/Cases/Case_Test_MixedTreatment.asset`
 - Case id: `test_mixed_treatment`
@@ -171,10 +180,12 @@ Current sample case:
 - Required treatments:
   - Arm -> Tongs
   - Torso -> Knife
+  - Leg -> Needle
 
 Unity setup tool:
 
-- `Tools > Pixel Forge > Treatment > Assign Test Treatment Case To Selected Customer`
+- `Tools > Pixel Forge > Treatment > Assign Arm Tongs Case To Selected Customer`
+- `Tools > Pixel Forge > Treatment > Assign Mixed Treatment Case To Selected Customer`
 
 Status: **Implemented as the current source of truth for patient treatment requirements.**
 
@@ -707,6 +718,7 @@ Remaining work:
 | Path | Purpose |
 |---|---|
 | `Assets/Core/Data/Dialog/DialogDataTest.asset` | Test dialog data. |
+| `Assets/Core/Data/Treatment/Cases/Case_Test_Arm_Tongs.asset` | Focused test customer case requiring Arm/Tongs only. |
 | `Assets/Core/Data/Treatment/Cases/Case_Test_MixedTreatment.asset` | Test customer case requiring Arm/Tongs and Torso/Knife. |
 | `Assets/Core/Data/Treatment/BodyPrefabs/TreatmentBodyPrefabCatalog.asset` | Current catalog asset for mini game + body area body prefab lookup. |
 | `Assets/Core/Data/Treatment/Tongs/SmallParasiteType.asset` | Small parasite type. |

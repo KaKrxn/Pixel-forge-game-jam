@@ -902,6 +902,15 @@ Tongs can consume spawned body anchors.
 Existing scene fallback still works.
 ```
 
+Current implementation checkpoint:
+
+```text
+TreatmentBodyPrefabCatalog maps Tongs + Arm to Tongs_Arm_BodyPrefab.
+AnatomyController can call TreatmentBodyPrefabSpawner before starting Tongs, Knife, or Needle.
+TongsMiniGame, KnifeMiniGame, and NeedleMiniGame can consume roots/anchors from a spawned TreatmentBodyPrefab.
+Existing scenes still fall back to their current serialized mini game references when no spawner is assigned.
+```
+
 ---
 
 ## 17. Summary

@@ -128,6 +128,22 @@ public sealed class TongsMiniGame : MonoBehaviour
         flow?.SetTreatmentStress(false);
     }
 
+    public void ApplyBodyPrefab(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return;
+        }
+
+        UnsubscribeParasites();
+        ClearSpawnedParasites();
+        parasiteRoot = body.ParasiteRoot != null ? body.ParasiteRoot : body.GameplayRoot;
+        spawnAnchors.Clear();
+        spawnAnchors.AddRange(body.GetParasiteAnchorTransforms());
+        RefreshParasiteList();
+        SubscribeParasites();
+    }
+
     public void Stop()
     {
         EndActiveHold();

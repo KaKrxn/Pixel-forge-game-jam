@@ -3,10 +3,28 @@ using UnityEngine;
 
 public static class TreatmentCaseSetup
 {
-    private const string SampleCasePath = "Assets/Core/Data/Treatment/Cases/Case_Test_MixedTreatment.asset";
+    private const string ArmTongsCasePath = "Assets/Core/Data/Treatment/Cases/Case_Test_Arm_Tongs.asset";
+    private const string MixedCasePath = "Assets/Core/Data/Treatment/Cases/Case_Test_MixedTreatment.asset";
+
+    [MenuItem("Tools/Pixel Forge/Treatment/Assign Arm Tongs Case To Selected Customer")]
+    public static void AssignArmTongsCaseToSelectedCustomer()
+    {
+        AssignCaseToSelectedCustomer(ArmTongsCasePath);
+    }
 
     [MenuItem("Tools/Pixel Forge/Treatment/Assign Test Treatment Case To Selected Customer")]
     public static void AssignTestTreatmentCaseToSelectedCustomer()
+    {
+        AssignArmTongsCaseToSelectedCustomer();
+    }
+
+    [MenuItem("Tools/Pixel Forge/Treatment/Assign Mixed Treatment Case To Selected Customer")]
+    public static void AssignMixedTreatmentCaseToSelectedCustomer()
+    {
+        AssignCaseToSelectedCustomer(MixedCasePath);
+    }
+
+    private static void AssignCaseToSelectedCustomer(string casePath)
     {
         CustomerAgent customer = FindSelectedOrSceneCustomer();
         if (customer == null)
@@ -15,10 +33,10 @@ public static class TreatmentCaseSetup
             return;
         }
 
-        TreatmentCaseData caseData = AssetDatabase.LoadAssetAtPath<TreatmentCaseData>(SampleCasePath);
+        TreatmentCaseData caseData = AssetDatabase.LoadAssetAtPath<TreatmentCaseData>(casePath);
         if (caseData == null)
         {
-            Debug.LogWarning($"Treatment case setup skipped because the sample case asset was not found at {SampleCasePath}.");
+            Debug.LogWarning($"Treatment case setup skipped because the case asset was not found at {casePath}.");
             return;
         }
 

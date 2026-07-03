@@ -35,6 +35,7 @@ public sealed class AnatomyController : MonoBehaviour
     [SerializeField] private TongsMiniGame tongsMiniGame;
     [SerializeField] private KnifeMiniGame knifeMiniGame;
     [SerializeField] private NeedleMiniGame needleMiniGame;
+    [SerializeField] private TreatmentBodyPrefabSpawner bodyPrefabSpawner;
     [SerializeField] private List<BodyArea> knifeAreas = new List<BodyArea>
     {
         BodyArea.Head,
@@ -62,6 +63,7 @@ public sealed class AnatomyController : MonoBehaviour
     private void Awake()
     {
         CachePartButtons();
+        ResolveBodyPrefabSpawner();
 
         if (exitPartButton != null)
         {
@@ -142,6 +144,7 @@ public sealed class AnatomyController : MonoBehaviour
         tongsMiniGame?.Stop();
         knifeMiniGame?.Stop();
         needleMiniGame?.Stop();
+        bodyPrefabSpawner?.ClearActiveBody();
         SetRootVisible(false);
         SetPartMessageVisible(false);
         NavigationStateChanged?.Invoke();
@@ -204,18 +207,21 @@ public sealed class AnatomyController : MonoBehaviour
         {
             case TreatmentMiniGameType.Tongs when tongsMiniGame != null:
                 StartMiniGame(TreatmentMiniGameType.Tongs);
+                tongsMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Tongs, area));
                 tongsMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
 
             case TreatmentMiniGameType.Knife when knifeMiniGame != null:
                 StartMiniGame(TreatmentMiniGameType.Knife);
+                knifeMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Knife, area));
                 knifeMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
 
             case TreatmentMiniGameType.Needle when needleMiniGame != null:
                 StartMiniGame(TreatmentMiniGameType.Needle);
+                needleMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Needle, area));
                 needleMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
@@ -257,6 +263,7 @@ public sealed class AnatomyController : MonoBehaviour
         tongsMiniGame?.Stop();
         knifeMiniGame?.Stop();
         needleMiniGame?.Stop();
+        bodyPrefabSpawner?.ClearActiveBody();
         SetRootVisible(true);       // un-fold the screen when returning to the anatomy level
         SetBodyVisible(true);
         SetPartMessageVisible(false);
@@ -426,6 +433,25 @@ public sealed class AnatomyController : MonoBehaviour
         }
 
         return TreatmentMiniGameType.None;
+    }
+
+    private TreatmentBodyPrefab SpawnBodyPrefabForArea(TreatmentMiniGameType miniGameType, BodyArea area)
+    {
+        ResolveBodyPrefabSpawner();
+        if (bodyPrefabSpawner != null && bodyPrefabSpawner.TrySpawn(miniGameType, area, out TreatmentBodyPrefab body))
+        {
+            return body;
+        }
+
+        return null;
+    }
+
+    private void ResolveBodyPrefabSpawner()
+    {
+        if (bodyPrefabSpawner == null)
+        {
+            bodyPrefabSpawner = GetComponentInParent<TreatmentBodyPrefabSpawner>(true);
+        }
     }
 
     private bool AreAllInfectedAreasTreated()

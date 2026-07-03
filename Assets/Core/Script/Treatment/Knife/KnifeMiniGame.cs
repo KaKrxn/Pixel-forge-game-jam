@@ -157,6 +157,32 @@ public sealed class KnifeMiniGame : MonoBehaviour
         flow?.SetTreatmentStress(false);
     }
 
+    public void ApplyBodyPrefab(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return;
+        }
+
+        UnsubscribeLesions();
+        ClearSpawnedLesions();
+        lesionRoot = body.LesionRoot != null ? body.LesionRoot : body.GameplayRoot;
+        spawnAnchors.Clear();
+        spawnAnchors.AddRange(body.GetLesionAnchorTransforms());
+        lesionSpawnAnchors.Clear();
+
+        for (int i = 0; i < spawnAnchors.Count; i++)
+        {
+            if (spawnAnchors[i] != null && spawnAnchors[i].TryGetComponent(out LesionSpawnAnchor anchor))
+            {
+                lesionSpawnAnchors.Add(anchor);
+            }
+        }
+
+        RefreshLesionList();
+        SubscribeLesions();
+    }
+
     public void Stop()
     {
         EndAction();

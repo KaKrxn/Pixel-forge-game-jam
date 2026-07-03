@@ -142,6 +142,32 @@ public sealed class NeedleMiniGame : MonoBehaviour
         flow?.SetTreatmentStress(false);
     }
 
+    public void ApplyBodyPrefab(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return;
+        }
+
+        UnsubscribePustules();
+        ClearSpawnedPustules();
+        pustuleRoot = body.PustuleRoot != null ? body.PustuleRoot : body.GameplayRoot;
+        spawnAnchors.Clear();
+        spawnAnchors.AddRange(body.GetPustuleAnchorTransforms());
+        pustuleSpawnAnchors.Clear();
+
+        for (int i = 0; i < spawnAnchors.Count; i++)
+        {
+            if (spawnAnchors[i] != null && spawnAnchors[i].TryGetComponent(out PustuleSpawnAnchor anchor))
+            {
+                pustuleSpawnAnchors.Add(anchor);
+            }
+        }
+
+        RefreshPustuleList();
+        SubscribePustules();
+    }
+
     public void Stop()
     {
         EndAction();
