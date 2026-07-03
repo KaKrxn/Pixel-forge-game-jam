@@ -412,6 +412,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
         LogSpawn($"Begin spawn. validOptions={validSpawnOptions.Count}, rawAnchors={CountConfiguredSpawnAnchors()}, effectiveAnchors={shuffledAnchors.Count}, min={minParasites}, max={maxParasites}, finalCount={count}, alignAnchor={alignParasiteAnchorToSpawnPoint}.");
         LogSpawnAnchors(shuffledAnchors);
+        HideSpawnVisuals(shuffledAnchors);
 
         Transform parent = parasiteRoot != null ? parasiteRoot : transform;
 
@@ -433,7 +434,7 @@ public sealed class TongsMiniGame : MonoBehaviour
             if (selectedAnchor != null)
             {
                 LogSpawn($"Spawn #{i + 1}: prefab='{prefab.name}', type='{type.name}', selectedAnchor='{GetTransformPath(selectedAnchor)}', selectedAnchorPosition={FormatVector(selectedAnchor.position)}, spawnAnchorComponent={(spawnAnchor != null ? spawnAnchor.name : "none")}, resolvedSpawnPosition={(spawnAnchor != null ? FormatVector(spawnAnchor.SpawnPosition) : FormatVector(selectedAnchor.position))}, requiredDirection={direction}.", selectedAnchor);
-                ApplySpawnAnchor(parasite, selectedAnchor, i);
+                ApplySpawnAnchor(parasite, selectedAnchor, i, type);
             }
             else
             {
@@ -619,9 +620,10 @@ public sealed class TongsMiniGame : MonoBehaviour
             || anchorName.Contains("spawnanchors");
     }
 
-    private void ApplySpawnAnchor(Parasite parasite, Transform anchor, int spawnIndex)
+    private void ApplySpawnAnchor(Parasite parasite, Transform anchor, int spawnIndex, ParasiteType parasiteType)
     {
         ParasiteSpawnAnchor spawnAnchor = GetSpawnAnchorData(anchor);
+        spawnAnchor?.ShowSpawnVisual(parasiteType);
         parasite.BindSpawnAnchor(spawnAnchor, anchor, GetFallbackMaskSprite(anchor), parasiteSortingOrderStart + spawnIndex * parasiteSortingOrderStep);
         Vector3 spawnPosition = spawnAnchor != null ? spawnAnchor.SpawnPosition : anchor.position;
         Vector3 beforeRootPosition = parasite.transform.position;
@@ -659,6 +661,23 @@ public sealed class TongsMiniGame : MonoBehaviour
 
         SpriteRenderer spriteRenderer = anchor.GetComponentInChildren<SpriteRenderer>(true);
         return spriteRenderer != null ? spriteRenderer.sprite : null;
+    }
+
+    private static void HideSpawnVisuals(List<Transform> anchors)
+    {
+        if (anchors == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < anchors.Count; i++)
+        {
+            ParasiteSpawnAnchor spawnAnchor = GetSpawnAnchorData(anchors[i]);
+            if (spawnAnchor != null)
+            {
+                spawnAnchor.HideSpawnVisuals();
+            }
+        }
     }
 
     private int CountConfiguredSpawnAnchors()
