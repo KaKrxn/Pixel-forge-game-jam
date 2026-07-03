@@ -1,6 +1,7 @@
 public enum KnifeToolState
 {
     None,
-    Knife
+    Knife,
+    Tongs
 }
 

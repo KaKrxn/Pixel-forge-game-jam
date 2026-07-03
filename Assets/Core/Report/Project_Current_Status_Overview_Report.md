@@ -3,7 +3,7 @@
 **Project:** Cure Me, Please  
 **Workspace:** `Z:\.Project Unity\Pixel-forge-game-jam`  
 **Engine:** Unity 6000.3.17f1, 2D Pixel Art  
-**Report date:** July 3, 2026  
+**Report date:** July 4, 2026
 **Report purpose:** Maintain the current project snapshot, implemented systems, active gaps, setup notes, and script inventory.
 
 ---
@@ -50,7 +50,7 @@ Current intended flow:
 10. Player selects a body area based on dialog memory.
 11. The selected body area is checked against the active `TreatmentCaseData`.
 12. If the area is required, Anatomy starts the configured mini game for that area.
-13. Current sample case routes Arm to Tongs and Torso to Knife. Additional cases can route areas to Needle.
+13. Current sample case routes Torso to Knife, Arm to Tongs, and Leg to Needle.
 14. Completing one mini game marks only that body area as treated.
 15. Player returns to Anatomy and selects the next required treatment area.
 16. When all required areas are treated, the Treatment screen shows Complete.
@@ -161,10 +161,10 @@ Current features:
 - Each required treatment defines a body area and the mini game type needed for that area.
 - Runtime case state tracks which required areas are treated.
 - Anatomy can read the active customer's case and only complete treatment after all required areas are treated.
-- Current focused playtest case routes Arm to Tongs and completes the full customer exit flow.
-- A mixed sample case remains available for multi-area treatment testing.
+- Current focused playtest case is the mixed treatment case in `Game_K`.
+- The mixed case currently validates Torso Knife and Arm Tongs; Leg Needle remains deferred for the next development pass.
 
-Current focused playtest case:
+Focused single-area playtest case:
 
 - `Assets/Core/Data/Treatment/Cases/Case_Test_Arm_Tongs.asset`
 - Case id: `test_arm_tongs`
@@ -181,6 +181,23 @@ Mixed sample case:
   - Arm -> Tongs
   - Torso -> Knife
   - Leg -> Needle
+
+Current `Game_K` playtest setup:
+
+- Uses `Case_Test_MixedTreatment.asset` for mixed flow testing.
+- `Torso -> Knife` resolves through the Treatment Body Prefab Catalog.
+- `Arm -> Tongs` uses the existing scene `TongsMiniGame` with the Tongs body prefab roots/anchors.
+- `Leg -> Needle` is still part of the case but is intentionally paused for the next development pass.
+
+Latest validated mixed-flow slice:
+
+- Customer enters, dialog completes, and Treatment Room opens.
+- Anatomy opens and Torso starts Knife.
+- Knife can cut lesions; opened `Bulge` lesions are pulled using the `Tongs` tool.
+- Completing all Torso lesions returns to Anatomy and marks Torso treated.
+- Selecting Arm starts Tongs and the Arm body appears correctly.
+- Completing all parasites returns to Anatomy and marks Arm treated.
+- Full `Complete Test` validation is deferred until the Needle/Leg requirement is wired or temporarily removed from the active case.
 
 Unity setup tool:
 
@@ -431,6 +448,23 @@ Unity setup tool:
 
 Status: **Playable prototype implemented, with anchor-driven random lesion spawning and visual state support.**
 
+Current Knife body-prefab integration checkpoint:
+
+- `Knife_Torsoo_BodyPrefab.prefab` exists under `Assets/Core/Prefab/TreatmentBodies`.
+- The prefab has `TreatmentBodyPrefab` configured as `Knife + Torso`.
+- The prefab now hosts its own `KnifeMiniGame` component instead of relying on the old scene `KnifeMiniGameRoot`.
+- `KnifeMiniGameRoot` has been removed from `Game_K`.
+- `AnatomyController` can spawn the Knife body prefab, resolve the `KnifeMiniGame` from the spawned body, and inject runtime references for `GameFlow`, input camera, and `MiniGameOverlay`.
+- `TreatmentBodyPrefabCatalog.asset` maps `Knife + Torso` to `Knife_Torsoo_BodyPrefab`.
+- Knife body sprite sorting is enforced through `TreatmentBodyPrefab` as `Main / 20`.
+
+Current test status:
+
+- The Knife Torso body appears in the Treatment Room.
+- Layer/sorting was corrected and protected through body prefab sorting enforcement.
+- Knife Torso can complete and return to Anatomy.
+- Opened Bulge lesions require the `Tongs` tool for pull/extraction.
+
 Remaining work:
 
 - Final lesion art.
@@ -489,6 +523,22 @@ Current features:
 - If no catalog or matching entry is assigned, the spawner logs a warning and existing scene references can still be used.
 
 Status: **Runtime support implemented, content setup still in progress.**
+
+Current catalog entries:
+
+- `Tongs + Arm -> Tongs_Arm_BodyPrefab`
+- `Knife + Torso -> Knife_Torsoo_BodyPrefab`
+
+Current prefab implementation status:
+
+- `Tongs_Arm_BodyPrefab`: playable; Arm Tongs starts and returns to Anatomy after all parasites are extracted.
+- `Knife_Torsoo_BodyPrefab`: integrated into the catalog and scene routing; Torso Knife starts, completes, and returns to Anatomy.
+- Needle body prefabs: not yet integrated into the catalog.
+
+Runtime visual rule:
+
+- `TreatmentBodyPrefab` enforces body sprite sorting on `BodySpriteRoot` as Sorting Layer `Main`, Order in Layer `20`.
+- GameObject `Layer: Default / 0` is not the same as Sprite Renderer sorting and should not be treated as a render-order failure by itself.
 
 Remaining work:
 
@@ -720,7 +770,7 @@ Remaining work:
 |---|---|
 | `Assets/Core/Data/Dialog/DialogDataTest.asset` | Test dialog data. |
 | `Assets/Core/Data/Treatment/Cases/Case_Test_Arm_Tongs.asset` | Focused test customer case requiring Arm/Tongs only. |
-| `Assets/Core/Data/Treatment/Cases/Case_Test_MixedTreatment.asset` | Test customer case requiring Arm/Tongs and Torso/Knife. |
+| `Assets/Core/Data/Treatment/Cases/Case_Test_MixedTreatment.asset` | Test customer case requiring Arm/Tongs, Torso/Knife, and Leg/Needle. |
 | `Assets/Core/Data/Treatment/BodyPrefabs/TreatmentBodyPrefabCatalog.asset` | Current catalog asset for mini game + body area body prefab lookup. |
 | `Assets/Core/Data/Treatment/Tongs/SmallParasiteType.asset` | Small parasite type. |
 | `Assets/Core/Data/Treatment/Tongs/LongParasiteType.asset` | Long parasite type. |
@@ -808,13 +858,13 @@ Remaining work:
 
 ## 7. Current Workspace Notes
 
-This report was updated from the current workspace state on July 3, 2026. It includes both committed work and local in-progress work.
+This report was updated from the current workspace state on July 4, 2026. It includes both committed work and local in-progress work.
 
 Recent verification:
 
-- `dotnet build Assembly-CSharp.csproj` passed after the latest mini game spawn randomization work.
-- `dotnet build Assembly-CSharp-Editor.csproj` passed after the latest mini game setup tool updates.
-- Latest relevant commit before this report update: `ae4d409 Add lesion and pustule spawn randomization`.
+- Unity Play Mode user validation passed for this slice: customer dialog -> Treatment Room -> Anatomy -> Torso Knife -> fallback Anatomy / Torso treated -> Arm Tongs -> fallback Anatomy / Arm treated.
+- `git diff --check` passed for the latest touched treatment flow files before commit.
+- Full `Complete Test` validation is intentionally paused because `Case_Test_MixedTreatment` still includes `Leg -> Needle`.
 
 Notable current local / in-progress areas:
 
@@ -834,7 +884,7 @@ Notable current local / in-progress areas:
 - `Assets/Core/Report/Customer_Spawn_Queue_System_Design_Report.md`
 - `Assets/Core/Report/PatientTreatmentCaseSO_Design_Report.md`
 - `Assets/Core/Report/SharedMiniGameOverlay_Refactor_Report.md`
-- `Assets/Core/Scene/GameScene.unity`
+- `Assets/Core/Scene/Game_K.unity`
 
 Important project rule:
 
@@ -844,30 +894,34 @@ Important project rule:
 
 ## 8. Recommended Next Steps
 
-1. Verify the current full sample case in Play Mode:
+1. Resume with Needle/Leg or temporarily adjust the active case:
+   - Option A: implement or hook the required `Leg -> Needle` body/minigame path.
+   - Option B: use a temporary two-area case if the next goal is customer completion after only Torso/Arm.
+2. Verify the current full sample case in Play Mode:
    - Customer enters.
    - Dialog opens from the assigned case.
    - Dialog completes.
    - Treatment Room opens.
    - Anatomy screen appears.
-   - Arm starts Tongs and returns to Anatomy when complete.
    - Torso starts Knife and returns to Anatomy when complete.
-   - Complete appears only after both required areas are treated.
+   - Arm starts Tongs and returns to Anatomy when complete.
+   - Leg starts Needle and returns to Anatomy when complete.
+   - Complete appears only after all required areas are treated.
    - Customer exits after treatment completion.
-2. Finish and test body prefab setup:
+3. Finish and test body prefab setup:
    - Verify `Tongs_Arm_BodyPrefab` anchor visuals, parasite reveal masks, and spawn alignment.
    - Configure Knife body prefabs with `LesionSpawnAnchor` type/orientation rules and selected visuals.
    - Configure Needle body prefabs with `PustuleSpawnAnchor` type rules and selected visuals.
-3. Playtest Knife and Needle random spawning:
+4. Playtest Knife and Needle random spawning:
    - Knife should select unique anchors, randomize Tumor/Bulge, randomize horizontal/vertical cut orientation, and show only selected visuals.
    - Needle should select unique anchors, randomize Small/Big pustules, and show only selected visuals.
-4. Wire or verify final `TreatmentBodyPrefabCatalog` usage in the treatment flow.
-5. Finish the Candle refill interaction at the Counter return state.
-6. Create real patient case assets beyond `Case_Test_MixedTreatment`, including cases that route to Needle.
-7. Implement the Customer Spawn Queue runtime from `Customer_Spawn_Queue_System_Design_Report.md` when the current single-customer loop is stable.
-8. Replace Anatomy placeholder body parts with final sprites and verify hit testing.
-9. Finalize shared MiniGameOverlay visuals, tool icons, and SFX.
-10. Balance Sanity, Candle drain/refill, Tongs pain, Knife pain, and Needle pain.
+5. Wire or verify final `TreatmentBodyPrefabCatalog` usage in the treatment flow.
+6. Finish the Candle refill interaction at the Counter return state.
+7. Create real patient case assets beyond `Case_Test_MixedTreatment`, including cases that route to Needle.
+8. Implement the Customer Spawn Queue runtime from `Customer_Spawn_Queue_System_Design_Report.md` when the current single-customer loop is stable.
+9. Replace Anatomy placeholder body parts with final sprites and verify hit testing.
+10. Finalize shared MiniGameOverlay visuals, tool icons, and SFX.
+11. Balance Sanity, Candle drain/refill, Tongs pain, Knife pain, and Needle pain.
 
 ---
 

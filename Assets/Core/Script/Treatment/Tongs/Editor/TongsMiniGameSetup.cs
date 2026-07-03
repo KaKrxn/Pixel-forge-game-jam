@@ -659,6 +659,7 @@ public static class TongsMiniGameSetup
         serializedObject.FindProperty("autoFindParasitesInChildren").boolValue = true;
         serializedObject.FindProperty("startHidden").boolValue = true;
         serializedObject.FindProperty("requireTongsEquipped").boolValue = true;
+        serializedObject.FindProperty("autoCompleteWhenAllParasitesDone").boolValue = true;
         serializedObject.FindProperty("completeTreatmentOnButton").boolValue = false;
         AssignParasiteSpawnOptionList(serializedObject, GetDefaultSpawnOptions());
         serializedObject.ApplyModifiedPropertiesWithoutUndo();

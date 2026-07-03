@@ -47,6 +47,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     [SerializeField] private bool requireTongsEquipped = true;
     [SerializeField] private bool autoFindParasitesInChildren = true;
     [SerializeField] private bool startHidden = true;
+    [SerializeField] private bool autoCompleteWhenAllParasitesDone = true;
     [SerializeField] private bool completeTreatmentOnButton;
     [SerializeField] private bool useUnscaledTime;
 
@@ -57,6 +58,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     private readonly List<Parasite> spawnedParasites = new List<Parasite>();
     private bool isRunning;
     private bool isComplete;
+    private bool completionRaised;
     private bool tongsEquipped;
     private bool usingBodyPrefabAnchors;
 
@@ -112,12 +114,16 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void Begin(CustomerAgent customer)
     {
+        EnsureRootActiveForBegin();
+        ApplyRootBodySorting();
+
         activeCustomer = customer;
         activeSanity = customer != null ? customer.GetComponent<Sanity>() : null;
         activeParasite = null;
         meterParasite = null;
         isRunning = true;
         isComplete = false;
+        completionRaised = false;
         tongsEquipped = !requireTongsEquipped;
 
         PrepareParasites();
@@ -172,11 +178,12 @@ public sealed class TongsMiniGame : MonoBehaviour
     public void Resume()
     {
         SetRootVisible(true);
+        ApplyRootBodySorting();
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
 
         if (isComplete)
         {
-            SetCompleteButtonVisible(true);
+            SetCompleteButtonVisible(!autoCompleteWhenAllParasitesDone);
             return;
         }
 
@@ -225,15 +232,7 @@ public sealed class TongsMiniGame : MonoBehaviour
             return;
         }
 
-        Stop();
-
-        if (completeTreatmentOnButton)
-        {
-            flow?.CompleteTreatment(activeCustomer);
-            return;
-        }
-
-        MiniGameCompleted?.Invoke();
+        RaiseCompleted();
     }
 
     private void BeginHoldAt(Vector2 pointerPosition)
@@ -904,7 +903,31 @@ public sealed class TongsMiniGame : MonoBehaviour
     private void RefreshCompletionState()
     {
         isComplete = HasAnyParasite() && AreAllParasitesExtracted();
-        SetCompleteButtonVisible(isComplete);
+        SetCompleteButtonVisible(isComplete && !autoCompleteWhenAllParasitesDone);
+
+        if (isComplete && autoCompleteWhenAllParasitesDone)
+        {
+            RaiseCompleted();
+        }
+    }
+
+    private void RaiseCompleted()
+    {
+        if (completionRaised)
+        {
+            return;
+        }
+
+        completionRaised = true;
+        Stop();
+
+        if (completeTreatmentOnButton)
+        {
+            flow?.CompleteTreatment(activeCustomer);
+            return;
+        }
+
+        MiniGameCompleted?.Invoke();
     }
 
     private bool HasAnyParasite()
@@ -950,6 +973,25 @@ public sealed class TongsMiniGame : MonoBehaviour
         if (root != null)
         {
             root.SetActive(visible);
+        }
+    }
+
+    private void EnsureRootActiveForBegin()
+    {
+        GameObject target = root != null ? root : gameObject;
+        if (target != null && !target.activeSelf)
+        {
+            target.SetActive(true);
+        }
+    }
+
+    private void ApplyRootBodySorting()
+    {
+        GameObject target = root != null ? root : gameObject;
+        TreatmentBodyPrefab body = target != null ? target.GetComponent<TreatmentBodyPrefab>() : null;
+        if (body != null)
+        {
+            body.ApplyBodySpriteSorting();
         }
     }
 

@@ -757,8 +757,15 @@ Then add entries like:
 
 ```text
 Tongs + Arm  -> Tongs_Arm_BodyPrefab
-Knife + Leg  -> Knife_Leg_BodyPrefab
+Knife + Torso -> Knife_Torso_BodyPrefab
 Needle + Arm -> Needle_Arm_BodyPrefab
+```
+
+Current live catalog entries:
+
+```text
+Tongs + Arm   -> Tongs_Arm_BodyPrefab
+Knife + Torso -> Knife_Torsoo_BodyPrefab
 ```
 
 ### 13.2 Body Prefab Asset
@@ -906,9 +913,22 @@ Current implementation checkpoint:
 
 ```text
 TreatmentBodyPrefabCatalog maps Tongs + Arm to Tongs_Arm_BodyPrefab.
+TreatmentBodyPrefabCatalog maps Knife + Torso to Knife_Torsoo_BodyPrefab.
 AnatomyController can call TreatmentBodyPrefabSpawner before starting Tongs, Knife, or Needle.
 TongsMiniGame, KnifeMiniGame, and NeedleMiniGame can consume roots/anchors from a spawned TreatmentBodyPrefab.
 Existing scenes still fall back to their current serialized mini game references when no spawner is assigned.
+```
+
+Current Knife Torso checkpoint:
+
+```text
+Knife_Torsoo_BodyPrefab owns its TreatmentBodyPrefab and KnifeMiniGame components.
+Game_K no longer keeps the old KnifeMiniGameRoot scene instance.
+AnatomyController spawns Knife_Torsoo_BodyPrefab for Torso + Knife, resolves KnifeMiniGame from the spawned body, and injects GameFlow, input camera, and MiniGameOverlay at runtime.
+TreatmentBodyPrefab enforces BodySpriteRoot sorting as Main / 20.
+Knife Torso completes, returns to Anatomy, and marks Torso treated.
+Tongs Arm starts after Torso, appears correctly, completes, returns to Anatomy, and marks Arm treated.
+Full Complete Test validation is paused because the active mixed case still includes Leg + Needle.
 ```
 
 Scene setup support:
@@ -917,7 +937,7 @@ Scene setup support:
 Tools > Pixel Forge > Treatment > Setup Dynamic Body Prefab Spawner In Open Scene
 ```
 
-This editor command adds or configures `TreatmentBodyPrefabSpawner` on the scene `AnatomyController`, assigns the shared catalog, chooses the current treatment body parent, and disables scene-authored `TreatmentBodyPrefab` instances so the catalog-spawned body does not overlap them.
+This editor command adds or configures `TreatmentBodyPrefabSpawner` on the scene `AnatomyController`, assigns the shared catalog, chooses the current treatment body parent, and disables scene-authored `TreatmentBodyPrefab` instances so the catalog-spawned body does not overlap them. It should not disable body prefabs that host active mini-game components.
 
 ---
 

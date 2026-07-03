@@ -31,6 +31,7 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
         Transform parent = bodyParent != null ? bodyParent : transform;
         activeBody = Instantiate(prefab, parent);
         activeBody.name = $"{miniGameType}_{area}_Body";
+        activeBody.ApplyBodySpriteSorting();
         body = activeBody;
 
         if (!activeBody.Matches(miniGameType, area))

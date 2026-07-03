@@ -7,6 +7,9 @@ public sealed class TreatmentBodyPrefab : MonoBehaviour
     [SerializeField] private BodyArea area = BodyArea.Arm;
     [SerializeField] private Transform gameplayRoot;
     [SerializeField] private Transform bodySpriteRoot;
+    [SerializeField] private bool enforceBodySpriteSorting = true;
+    [SerializeField] private string bodySortingLayerName = "Main";
+    [SerializeField] private int bodySortingOrder = 20;
 
     [Header("Tongs")]
     [SerializeField] private Transform parasiteRoot;
@@ -31,9 +34,34 @@ public sealed class TreatmentBodyPrefab : MonoBehaviour
     public Transform PustuleRoot => pustuleRoot;
     public IReadOnlyList<Transform> PustuleSpawnAnchors => pustuleSpawnAnchors;
 
+    private void Awake()
+    {
+        ApplyBodySpriteSorting();
+    }
+
     public bool Matches(TreatmentMiniGameType requestedMiniGameType, BodyArea requestedArea)
     {
         return miniGameType == requestedMiniGameType && area == requestedArea;
+    }
+
+    public void ApplyBodySpriteSorting()
+    {
+        if (!enforceBodySpriteSorting || bodySpriteRoot == null)
+        {
+            return;
+        }
+
+        SpriteRenderer[] renderers = bodySpriteRoot.GetComponentsInChildren<SpriteRenderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] == null)
+            {
+                continue;
+            }
+
+            renderers[i].sortingLayerName = bodySortingLayerName;
+            renderers[i].sortingOrder = bodySortingOrder;
+        }
     }
 
     public List<Transform> GetParasiteAnchorTransforms()
@@ -62,6 +90,8 @@ public sealed class TreatmentBodyPrefab : MonoBehaviour
         {
             gameplayRoot = transform;
         }
+
+        ApplyBodySpriteSorting();
     }
 
     private static List<Transform> CopyValidTransforms(IReadOnlyList<Transform> source)

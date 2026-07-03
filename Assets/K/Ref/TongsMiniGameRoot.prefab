@@ -617,6 +617,7 @@ MonoBehaviour:
   requireTongsEquipped: 1
   autoFindParasitesInChildren: 1
   startHidden: 1
+  autoCompleteWhenAllParasitesDone: 1
   completeTreatmentOnButton: 0
   useUnscaledTime: 0
 --- !u!1 &5684575097073768892

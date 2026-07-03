@@ -247,6 +247,9 @@ MonoBehaviour:
   area: 2
   gameplayRoot: {fileID: 5115137240516885456}
   bodySpriteRoot: {fileID: 5900884200986502530}
+  enforceBodySpriteSorting: 1
+  bodySortingLayerName: Main
+  bodySortingOrder: 20
   parasiteRoot: {fileID: 7787635775516227447}
   parasiteSpawnAnchors:
   - {fileID: 2846216220201894323}
