@@ -205,7 +205,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -398,7 +398,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.5, y: 2}
+  m_Size: {x: 0.91333336, y: 0.92333335}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1664,7 +1664,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 4.8, y: 2.7}
+  m_Size: {x: 1.62, y: 3.13}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -2466,19 +2466,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Dialog
   flow: {fileID: 491569613}
-  dialogData: {fileID: 11400000, guid: 2b0e74fb714f32745a586ac4f2f7cd2f, type: 2}
+  dialogData: {fileID: 11400000, guid: 0279b89aa91043c42ad89328cb701904, type: 2}
   root: {fileID: 303029290}
-  speakerText: {fileID: 1036505797}
-  bodyText: {fileID: 1488935706}
+  speakerText: {fileID: 0}
+  bodyText: {fileID: 0}
   nextButton: {fileID: 1667324898}
-  charactersPerSecond: 25
+  charactersPerSecond: 45
   useUnscaledTime: 1
-  dialogAudioSource: {fileID: 1900121089}
-  playerBlipClip: {fileID: 8300000, guid: eea90867271d0c442bbf0f4222f66b88, type: 3}
+  dialogAudioSource: {fileID: 0}
+  playerBlipClip: {fileID: 0}
   customerBlipClip: {fileID: 0}
-  blipVolume: 0.3
-  blipEveryVisibleCharacters: 4
-  minimumBlipInterval: 0.1
+  blipVolume: 0.45
+  blipEveryVisibleCharacters: 2
+  minimumBlipInterval: 0.025
   stopBlipsWhenLineCompletes: 1
 --- !u!114 &491569613
 MonoBehaviour:
@@ -2494,9 +2494,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameFlow
   firstCustomer: {fileID: 310168016}
   dialog: {fileID: 491569612}
-  roomTransition: {fileID: 491569616}
-  treatment: {fileID: 491569615}
-  candle: {fileID: 684896821}
+  roomTransition: {fileID: 0}
+  treatment: {fileID: 0}
+  candle: {fileID: 0}
   startOnPlay: 1
 --- !u!4 &491569614
 Transform:
@@ -2870,7 +2870,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 5.625
+  orthographic size: 5.875
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -4228,7 +4228,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.41, y: 1.2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -4331,7 +4331,7 @@ PolygonCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5121951, y: -0.016666668}
     oldSize: {x: 0.41, y: 1.2}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 0.41, y: 1.2}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -5689,7 +5689,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -6010,7 +6010,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -7126,8 +7126,8 @@ Transform:
   m_GameObject: {fileID: 1303517289}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.03999996, y: 0.012499809, z: 2.42}
-  m_LocalScale: {x: 4.5, y: 4.5, z: 1}
+  m_LocalPosition: {x: -0.0172, y: -0.1307, z: 2.42}
+  m_LocalScale: {x: 5.526158, y: 5.6664076, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 537672987}
@@ -7186,7 +7186,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4.8, y: 2.7}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -7294,7 +7294,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.5, y: 2}
+  m_Size: {x: 0.91333336, y: 0.92333335}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -7436,7 +7436,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -7933,7 +7933,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -8502,7 +8502,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -11182,7 +11182,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.19, y: 1.46}
+  m_Size: {x: 16.72, y: 9.41}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -11719,6 +11719,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: KnifeMiniGameRoot
       objectReference: {fileID: 0}
+    - target: {fileID: 4096826466024471162, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11732,6 +11736,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1692959104}
     m_Modifications:
+    - target: {fileID: 1404394231517971868, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4272767828331770880, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -11775,6 +11783,18 @@ PrefabInstance:
     - target: {fileID: 5544644698791816240, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
       propertyPath: m_Name
       value: TongsMiniGameRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 5544644698791816240, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6184337514388586145, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8567287288857996514, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9152243872057504307, guid: a190f2b563c33a7459a1b5480ff929d5, type: 3}
       propertyPath: flow
