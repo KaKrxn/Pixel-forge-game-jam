@@ -20,6 +20,9 @@ public sealed class Pustule : MonoBehaviour
     [SerializeField] private Color normalColor = new Color(0.96f, 0.72f, 0.34f, 1f);
     [SerializeField] private Color piercedColor = new Color(1f, 0.86f, 0.46f, 1f);
     [SerializeField] private Color completedColor = new Color(1f, 1f, 1f, 0.2f);
+    [Header("State Visuals")]
+    [SerializeField] private GameObject fullVisualRoot;
+    [SerializeField] private GameObject emptyVisualRoot;
 
     private Collider2D hitCollider;
     private float pierceProgress;
@@ -147,6 +150,22 @@ public sealed class Pustule : MonoBehaviour
         DrainPain(deltaTime);
     }
 
+    public void ApplySpawnSettings(float radiusOverride)
+    {
+        if (radiusOverride <= 0f)
+        {
+            return;
+        }
+
+        pustuleRadius = radiusOverride;
+        ResolveReferences();
+
+        if (hitCollider is CircleCollider2D circleCollider)
+        {
+            circleCollider.radius = radiusOverride;
+        }
+    }
+
     private Vector2 ApplyDrainJitter(Vector2 pointerWorldPosition)
     {
         if (type != PustuleType.Big || jitterStrength <= 0f)
@@ -263,6 +282,8 @@ public sealed class Pustule : MonoBehaviour
 
     private void ApplyVisualState()
     {
+        ApplyStateVisualRoots();
+
         if (targetRenderer == null)
         {
             return;
@@ -279,6 +300,24 @@ public sealed class Pustule : MonoBehaviour
         else
         {
             targetRenderer.color = normalColor;
+        }
+    }
+
+    private void ApplyStateVisualRoots()
+    {
+        if (fullVisualRoot == null && emptyVisualRoot == null)
+        {
+            return;
+        }
+
+        if (fullVisualRoot != null)
+        {
+            fullVisualRoot.SetActive(!completed);
+        }
+
+        if (emptyVisualRoot != null)
+        {
+            emptyVisualRoot.SetActive(completed);
         }
     }
 

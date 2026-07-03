@@ -10,11 +10,48 @@ using UnityEngine.InputSystem;
 
 public sealed class KnifeMiniGame : MonoBehaviour
 {
+    [Serializable]
+    private sealed class LesionSpawnOption
+    {
+        [SerializeField] private LesionType lesionType = LesionType.Tumor;
+        [SerializeField] private Lesion lesionPrefab;
+
+        public LesionType LesionType => lesionType;
+        public Lesion LesionPrefab => lesionPrefab;
+        public bool IsValid => lesionPrefab != null;
+    }
+
+    private sealed class RuntimeLesionAnchor
+    {
+        public RuntimeLesionAnchor(Transform spawnPoint, LesionSpawnAnchor anchor)
+        {
+            SpawnPoint = spawnPoint;
+            Anchor = anchor;
+        }
+
+        public Transform SpawnPoint { get; }
+        public LesionSpawnAnchor Anchor { get; }
+        public bool IsConfigurable => Anchor != null;
+        public bool IsValid => SpawnPoint != null;
+
+        public Quaternion GetRotation(LesionCutOrientation orientation)
+        {
+            if (Anchor != null)
+            {
+                return Anchor.GetSpawnRotation(orientation);
+            }
+
+            return SpawnPoint != null ? SpawnPoint.rotation : Quaternion.identity;
+        }
+    }
+
     [SerializeField] private GameFlow flow;
     [SerializeField] private GameObject root;
     [SerializeField] private Transform lesionRoot;
     [SerializeField] private List<Lesion> lesions = new List<Lesion>();
     [Header("Spawn")]
+    [SerializeField] private List<LesionSpawnOption> lesionSpawnOptions = new List<LesionSpawnOption>();
+    [SerializeField] private List<LesionSpawnAnchor> lesionSpawnAnchors = new List<LesionSpawnAnchor>();
     [SerializeField] private List<Lesion> lesionPrefabs = new List<Lesion>();
     [SerializeField] private List<Transform> spawnAnchors = new List<Transform>();
     [SerializeField] private bool spawnLesionsOnBegin;
@@ -353,7 +390,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     private void PrepareLesions()
     {
-        if (spawnLesionsOnBegin && lesionPrefabs.Count > 0 && spawnAnchors.Count > 0)
+        if (spawnLesionsOnBegin && HasAnyLesionPrefabSource() && HasAnyLesionAnchorSource())
         {
             SpawnLesions();
             return;
@@ -366,8 +403,9 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         ClearSpawnedLesions();
         lesions.Clear();
+        HideAllLesionSpawnVisuals();
 
-        List<Transform> anchors = GetShuffledAnchors();
+        List<RuntimeLesionAnchor> anchors = GetShuffledAnchors();
         int low = Mathf.Max(1, minLesions);
         int high = Mathf.Max(low, maxLesions);
         int count = Mathf.Min(UnityEngine.Random.Range(low, high + 1), anchors.Count);
@@ -376,16 +414,173 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            if (!TryGetNextPrefab(prefabBag, out Lesion prefab))
+            RuntimeLesionAnchor anchor = anchors[i];
+            if (!TryGetPrefabForAnchor(anchor, prefabBag, out Lesion prefab, out LesionType lesionType, out LesionCutOrientation orientation))
             {
-                break;
+                continue;
             }
 
-            Lesion lesion = Instantiate(prefab, anchors[i].position, anchors[i].rotation, parent);
-            lesion.name = $"{prefab.name}_{i + 1:00}";
+            Lesion lesion = Instantiate(prefab, anchor.SpawnPoint.position, anchor.GetRotation(orientation), parent);
+            lesion.name = $"{prefab.name}_{i + 1:00}_{lesionType}_{orientation}";
             lesions.Add(lesion);
             spawnedLesions.Add(lesion);
+            anchor.Anchor?.ShowSpawnVisual(lesionType, orientation);
         }
+    }
+
+    private bool HasAnyLesionPrefabSource()
+    {
+        if (lesionSpawnOptions != null)
+        {
+            for (int i = 0; i < lesionSpawnOptions.Count; i++)
+            {
+                if (lesionSpawnOptions[i] != null && lesionSpawnOptions[i].IsValid)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (lesionPrefabs != null)
+        {
+            for (int i = 0; i < lesionPrefabs.Count; i++)
+            {
+                if (lesionPrefabs[i] != null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasAnyLesionAnchorSource()
+    {
+        if (lesionSpawnAnchors != null)
+        {
+            for (int i = 0; i < lesionSpawnAnchors.Count; i++)
+            {
+                if (lesionSpawnAnchors[i] != null && lesionSpawnAnchors[i].IsUsable)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (spawnAnchors != null)
+        {
+            for (int i = 0; i < spawnAnchors.Count; i++)
+            {
+                if (spawnAnchors[i] != null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryGetPrefabForAnchor(RuntimeLesionAnchor anchor, List<Lesion> prefabBag, out Lesion prefab, out LesionType lesionType, out LesionCutOrientation orientation)
+    {
+        prefab = null;
+        lesionType = LesionType.Tumor;
+        orientation = LesionCutOrientation.Horizontal;
+
+        if (anchor == null || !anchor.IsValid)
+        {
+            return false;
+        }
+
+        if (anchor.IsConfigurable)
+        {
+            if (!anchor.Anchor.TryGetRandomLesionType(out lesionType) || !anchor.Anchor.TryGetRandomOrientation(out orientation))
+            {
+                return false;
+            }
+
+            return TryGetPrefabForType(lesionType, out prefab);
+        }
+
+        if (TryGetRandomTypedLesionPrefab(out lesionType, out prefab))
+        {
+            return true;
+        }
+
+        if (TryGetNextPrefab(prefabBag, out prefab))
+        {
+            lesionType = prefab.Type;
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryGetPrefabForType(LesionType lesionType, out Lesion prefab)
+    {
+        List<Lesion> candidates = new List<Lesion>();
+
+        if (lesionSpawnOptions != null)
+        {
+            for (int i = 0; i < lesionSpawnOptions.Count; i++)
+            {
+                LesionSpawnOption option = lesionSpawnOptions[i];
+                if (option != null && option.IsValid && option.LesionType == lesionType)
+                {
+                    candidates.Add(option.LesionPrefab);
+                }
+            }
+        }
+
+        if (candidates.Count == 0 && lesionPrefabs != null)
+        {
+            for (int i = 0; i < lesionPrefabs.Count; i++)
+            {
+                Lesion current = lesionPrefabs[i];
+                if (current != null && current.Type == lesionType)
+                {
+                    candidates.Add(current);
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            prefab = null;
+            return false;
+        }
+
+        prefab = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        return prefab != null;
+    }
+
+    private bool TryGetRandomTypedLesionPrefab(out LesionType lesionType, out Lesion prefab)
+    {
+        List<LesionSpawnOption> candidates = new List<LesionSpawnOption>();
+        if (lesionSpawnOptions != null)
+        {
+            for (int i = 0; i < lesionSpawnOptions.Count; i++)
+            {
+                LesionSpawnOption option = lesionSpawnOptions[i];
+                if (option != null && option.IsValid)
+                {
+                    candidates.Add(option);
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            lesionType = LesionType.Tumor;
+            prefab = null;
+            return false;
+        }
+
+        LesionSpawnOption selected = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        lesionType = selected.LesionType;
+        prefab = selected.LesionPrefab;
+        return prefab != null;
     }
 
     private bool TryGetNextPrefab(List<Lesion> prefabBag, out Lesion prefab)
@@ -418,14 +613,37 @@ public sealed class KnifeMiniGame : MonoBehaviour
         return prefab != null;
     }
 
-    private List<Transform> GetShuffledAnchors()
+    private List<RuntimeLesionAnchor> GetShuffledAnchors()
     {
-        List<Transform> anchors = new List<Transform>();
-        for (int i = 0; i < spawnAnchors.Count; i++)
+        List<RuntimeLesionAnchor> anchors = new List<RuntimeLesionAnchor>();
+
+        if (lesionSpawnAnchors != null)
         {
-            if (spawnAnchors[i] != null)
+            for (int i = 0; i < lesionSpawnAnchors.Count; i++)
             {
-                anchors.Add(spawnAnchors[i]);
+                AddRuntimeAnchor(anchors, lesionSpawnAnchors[i]);
+            }
+        }
+
+        if (spawnAnchors != null)
+        {
+            for (int i = 0; i < spawnAnchors.Count; i++)
+            {
+                Transform spawnAnchor = spawnAnchors[i];
+                if (spawnAnchor == null)
+                {
+                    continue;
+                }
+
+                LesionSpawnAnchor configurableAnchor = spawnAnchor.GetComponent<LesionSpawnAnchor>();
+                if (configurableAnchor != null)
+                {
+                    AddRuntimeAnchor(anchors, configurableAnchor);
+                }
+                else if (!ContainsSpawnPoint(anchors, spawnAnchor))
+                {
+                    anchors.Add(new RuntimeLesionAnchor(spawnAnchor, null));
+                }
             }
         }
 
@@ -436,6 +654,53 @@ public sealed class KnifeMiniGame : MonoBehaviour
         }
 
         return anchors;
+    }
+
+    private static void AddRuntimeAnchor(List<RuntimeLesionAnchor> anchors, LesionSpawnAnchor anchor)
+    {
+        if (anchor == null || !anchor.IsUsable || ContainsSpawnPoint(anchors, anchor.SpawnPoint))
+        {
+            return;
+        }
+
+        anchors.Add(new RuntimeLesionAnchor(anchor.SpawnPoint, anchor));
+    }
+
+    private static bool ContainsSpawnPoint(List<RuntimeLesionAnchor> anchors, Transform spawnPoint)
+    {
+        for (int i = 0; i < anchors.Count; i++)
+        {
+            if (anchors[i] != null && anchors[i].SpawnPoint == spawnPoint)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void HideAllLesionSpawnVisuals()
+    {
+        if (lesionSpawnAnchors != null)
+        {
+            for (int i = 0; i < lesionSpawnAnchors.Count; i++)
+            {
+                lesionSpawnAnchors[i]?.HideSpawnVisuals();
+            }
+        }
+
+        if (spawnAnchors == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < spawnAnchors.Count; i++)
+        {
+            if (spawnAnchors[i] != null && spawnAnchors[i].TryGetComponent(out LesionSpawnAnchor anchor))
+            {
+                anchor.HideSpawnVisuals();
+            }
+        }
     }
 
     private void RefreshLesionList()

@@ -31,6 +31,9 @@ public sealed class Lesion : MonoBehaviour
     [SerializeField] private Color normalColor = Color.white;
     [SerializeField] private Color woundOpenColor = new Color(1f, 0.55f, 0.45f, 1f);
     [SerializeField] private Color completedColor = new Color(1f, 1f, 1f, 0.25f);
+    [Header("State Visuals")]
+    [SerializeField] private GameObject closedVisualRoot;
+    [SerializeField] private GameObject openedVisualRoot;
     [Header("Cut Guide")]
     [SerializeField] private CutGuideLine guideLine;
     [Header("Pull Visual")]
@@ -456,6 +459,8 @@ public sealed class Lesion : MonoBehaviour
 
     private void ApplyVisualState()
     {
+        ApplyStateVisualRoots();
+
         if (targetRenderer == null)
         {
             return;
@@ -472,6 +477,27 @@ public sealed class Lesion : MonoBehaviour
         else
         {
             targetRenderer.color = normalColor;
+        }
+    }
+
+    private void ApplyStateVisualRoots()
+    {
+        if (closedVisualRoot == null && openedVisualRoot == null)
+        {
+            return;
+        }
+
+        bool showOpened = !completed && type == LesionType.Bulge && woundOpen;
+        bool showClosed = !completed && !showOpened;
+
+        if (closedVisualRoot != null)
+        {
+            closedVisualRoot.SetActive(showClosed);
+        }
+
+        if (openedVisualRoot != null)
+        {
+            openedVisualRoot.SetActive(showOpened);
         }
     }
 

@@ -23,6 +23,7 @@ public static class KnifeMiniGameSetup
         EnsureSampleLesions(lesionRoot);
         EnsureGuideLines(lesionRoot);
         EnsureSpawnAnchors(spawnRoot);
+        EnsureSpawnAnchorComponents(spawnRoot);
 
         AssignMiniGame(miniGame, lesionRoot, spawnRoot);
         AssignAnatomyController(miniGame);
@@ -102,6 +103,15 @@ public static class KnifeMiniGameSetup
         }
 
         Transform[] anchors = GetDirectChildren(spawnRoot);
+        LesionSpawnAnchor[] lesionAnchors = GetDirectChildComponents<LesionSpawnAnchor>(spawnRoot);
+        SerializedProperty lesionSpawnAnchors = serializedObject.FindProperty("lesionSpawnAnchors");
+        lesionSpawnAnchors.ClearArray();
+        for (int i = 0; i < lesionAnchors.Length; i++)
+        {
+            lesionSpawnAnchors.InsertArrayElementAtIndex(i);
+            lesionSpawnAnchors.GetArrayElementAtIndex(i).objectReferenceValue = lesionAnchors[i];
+        }
+
         SerializedProperty spawnAnchors = serializedObject.FindProperty("spawnAnchors");
         spawnAnchors.ClearArray();
         for (int i = 0; i < anchors.Length; i++)
@@ -270,12 +280,24 @@ public static class KnifeMiniGameSetup
 
     private static void CreateAnchor(Transform parent, string name, Vector3 localPosition)
     {
-        GameObject anchor = new GameObject(name);
+        GameObject anchor = new GameObject(name, typeof(LesionSpawnAnchor));
         Undo.RegisterCreatedObjectUndo(anchor, $"Create {name}");
         anchor.transform.SetParent(parent, false);
         anchor.transform.localPosition = localPosition;
         anchor.transform.localRotation = Quaternion.identity;
         anchor.transform.localScale = Vector3.one;
+    }
+
+    private static void EnsureSpawnAnchorComponents(Transform spawnRoot)
+    {
+        Transform[] anchors = GetDirectChildren(spawnRoot);
+        for (int i = 0; i < anchors.Length; i++)
+        {
+            if (anchors[i] != null && anchors[i].GetComponent<LesionSpawnAnchor>() == null)
+            {
+                Undo.AddComponent<LesionSpawnAnchor>(anchors[i].gameObject);
+            }
+        }
     }
 
     private static Transform FindOrCreateChild(Transform parent, string name)
@@ -304,6 +326,21 @@ public static class KnifeMiniGameSetup
         }
 
         return children;
+    }
+
+    private static T[] GetDirectChildComponents<T>(Transform parent) where T : Component
+    {
+        System.Collections.Generic.List<T> components = new System.Collections.Generic.List<T>();
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            T component = parent.GetChild(i).GetComponent<T>();
+            if (component != null)
+            {
+                components.Add(component);
+            }
+        }
+
+        return components.ToArray();
     }
 
     private static Button FindButton(Transform root, string buttonName)

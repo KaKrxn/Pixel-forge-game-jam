@@ -22,6 +22,7 @@ public static class NeedleMiniGameSetup
         Transform spawnRoot = FindOrCreateChild(miniGame.transform, "Spawn Anchor Manager");
         EnsureSamplePustules(pustuleRoot);
         EnsureSpawnAnchors(spawnRoot);
+        EnsureSpawnAnchorComponents(spawnRoot);
 
         AssignMiniGame(miniGame, pustuleRoot, spawnRoot);
         AssignAnatomyController(miniGame);
@@ -101,6 +102,15 @@ public static class NeedleMiniGameSetup
         }
 
         Transform[] anchors = GetDirectChildren(spawnRoot);
+        PustuleSpawnAnchor[] pustuleAnchors = GetDirectChildComponents<PustuleSpawnAnchor>(spawnRoot);
+        SerializedProperty pustuleSpawnAnchors = serializedObject.FindProperty("pustuleSpawnAnchors");
+        pustuleSpawnAnchors.ClearArray();
+        for (int i = 0; i < pustuleAnchors.Length; i++)
+        {
+            pustuleSpawnAnchors.InsertArrayElementAtIndex(i);
+            pustuleSpawnAnchors.GetArrayElementAtIndex(i).objectReferenceValue = pustuleAnchors[i];
+        }
+
         SerializedProperty spawnAnchors = serializedObject.FindProperty("spawnAnchors");
         spawnAnchors.ClearArray();
         for (int i = 0; i < anchors.Length; i++)
@@ -245,12 +255,24 @@ public static class NeedleMiniGameSetup
 
     private static void CreateAnchor(Transform parent, string name, Vector3 localPosition)
     {
-        GameObject anchor = new GameObject(name);
+        GameObject anchor = new GameObject(name, typeof(PustuleSpawnAnchor));
         Undo.RegisterCreatedObjectUndo(anchor, $"Create {name}");
         anchor.transform.SetParent(parent, false);
         anchor.transform.localPosition = localPosition;
         anchor.transform.localRotation = Quaternion.identity;
         anchor.transform.localScale = Vector3.one;
+    }
+
+    private static void EnsureSpawnAnchorComponents(Transform spawnRoot)
+    {
+        Transform[] anchors = GetDirectChildren(spawnRoot);
+        for (int i = 0; i < anchors.Length; i++)
+        {
+            if (anchors[i] != null && anchors[i].GetComponent<PustuleSpawnAnchor>() == null)
+            {
+                Undo.AddComponent<PustuleSpawnAnchor>(anchors[i].gameObject);
+            }
+        }
     }
 
     private static GameObject CreateOverlayToolButton(MiniGameOverlay overlay, string objectName, string label)
@@ -345,6 +367,21 @@ public static class NeedleMiniGameSetup
         }
 
         return children;
+    }
+
+    private static T[] GetDirectChildComponents<T>(Transform parent) where T : Component
+    {
+        System.Collections.Generic.List<T> components = new System.Collections.Generic.List<T>();
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            T component = parent.GetChild(i).GetComponent<T>();
+            if (component != null)
+            {
+                components.Add(component);
+            }
+        }
+
+        return components.ToArray();
     }
 
     private static Button FindButton(Transform root, string buttonName)

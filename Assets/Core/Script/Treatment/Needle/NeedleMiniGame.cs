@@ -9,11 +9,38 @@ using UnityEngine.InputSystem;
 
 public sealed class NeedleMiniGame : MonoBehaviour
 {
+    [Serializable]
+    private sealed class PustuleSpawnOption
+    {
+        [SerializeField] private PustuleType pustuleType = PustuleType.Small;
+        [SerializeField] private Pustule pustulePrefab;
+
+        public PustuleType PustuleType => pustuleType;
+        public Pustule PustulePrefab => pustulePrefab;
+        public bool IsValid => pustulePrefab != null;
+    }
+
+    private sealed class RuntimePustuleAnchor
+    {
+        public RuntimePustuleAnchor(Transform spawnPoint, PustuleSpawnAnchor anchor)
+        {
+            SpawnPoint = spawnPoint;
+            Anchor = anchor;
+        }
+
+        public Transform SpawnPoint { get; }
+        public PustuleSpawnAnchor Anchor { get; }
+        public bool IsConfigurable => Anchor != null;
+        public bool IsValid => SpawnPoint != null;
+    }
+
     [SerializeField] private GameFlow flow;
     [SerializeField] private GameObject root;
     [SerializeField] private Transform pustuleRoot;
     [SerializeField] private List<Pustule> pustules = new List<Pustule>();
     [Header("Spawn")]
+    [SerializeField] private List<PustuleSpawnOption> pustuleSpawnOptions = new List<PustuleSpawnOption>();
+    [SerializeField] private List<PustuleSpawnAnchor> pustuleSpawnAnchors = new List<PustuleSpawnAnchor>();
     [SerializeField] private List<Pustule> pustulePrefabs = new List<Pustule>();
     [SerializeField] private List<Transform> spawnAnchors = new List<Transform>();
     [SerializeField] private bool spawnPustulesOnBegin;
@@ -350,7 +377,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     private void PreparePustules()
     {
-        if (spawnPustulesOnBegin && pustulePrefabs.Count > 0 && spawnAnchors.Count > 0)
+        if (spawnPustulesOnBegin && HasAnyPustulePrefabSource() && HasAnyPustuleAnchorSource())
         {
             SpawnPustules();
             return;
@@ -363,8 +390,9 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         ClearSpawnedPustules();
         pustules.Clear();
+        HideAllPustuleSpawnVisuals();
 
-        List<Transform> anchors = GetShuffledAnchors();
+        List<RuntimePustuleAnchor> anchors = GetShuffledAnchors();
         int low = Mathf.Max(1, minPustules);
         int high = Mathf.Max(low, maxPustules);
         int count = Mathf.Min(UnityEngine.Random.Range(low, high + 1), anchors.Count);
@@ -373,16 +401,177 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            if (!TryGetNextPrefab(prefabBag, out Pustule prefab))
+            RuntimePustuleAnchor anchor = anchors[i];
+            if (!TryGetPrefabForAnchor(anchor, prefabBag, out Pustule prefab, out PustuleType pustuleType))
             {
-                break;
+                continue;
             }
 
-            Pustule pustule = Instantiate(prefab, anchors[i].position, anchors[i].rotation, parent);
-            pustule.name = $"{prefab.name}_{i + 1:00}";
+            Pustule pustule = Instantiate(prefab, anchor.SpawnPoint.position, anchor.SpawnPoint.rotation, parent);
+            pustule.name = $"{prefab.name}_{i + 1:00}_{pustuleType}";
+            if (anchor.Anchor != null && anchor.Anchor.TryGetRadiusOverride(out float radiusOverride))
+            {
+                pustule.ApplySpawnSettings(radiusOverride);
+            }
+
             pustules.Add(pustule);
             spawnedPustules.Add(pustule);
+            anchor.Anchor?.ShowSpawnVisual(pustuleType);
         }
+    }
+
+    private bool HasAnyPustulePrefabSource()
+    {
+        if (pustuleSpawnOptions != null)
+        {
+            for (int i = 0; i < pustuleSpawnOptions.Count; i++)
+            {
+                if (pustuleSpawnOptions[i] != null && pustuleSpawnOptions[i].IsValid)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (pustulePrefabs != null)
+        {
+            for (int i = 0; i < pustulePrefabs.Count; i++)
+            {
+                if (pustulePrefabs[i] != null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasAnyPustuleAnchorSource()
+    {
+        if (pustuleSpawnAnchors != null)
+        {
+            for (int i = 0; i < pustuleSpawnAnchors.Count; i++)
+            {
+                if (pustuleSpawnAnchors[i] != null && pustuleSpawnAnchors[i].IsUsable)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (spawnAnchors != null)
+        {
+            for (int i = 0; i < spawnAnchors.Count; i++)
+            {
+                if (spawnAnchors[i] != null)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryGetPrefabForAnchor(RuntimePustuleAnchor anchor, List<Pustule> prefabBag, out Pustule prefab, out PustuleType pustuleType)
+    {
+        prefab = null;
+        pustuleType = PustuleType.Small;
+
+        if (anchor == null || !anchor.IsValid)
+        {
+            return false;
+        }
+
+        if (anchor.IsConfigurable)
+        {
+            if (!anchor.Anchor.TryGetRandomPustuleType(out pustuleType))
+            {
+                return false;
+            }
+
+            return TryGetPrefabForType(pustuleType, out prefab);
+        }
+
+        if (TryGetRandomTypedPustulePrefab(out pustuleType, out prefab))
+        {
+            return true;
+        }
+
+        if (TryGetNextPrefab(prefabBag, out prefab))
+        {
+            pustuleType = prefab.Type;
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryGetPrefabForType(PustuleType pustuleType, out Pustule prefab)
+    {
+        List<Pustule> candidates = new List<Pustule>();
+
+        if (pustuleSpawnOptions != null)
+        {
+            for (int i = 0; i < pustuleSpawnOptions.Count; i++)
+            {
+                PustuleSpawnOption option = pustuleSpawnOptions[i];
+                if (option != null && option.IsValid && option.PustuleType == pustuleType)
+                {
+                    candidates.Add(option.PustulePrefab);
+                }
+            }
+        }
+
+        if (candidates.Count == 0 && pustulePrefabs != null)
+        {
+            for (int i = 0; i < pustulePrefabs.Count; i++)
+            {
+                Pustule current = pustulePrefabs[i];
+                if (current != null && current.Type == pustuleType)
+                {
+                    candidates.Add(current);
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            prefab = null;
+            return false;
+        }
+
+        prefab = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        return prefab != null;
+    }
+
+    private bool TryGetRandomTypedPustulePrefab(out PustuleType pustuleType, out Pustule prefab)
+    {
+        List<PustuleSpawnOption> candidates = new List<PustuleSpawnOption>();
+        if (pustuleSpawnOptions != null)
+        {
+            for (int i = 0; i < pustuleSpawnOptions.Count; i++)
+            {
+                PustuleSpawnOption option = pustuleSpawnOptions[i];
+                if (option != null && option.IsValid)
+                {
+                    candidates.Add(option);
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            pustuleType = PustuleType.Small;
+            prefab = null;
+            return false;
+        }
+
+        PustuleSpawnOption selected = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        pustuleType = selected.PustuleType;
+        prefab = selected.PustulePrefab;
+        return prefab != null;
     }
 
     private bool TryGetNextPrefab(List<Pustule> prefabBag, out Pustule prefab)
@@ -415,14 +604,37 @@ public sealed class NeedleMiniGame : MonoBehaviour
         return prefab != null;
     }
 
-    private List<Transform> GetShuffledAnchors()
+    private List<RuntimePustuleAnchor> GetShuffledAnchors()
     {
-        List<Transform> anchors = new List<Transform>();
-        for (int i = 0; i < spawnAnchors.Count; i++)
+        List<RuntimePustuleAnchor> anchors = new List<RuntimePustuleAnchor>();
+
+        if (pustuleSpawnAnchors != null)
         {
-            if (spawnAnchors[i] != null)
+            for (int i = 0; i < pustuleSpawnAnchors.Count; i++)
             {
-                anchors.Add(spawnAnchors[i]);
+                AddRuntimeAnchor(anchors, pustuleSpawnAnchors[i]);
+            }
+        }
+
+        if (spawnAnchors != null)
+        {
+            for (int i = 0; i < spawnAnchors.Count; i++)
+            {
+                Transform spawnAnchor = spawnAnchors[i];
+                if (spawnAnchor == null)
+                {
+                    continue;
+                }
+
+                PustuleSpawnAnchor configurableAnchor = spawnAnchor.GetComponent<PustuleSpawnAnchor>();
+                if (configurableAnchor != null)
+                {
+                    AddRuntimeAnchor(anchors, configurableAnchor);
+                }
+                else if (!ContainsSpawnPoint(anchors, spawnAnchor))
+                {
+                    anchors.Add(new RuntimePustuleAnchor(spawnAnchor, null));
+                }
             }
         }
 
@@ -433,6 +645,53 @@ public sealed class NeedleMiniGame : MonoBehaviour
         }
 
         return anchors;
+    }
+
+    private static void AddRuntimeAnchor(List<RuntimePustuleAnchor> anchors, PustuleSpawnAnchor anchor)
+    {
+        if (anchor == null || !anchor.IsUsable || ContainsSpawnPoint(anchors, anchor.SpawnPoint))
+        {
+            return;
+        }
+
+        anchors.Add(new RuntimePustuleAnchor(anchor.SpawnPoint, anchor));
+    }
+
+    private static bool ContainsSpawnPoint(List<RuntimePustuleAnchor> anchors, Transform spawnPoint)
+    {
+        for (int i = 0; i < anchors.Count; i++)
+        {
+            if (anchors[i] != null && anchors[i].SpawnPoint == spawnPoint)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void HideAllPustuleSpawnVisuals()
+    {
+        if (pustuleSpawnAnchors != null)
+        {
+            for (int i = 0; i < pustuleSpawnAnchors.Count; i++)
+            {
+                pustuleSpawnAnchors[i]?.HideSpawnVisuals();
+            }
+        }
+
+        if (spawnAnchors == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < spawnAnchors.Count; i++)
+        {
+            if (spawnAnchors[i] != null && spawnAnchors[i].TryGetComponent(out PustuleSpawnAnchor anchor))
+            {
+                anchor.HideSpawnVisuals();
+            }
+        }
     }
 
     private void RefreshPustuleList()
