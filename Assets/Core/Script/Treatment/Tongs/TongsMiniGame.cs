@@ -39,6 +39,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     [Header("Input")]
     [SerializeField] private Camera inputCamera;
     [SerializeField] private float worldInputPlaneZ;
+    [SerializeField, Min(0.01f)] private float fallbackHitRadius = 0.45f;
     [Header("UI")]
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Tongs";
@@ -46,6 +47,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     [SerializeField] private bool requireTongsEquipped = true;
     [SerializeField] private bool autoFindParasitesInChildren = true;
     [SerializeField] private bool startHidden = true;
+    [SerializeField] private bool autoCompleteWhenAllParasitesDone = true;
     [SerializeField] private bool completeTreatmentOnButton;
     [SerializeField] private bool useUnscaledTime;
 
@@ -56,7 +58,9 @@ public sealed class TongsMiniGame : MonoBehaviour
     private readonly List<Parasite> spawnedParasites = new List<Parasite>();
     private bool isRunning;
     private bool isComplete;
+    private bool completionRaised;
     private bool tongsEquipped;
+    private bool usingBodyPrefabAnchors;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -110,12 +114,16 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void Begin(CustomerAgent customer)
     {
+        EnsureRootActiveForBegin();
+        ApplyRootBodySorting();
+
         activeCustomer = customer;
         activeSanity = customer != null ? customer.GetComponent<Sanity>() : null;
         activeParasite = null;
         meterParasite = null;
         isRunning = true;
         isComplete = false;
+        completionRaised = false;
         tongsEquipped = !requireTongsEquipped;
 
         PrepareParasites();
@@ -123,6 +131,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         ResetParasites();
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
+        overlay?.SelectTool(overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
         flow?.SetTreatmentStress(false);
@@ -132,14 +141,17 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         if (body == null)
         {
+            usingBodyPrefabAnchors = false;
             return;
         }
 
         UnsubscribeParasites();
         ClearSpawnedParasites();
+        ReplaceRuntimeRoot(body);
         parasiteRoot = body.ParasiteRoot != null ? body.ParasiteRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetParasiteAnchorTransforms());
+        usingBodyPrefabAnchors = true;
         RefreshParasiteList();
         SubscribeParasites();
     }
@@ -148,6 +160,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         EndActiveHold();
         isRunning = false;
+        usingBodyPrefabAnchors = false;
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -165,11 +178,12 @@ public sealed class TongsMiniGame : MonoBehaviour
     public void Resume()
     {
         SetRootVisible(true);
+        ApplyRootBodySorting();
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
 
         if (isComplete)
         {
-            SetCompleteButtonVisible(true);
+            SetCompleteButtonVisible(!autoCompleteWhenAllParasitesDone);
             return;
         }
 
@@ -218,15 +232,7 @@ public sealed class TongsMiniGame : MonoBehaviour
             return;
         }
 
-        Stop();
-
-        if (completeTreatmentOnButton)
-        {
-            flow?.CompleteTreatment(activeCustomer);
-            return;
-        }
-
-        MiniGameCompleted?.Invoke();
+        RaiseCompleted();
     }
 
     private void BeginHoldAt(Vector2 pointerPosition)
@@ -367,7 +373,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         return null;
     }
 
-    private static bool ContainsPointer(Parasite parasite, Vector2 worldPointer)
+    private bool ContainsPointer(Parasite parasite, Vector2 worldPointer)
     {
         Collider2D collider = parasite.GetComponent<Collider2D>();
         if (collider != null && collider.OverlapPoint(worldPointer))
@@ -384,7 +390,14 @@ public sealed class TongsMiniGame : MonoBehaviour
             }
         }
 
-        return false;
+        Vector2 rootPosition = parasite.transform.position;
+        if ((worldPointer - rootPosition).sqrMagnitude <= fallbackHitRadius * fallbackHitRadius)
+        {
+            return true;
+        }
+
+        Vector2 spawnAnchorPosition = parasite.SpawnAnchorWorldPosition;
+        return (worldPointer - spawnAnchorPosition).sqrMagnitude <= fallbackHitRadius * fallbackHitRadius;
     }
 
     private void RefreshParasiteList()
@@ -645,7 +658,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         Vector3 beforeRootPosition = parasite.transform.position;
         Vector3 beforePrefabAnchorPosition = parasite.SpawnAnchorWorldPosition;
 
-        if (alignParasiteAnchorToSpawnPoint)
+        if (alignParasiteAnchorToSpawnPoint && !usingBodyPrefabAnchors)
         {
             parasite.AlignSpawnAnchorToWorld(spawnPosition);
             LogSpawn($"Applied anchor alignment for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, beforePrefabSpawnAnchor={FormatVector(beforePrefabAnchorPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, afterPrefabSpawnAnchor={FormatVector(parasite.SpawnAnchorWorldPosition)}, rootDelta={FormatVector(parasite.transform.position - beforeRootPosition)}.", parasite);
@@ -654,7 +667,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
         parasite.transform.position = spawnPosition;
         parasite.RebaseVisualPosition();
-        LogSpawn($"Applied root-position spawn for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, prefabSpawnAnchorNow={FormatVector(parasite.SpawnAnchorWorldPosition)}.", parasite);
+        LogSpawn($"Applied root-position spawn for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, prefabSpawnAnchorNow={FormatVector(parasite.SpawnAnchorWorldPosition)}, usingBodyPrefabAnchors={usingBodyPrefabAnchors}.", parasite);
     }
 
     private static ParasiteSpawnAnchor GetSpawnAnchorData(Transform anchor)
@@ -890,7 +903,31 @@ public sealed class TongsMiniGame : MonoBehaviour
     private void RefreshCompletionState()
     {
         isComplete = HasAnyParasite() && AreAllParasitesExtracted();
-        SetCompleteButtonVisible(isComplete);
+        SetCompleteButtonVisible(isComplete && !autoCompleteWhenAllParasitesDone);
+
+        if (isComplete && autoCompleteWhenAllParasitesDone)
+        {
+            RaiseCompleted();
+        }
+    }
+
+    private void RaiseCompleted()
+    {
+        if (completionRaised)
+        {
+            return;
+        }
+
+        completionRaised = true;
+        Stop();
+
+        if (completeTreatmentOnButton)
+        {
+            flow?.CompleteTreatment(activeCustomer);
+            return;
+        }
+
+        MiniGameCompleted?.Invoke();
     }
 
     private bool HasAnyParasite()
@@ -937,5 +974,34 @@ public sealed class TongsMiniGame : MonoBehaviour
         {
             root.SetActive(visible);
         }
+    }
+
+    private void EnsureRootActiveForBegin()
+    {
+        GameObject target = root != null ? root : gameObject;
+        if (target != null && !target.activeSelf)
+        {
+            target.SetActive(true);
+        }
+    }
+
+    private void ApplyRootBodySorting()
+    {
+        GameObject target = root != null ? root : gameObject;
+        TreatmentBodyPrefab body = target != null ? target.GetComponent<TreatmentBodyPrefab>() : null;
+        if (body != null)
+        {
+            body.ApplyBodySpriteSorting();
+        }
+    }
+
+    private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
+    {
+        if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
+        {
+            root.SetActive(false);
+        }
+
+        root = body.gameObject;
     }
 }

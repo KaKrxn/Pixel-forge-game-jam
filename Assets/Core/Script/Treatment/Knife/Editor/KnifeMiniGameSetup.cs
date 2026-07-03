@@ -89,6 +89,7 @@ public static class KnifeMiniGameSetup
         serializedObject.FindProperty("worldInputPlaneZ").floatValue = 0f;
         serializedObject.FindProperty("overlay").objectReferenceValue = FindSceneObject<MiniGameOverlay>();
         serializedObject.FindProperty("overlayToolId").stringValue = "Knife";
+        serializedObject.FindProperty("pullToolId").stringValue = "Tongs";
         serializedObject.FindProperty("spawnLesionsOnBegin").boolValue = false;
         serializedObject.FindProperty("autoCompleteWhenAllLesionsDone").boolValue = true;
         serializedObject.FindProperty("startHidden").boolValue = true;

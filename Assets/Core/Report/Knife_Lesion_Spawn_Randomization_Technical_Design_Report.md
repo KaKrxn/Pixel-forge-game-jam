@@ -211,7 +211,7 @@ Bulge needs two visual states:
 2. **Opened Bulge**
    - Visible after the cut is complete.
    - Represents the opened wound state.
-   - Player should stop holding Knife and use bare hand to pull.
+   - Player should switch to the `Tongs` tool and pull/extract the opened lesion.
 
 Recommended prefab structure:
 
@@ -288,7 +288,7 @@ Knife equipped -> cut along guide path -> complete
 Bulge:
 
 ```text
-Knife equipped -> cut along guide path -> switch to opened visual -> bare hand pull -> complete
+Knife equipped -> cut along guide path -> switch to opened visual -> Tongs pull -> complete
 ```
 
 ### 7.4 Completion
@@ -514,13 +514,21 @@ After Unity setup is stable, old fields can be hidden or removed later.
 
 ### 10.3 Body Prefab Catalog Integration
 
-The body prefab catalog system is currently a separate routing layer. This Knife spawn randomization design should be compatible with it, but full automatic body prefab swapping requires a later hook:
+The body prefab catalog system is currently the routing layer used by the active Knife Torso test. The current flow is:
 
 ```text
 AnatomyController -> TreatmentBodyPrefabSpawner -> KnifeMiniGame
 ```
 
-This report only defines the Knife lesion randomization design.
+Current implementation notes:
+
+- `Knife_Torsoo_BodyPrefab` is the current Knife body-prefab test asset.
+- It is configured as `Knife + Torso` through `TreatmentBodyPrefab`.
+- It hosts its own `KnifeMiniGame` component.
+- It provides lesion spawn anchors through `TreatmentBodyPrefab.lesionSpawnAnchors`.
+- It uses `KnifeSampleLesion_Tumor` and `KnifeSampleLesion_Bulge` as current test lesion prefabs.
+- `Game_K` no longer uses the old scene-authored `KnifeMiniGameRoot`.
+- `AnatomyController` injects runtime scene references into the spawned body's `KnifeMiniGame`.
 
 ---
 
@@ -532,9 +540,18 @@ This report only defines the Knife lesion randomization design.
 4. Update `KnifeMiniGame.SpawnLesions()`.
 5. Add Bulge closed/open visuals to `Lesion`.
 6. Update editor setup helper.
-7. Configure one test prefab: `Knife_Arm_BodyPrefab`.
+7. Configure one test prefab: `Knife_Torsoo_BodyPrefab`.
 8. Run Unity play test.
-9. Expand setup to Head, Torso, and Leg Knife body prefabs.
+9. Confirm Knife completion returns to Anatomy and marks Torso treated.
+10. Expand setup to Head, Arm, and Leg Knife body prefabs.
+
+Current status:
+
+```text
+Steps 1-7 are implemented for the current Knife Torso test path.
+Step 8 is in progress.
+Step 9 is the next validation target.
+```
 
 ---
 

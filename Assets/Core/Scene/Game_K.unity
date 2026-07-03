@@ -1751,7 +1751,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d0b72f20f5c3064bb6b9a5de63f3859, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerCaseProvider
-  caseData: {fileID: 11400000, guid: 8d4f2a7c9b13485b9c6e2f1a0d7e3c44, type: 2}
+  caseData: {fileID: 11400000, guid: 50b2c95037b34bd438fb0a3a93a1e7db, type: 2}
 --- !u!1 &314523099
 GameObject:
   m_ObjectHideFlags: 0
@@ -2854,7 +2854,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 7.859375
+  orthographic size: 5.625
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3906,6 +3906,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tongs_Arm_BodyPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 4239366282502729421, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5115137240516885456, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -4007,11 +4011,13 @@ MonoBehaviour:
   debugSpawn: 1
   inputCamera: {fileID: 519420031}
   worldInputPlaneZ: 0
+  fallbackHitRadius: 0.45
   overlay: {fileID: 582104043}
   overlayToolId: Tongs
   requireTongsEquipped: 1
   autoFindParasitesInChildren: 1
   startHidden: 1
+  autoCompleteWhenAllParasitesDone: 1
   completeTreatmentOnButton: 0
   useUnscaledTime: 0
 --- !u!4 &629271885 stripped
@@ -6444,6 +6450,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1045452155}
   - component: {fileID: 1045452156}
+  - component: {fileID: 1045452157}
   m_Layer: 0
   m_Name: AnatomyScreen
   m_TagString: Untagged
@@ -6510,11 +6517,30 @@ MonoBehaviour:
   - {fileID: 1660565451}
   tongsArea: 2
   tongsMiniGame: {fileID: 629271884}
-  knifeMiniGame: {fileID: 1092907683}
+  knifeMiniGame: {fileID: 0}
   needleMiniGame: {fileID: 1910242605}
+  bodyPrefabSpawner: {fileID: 1045452157}
+  miniGameFlow: {fileID: 491569613}
+  miniGameInputCamera: {fileID: 519420031}
+  miniGameOverlay: {fileID: 582104043}
   knifeAreas: 000000000100000003000000
   needleAreas: 
   autoTreatInfectedAreasWithoutMiniGame: 1
+--- !u!114 &1045452157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045452154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f37e7dc4694143ab95e097f749a6fa44, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TreatmentBodyPrefabSpawner
+  catalog: {fileID: 11400000, guid: 6015f858ebbeb524e8c8a0769e624da9, type: 2}
+  bodyParent: {fileID: 1692959104}
+  logWarnings: 1
 --- !u!1 &1082651503
 GameObject:
   m_ObjectHideFlags: 0
@@ -6590,22 +6616,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1082651503}
   m_CullTransparentMesh: 1
---- !u!4 &1092907682 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-  m_PrefabInstance: {fileID: 1478555823425467153}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1092907683 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3619169483170819631, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-  m_PrefabInstance: {fileID: 1478555823425467153}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c78d4b9207bc47bf969924e1779a2984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KnifeMiniGame
 --- !u!1 &1098809602
 GameObject:
   m_ObjectHideFlags: 0
@@ -9397,7 +9407,6 @@ Transform:
   m_Children:
   - {fileID: 582104039}
   - {fileID: 629271882}
-  - {fileID: 1092907682}
   - {fileID: 1910242606}
   m_Father: {fileID: 1839294940}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11854,79 +11863,6 @@ MonoBehaviour:
   lockZ: 1
   snapToPixelGrid: 1
   pixelsPerUnit: 16
---- !u!1001 &1478555823425467153
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1692959104}
-    m_Modifications:
-    - target: {fileID: 3619169483170819631, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: flow
-      value: 
-      objectReference: {fileID: 491569613}
-    - target: {fileID: 3619169483170819631, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: overlay
-      value: 
-      objectReference: {fileID: 582104043}
-    - target: {fileID: 3619169483170819631, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: inputCamera
-      value: 
-      objectReference: {fileID: 519420031}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3921589716599877750, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4096826466024471162, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_Name
-      value: KnifeMiniGameRoot
-      objectReference: {fileID: 0}
-    - target: {fileID: 4096826466024471162, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: a7b9511b309cc6a4995dc7be0d19aef6, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
