@@ -2854,7 +2854,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 7.859375
+  orthographic size: 5.625
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -3905,6 +3905,10 @@ PrefabInstance:
     - target: {fileID: 4239366282502729421, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
       propertyPath: m_Name
       value: Tongs_Arm_BodyPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 4239366282502729421, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5115137240516885456, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6444,6 +6448,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1045452155}
   - component: {fileID: 1045452156}
+  - component: {fileID: 1045452157}
   m_Layer: 0
   m_Name: AnatomyScreen
   m_TagString: Untagged
@@ -6512,9 +6517,25 @@ MonoBehaviour:
   tongsMiniGame: {fileID: 629271884}
   knifeMiniGame: {fileID: 1092907683}
   needleMiniGame: {fileID: 1910242605}
+  bodyPrefabSpawner: {fileID: 1045452157}
   knifeAreas: 000000000100000003000000
   needleAreas: 
   autoTreatInfectedAreasWithoutMiniGame: 1
+--- !u!114 &1045452157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1045452154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f37e7dc4694143ab95e097f749a6fa44, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TreatmentBodyPrefabSpawner
+  catalog: {fileID: 11400000, guid: 6015f858ebbeb524e8c8a0769e624da9, type: 2}
+  bodyParent: {fileID: 1692959104}
+  logWarnings: 1
 --- !u!1 &1082651503
 GameObject:
   m_ObjectHideFlags: 0

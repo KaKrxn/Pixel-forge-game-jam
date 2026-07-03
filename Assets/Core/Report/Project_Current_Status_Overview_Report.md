@@ -186,6 +186,7 @@ Unity setup tool:
 
 - `Tools > Pixel Forge > Treatment > Assign Arm Tongs Case To Selected Customer`
 - `Tools > Pixel Forge > Treatment > Assign Mixed Treatment Case To Selected Customer`
+- `Tools > Pixel Forge > Treatment > Setup Dynamic Body Prefab Spawner In Open Scene`
 
 Status: **Implemented as the current source of truth for patient treatment requirements.**
 

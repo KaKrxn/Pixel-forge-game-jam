@@ -166,6 +166,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
         UnsubscribeLesions();
         ClearSpawnedLesions();
+        ReplaceRuntimeRoot(body);
         lesionRoot = body.LesionRoot != null ? body.LesionRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetLesionAnchorTransforms());
@@ -871,6 +872,16 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         GameObject target = root != null ? root : gameObject;
         target.SetActive(visible);
+    }
+
+    private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
+    {
+        if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
+        {
+            root.SetActive(false);
+        }
+
+        root = body.gameObject;
     }
 }
 

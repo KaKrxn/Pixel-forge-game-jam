@@ -207,21 +207,21 @@ public sealed class AnatomyController : MonoBehaviour
         {
             case TreatmentMiniGameType.Tongs when tongsMiniGame != null:
                 StartMiniGame(TreatmentMiniGameType.Tongs);
-                tongsMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Tongs, area));
+                tongsMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Tongs, area, tongsMiniGame));
                 tongsMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
 
             case TreatmentMiniGameType.Knife when knifeMiniGame != null:
                 StartMiniGame(TreatmentMiniGameType.Knife);
-                knifeMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Knife, area));
+                knifeMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Knife, area, knifeMiniGame));
                 knifeMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
 
             case TreatmentMiniGameType.Needle when needleMiniGame != null:
                 StartMiniGame(TreatmentMiniGameType.Needle);
-                needleMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Needle, area));
+                needleMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Needle, area, needleMiniGame));
                 needleMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
@@ -435,8 +435,13 @@ public sealed class AnatomyController : MonoBehaviour
         return TreatmentMiniGameType.None;
     }
 
-    private TreatmentBodyPrefab SpawnBodyPrefabForArea(TreatmentMiniGameType miniGameType, BodyArea area)
+    private TreatmentBodyPrefab SpawnBodyPrefabForArea(TreatmentMiniGameType miniGameType, BodyArea area, Component miniGame)
     {
+        if (miniGame != null && miniGame.GetComponentInParent<TreatmentBodyPrefab>(true) != null)
+        {
+            return null;
+        }
+
         ResolveBodyPrefabSpawner();
         if (bodyPrefabSpawner != null && bodyPrefabSpawner.TrySpawn(miniGameType, area, out TreatmentBodyPrefab body))
         {

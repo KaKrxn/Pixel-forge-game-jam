@@ -151,6 +151,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
         UnsubscribePustules();
         ClearSpawnedPustules();
+        ReplaceRuntimeRoot(body);
         pustuleRoot = body.PustuleRoot != null ? body.PustuleRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetPustuleAnchorTransforms());
@@ -862,5 +863,15 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         GameObject target = root != null ? root : gameObject;
         target.SetActive(visible);
+    }
+
+    private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
+    {
+        if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
+        {
+            root.SetActive(false);
+        }
+
+        root = body.gameObject;
     }
 }

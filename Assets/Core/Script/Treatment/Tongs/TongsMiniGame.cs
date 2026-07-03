@@ -39,6 +39,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     [Header("Input")]
     [SerializeField] private Camera inputCamera;
     [SerializeField] private float worldInputPlaneZ;
+    [SerializeField, Min(0.01f)] private float fallbackHitRadius = 0.45f;
     [Header("UI")]
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Tongs";
@@ -57,6 +58,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     private bool isRunning;
     private bool isComplete;
     private bool tongsEquipped;
+    private bool usingBodyPrefabAnchors;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -123,6 +125,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         ResetParasites();
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
+        overlay?.SelectTool(overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
         flow?.SetTreatmentStress(false);
@@ -132,14 +135,17 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         if (body == null)
         {
+            usingBodyPrefabAnchors = false;
             return;
         }
 
         UnsubscribeParasites();
         ClearSpawnedParasites();
+        ReplaceRuntimeRoot(body);
         parasiteRoot = body.ParasiteRoot != null ? body.ParasiteRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetParasiteAnchorTransforms());
+        usingBodyPrefabAnchors = true;
         RefreshParasiteList();
         SubscribeParasites();
     }
@@ -148,6 +154,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         EndActiveHold();
         isRunning = false;
+        usingBodyPrefabAnchors = false;
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -367,7 +374,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         return null;
     }
 
-    private static bool ContainsPointer(Parasite parasite, Vector2 worldPointer)
+    private bool ContainsPointer(Parasite parasite, Vector2 worldPointer)
     {
         Collider2D collider = parasite.GetComponent<Collider2D>();
         if (collider != null && collider.OverlapPoint(worldPointer))
@@ -384,7 +391,14 @@ public sealed class TongsMiniGame : MonoBehaviour
             }
         }
 
-        return false;
+        Vector2 rootPosition = parasite.transform.position;
+        if ((worldPointer - rootPosition).sqrMagnitude <= fallbackHitRadius * fallbackHitRadius)
+        {
+            return true;
+        }
+
+        Vector2 spawnAnchorPosition = parasite.SpawnAnchorWorldPosition;
+        return (worldPointer - spawnAnchorPosition).sqrMagnitude <= fallbackHitRadius * fallbackHitRadius;
     }
 
     private void RefreshParasiteList()
@@ -645,7 +659,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         Vector3 beforeRootPosition = parasite.transform.position;
         Vector3 beforePrefabAnchorPosition = parasite.SpawnAnchorWorldPosition;
 
-        if (alignParasiteAnchorToSpawnPoint)
+        if (alignParasiteAnchorToSpawnPoint && !usingBodyPrefabAnchors)
         {
             parasite.AlignSpawnAnchorToWorld(spawnPosition);
             LogSpawn($"Applied anchor alignment for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, beforePrefabSpawnAnchor={FormatVector(beforePrefabAnchorPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, afterPrefabSpawnAnchor={FormatVector(parasite.SpawnAnchorWorldPosition)}, rootDelta={FormatVector(parasite.transform.position - beforeRootPosition)}.", parasite);
@@ -654,7 +668,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
         parasite.transform.position = spawnPosition;
         parasite.RebaseVisualPosition();
-        LogSpawn($"Applied root-position spawn for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, prefabSpawnAnchorNow={FormatVector(parasite.SpawnAnchorWorldPosition)}.", parasite);
+        LogSpawn($"Applied root-position spawn for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, prefabSpawnAnchorNow={FormatVector(parasite.SpawnAnchorWorldPosition)}, usingBodyPrefabAnchors={usingBodyPrefabAnchors}.", parasite);
     }
 
     private static ParasiteSpawnAnchor GetSpawnAnchorData(Transform anchor)
@@ -937,5 +951,15 @@ public sealed class TongsMiniGame : MonoBehaviour
         {
             root.SetActive(visible);
         }
+    }
+
+    private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
+    {
+        if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
+        {
+            root.SetActive(false);
+        }
+
+        root = body.gameObject;
     }
 }

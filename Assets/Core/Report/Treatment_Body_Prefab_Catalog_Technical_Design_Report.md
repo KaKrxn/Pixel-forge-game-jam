@@ -911,6 +911,14 @@ TongsMiniGame, KnifeMiniGame, and NeedleMiniGame can consume roots/anchors from 
 Existing scenes still fall back to their current serialized mini game references when no spawner is assigned.
 ```
 
+Scene setup support:
+
+```text
+Tools > Pixel Forge > Treatment > Setup Dynamic Body Prefab Spawner In Open Scene
+```
+
+This editor command adds or configures `TreatmentBodyPrefabSpawner` on the scene `AnatomyController`, assigns the shared catalog, chooses the current treatment body parent, and disables scene-authored `TreatmentBodyPrefab` instances so the catalog-spawned body does not overlap them.
+
 ---
 
 ## 17. Summary
