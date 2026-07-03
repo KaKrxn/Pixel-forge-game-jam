@@ -8,12 +8,72 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 353851785667359649, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2533131605772755277, guid: 441200b61d377c94ab1af4f7ea2eb702, type: 3}
+    - target: {fileID: 353851785667359649, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 353851785667359649, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 353851785667359649, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 353851785667359649, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2196260594606870599, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
       propertyPath: m_Name
       value: BigParasite_World Variant
       objectReference: {fileID: 0}
     - target: {fileID: 2196260594606870599, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3003003003003003002, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3003003003003003002, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.624
+      objectReference: {fileID: 0}
+    - target: {fileID: 3003003003003003003, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3003003003003003004, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.012
+      objectReference: {fileID: 0}
+    - target: {fileID: 3003003003003003004, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.841
+      objectReference: {fileID: 0}
+    - target: {fileID: 3003003003003003005, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3139367312198112182, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_SpriteTilingProperty.pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3139367312198112182, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 3139367312198112182, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 4232482866242300531, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+      propertyPath: normalColor.a
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6030170559921417407, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}

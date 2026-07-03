@@ -30,6 +30,11 @@ public sealed class GameFlow : MonoBehaviour
     private CustomerAgent activeCustomer;
     private Sanity activeSanity;
 
+    private void Awake()
+    {
+        ResolveSceneReferences();
+    }
+
     private void Start()
     {
         SetCandleAtCounter(true);
@@ -189,6 +194,34 @@ public sealed class GameFlow : MonoBehaviour
         SetTreatmentStress(false);
         SetState(ClinicFlowState.Complete);
         Debug.Log("Sanity reached maximum. Transformation placeholder triggered.");
+    }
+
+    private void ResolveSceneReferences()
+    {
+        if (dialog == null)
+        {
+            dialog = GetComponent<Dialog>();
+        }
+
+        if (roomTransition == null)
+        {
+            roomTransition = GetComponent<RoomTransition>();
+        }
+
+        if (treatment == null)
+        {
+            treatment = GetComponent<Treatment>();
+        }
+
+        if (firstCustomer == null)
+        {
+            firstCustomer = FindFirstObjectByType<CustomerAgent>();
+        }
+
+        if (candle == null)
+        {
+            candle = FindFirstObjectByType<Candle>();
+        }
     }
 
     public void CompleteTestTreatment()

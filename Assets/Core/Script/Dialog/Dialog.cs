@@ -124,6 +124,13 @@ public sealed class Dialog : MonoBehaviour
             return;
         }
 
+        ResolveExistingUiReferences();
+
+        if (root != null && speakerText != null && bodyText != null && nextButton != null)
+        {
+            return;
+        }
+
         Canvas canvas = FindFirstObjectByType<Canvas>();
         if (canvas == null)
         {
@@ -169,6 +176,43 @@ public sealed class Dialog : MonoBehaviour
 
         TMP_Text nextText = CreateText(buttonObject.transform, "Text", Vector2.zero, Vector2.one, 24, Color.black, TextAlignmentOptions.Center);
         nextText.text = "Next";
+    }
+
+    private void ResolveExistingUiReferences()
+    {
+        if (root == null)
+        {
+            Transform dialogRoot = FindChildInScene("DialogRoot");
+            if (dialogRoot != null)
+            {
+                root = dialogRoot.gameObject;
+            }
+        }
+
+        if (root == null)
+        {
+            return;
+        }
+
+        if (speakerText == null)
+        {
+            speakerText = FindText(root.transform, "SpeakerText");
+        }
+
+        if (bodyText == null)
+        {
+            bodyText = FindText(root.transform, "BodyText");
+        }
+
+        if (nextButton == null)
+        {
+            nextButton = FindComponentInChildrenByName<Button>(root.transform, "NextButton");
+            if (nextButton != null)
+            {
+                nextButton.onClick.RemoveListener(Advance);
+                nextButton.onClick.AddListener(Advance);
+            }
+        }
     }
 
     private void StartTypewriter(string text)
@@ -356,6 +400,63 @@ public sealed class Dialog : MonoBehaviour
         text.overflowMode = TextOverflowModes.Overflow;
 
         return text;
+    }
+
+    private static Transform FindChildInScene(string childName)
+    {
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        for (int i = 0; i < canvases.Length; i++)
+        {
+            Transform child = FindDeepChild(canvases[i].transform, childName);
+            if (child != null)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    private static TMP_Text FindText(Transform parent, string childName)
+    {
+        TMP_Text text = FindComponentInChildrenByName<TMP_Text>(parent, childName);
+        if (text != null)
+        {
+            return text;
+        }
+
+        TMP_Text[] texts = parent.GetComponentsInChildren<TMP_Text>(true);
+        return texts.Length > 0 ? texts[0] : null;
+    }
+
+    private static T FindComponentInChildrenByName<T>(Transform parent, string childName) where T : Component
+    {
+        Transform child = FindDeepChild(parent, childName);
+        return child != null ? child.GetComponent<T>() : null;
+    }
+
+    private static Transform FindDeepChild(Transform parent, string childName)
+    {
+        if (parent == null)
+        {
+            return null;
+        }
+
+        if (parent.name == childName)
+        {
+            return parent;
+        }
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = FindDeepChild(parent.GetChild(i), childName);
+            if (child != null)
+            {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     private void Hide()
