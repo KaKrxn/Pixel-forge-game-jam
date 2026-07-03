@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
+  m_Name: NoDialog
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Player
+  customerDisplayName: Test
+  customerBlipClip: {fileID: 0}
+  customerBlipClips:
+  - {fileID: 8300000, guid: 023cfcbfb9325e543b13260751e6a474, type: 3}
+  - {fileID: 8300000, guid: e9378dd533c6ace4f90a98c4e858d58e, type: 3}
+  - {fileID: 8300000, guid: eecd2fa1baaa83540a8b7281c5ca8b32, type: 3}
+  - {fileID: 8300000, guid: 62c2c3ba15f70194e87acbaa518f53e1, type: 3}
+  - {fileID: 8300000, guid: 50e602c3f4dad13409cc20a22e16724c, type: 3}
+  lines:
+  - speaker: 1
+    text: Test
