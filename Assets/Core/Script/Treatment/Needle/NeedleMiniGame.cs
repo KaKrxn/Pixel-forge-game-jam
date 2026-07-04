@@ -52,6 +52,8 @@ public sealed class NeedleMiniGame : MonoBehaviour
     [Header("UI")]
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Needle";
+    [Header("Obstacle")]
+    [SerializeField] private PatientAggressionController aggressionController;
     [Header("Rules")]
     [SerializeField] private bool autoCompleteWhenAllPustulesDone = true;
     [SerializeField] private bool startHidden = true;
@@ -68,6 +70,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     private bool isRunning;
     private bool isComplete;
     private bool completionRaised;
+    private TreatmentBodyPrefab activeBodyPrefab;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -139,6 +142,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
+        BeginAggression();
         flow?.SetTreatmentStress(false);
     }
 
@@ -152,6 +156,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
         UnsubscribePustules();
         ClearSpawnedPustules();
         ReplaceRuntimeRoot(body);
+        activeBodyPrefab = body;
         pustuleRoot = body.PustuleRoot != null ? body.PustuleRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetPustuleAnchorTransforms());
@@ -173,6 +178,8 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         EndAction();
         isRunning = false;
+        activeBodyPrefab = null;
+        aggressionController?.Stop();
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -182,6 +189,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         EndAction();
         isRunning = false;
+        aggressionController?.Pause();
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -191,6 +199,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
+        aggressionController?.Resume();
 
         if (isComplete)
         {
@@ -213,6 +222,34 @@ public sealed class NeedleMiniGame : MonoBehaviour
         unsupportedToolSelected = false;
         toolState = NeedleToolState.None;
         EndAction();
+    }
+
+    private void BeginAggression()
+    {
+        PatientAggressionProfile profile = ResolveAggressionProfile();
+        if (profile == null || activeBodyPrefab == null || activeSanity == null)
+        {
+            aggressionController?.Stop();
+            return;
+        }
+
+        if (aggressionController == null)
+        {
+            aggressionController = GetComponent<PatientAggressionController>();
+        }
+
+        if (aggressionController == null)
+        {
+            aggressionController = gameObject.AddComponent<PatientAggressionController>();
+        }
+
+        aggressionController.Begin(activeSanity, activeBodyPrefab.GameplayRoot, profile);
+    }
+
+    private PatientAggressionProfile ResolveAggressionProfile()
+    {
+        CustomerCaseProvider provider = activeCustomer != null ? activeCustomer.GetComponent<CustomerCaseProvider>() : null;
+        return provider != null && provider.CaseData != null ? provider.CaseData.AggressionProfile : null;
     }
 
     public void CompleteMiniGame()

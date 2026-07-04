@@ -64,6 +64,8 @@ public sealed class KnifeMiniGame : MonoBehaviour
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Knife";
     [SerializeField] private string pullToolId = "Tongs";
+    [Header("Obstacle")]
+    [SerializeField] private PatientAggressionController aggressionController;
     [Header("Rules")]
     [SerializeField] private bool autoCompleteWhenAllLesionsDone = true;
     [SerializeField] private bool startHidden = true;
@@ -80,6 +82,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     private bool isRunning;
     private bool isComplete;
     private bool completionRaised;
+    private TreatmentBodyPrefab activeBodyPrefab;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -173,6 +176,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId, pullToolId);
         RefreshCompletionState();
         RefreshMeters();
+        BeginAggression();
         flow?.SetTreatmentStress(false);
     }
 
@@ -186,6 +190,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         UnsubscribeLesions();
         ClearSpawnedLesions();
         ReplaceRuntimeRoot(body);
+        activeBodyPrefab = body;
         lesionRoot = body.LesionRoot != null ? body.LesionRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetLesionAnchorTransforms());
@@ -207,6 +212,8 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         EndAction();
         isRunning = false;
+        activeBodyPrefab = null;
+        aggressionController?.Stop();
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -216,6 +223,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         EndAction();
         isRunning = false;
+        aggressionController?.Pause();
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -225,6 +233,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId, pullToolId);
+        aggressionController?.Resume();
 
         if (isComplete)
         {
@@ -253,6 +262,34 @@ public sealed class KnifeMiniGame : MonoBehaviour
         unsupportedToolSelected = false;
         toolState = KnifeToolState.None;
         EndAction();
+    }
+
+    private void BeginAggression()
+    {
+        PatientAggressionProfile profile = ResolveAggressionProfile();
+        if (profile == null || activeBodyPrefab == null || activeSanity == null)
+        {
+            aggressionController?.Stop();
+            return;
+        }
+
+        if (aggressionController == null)
+        {
+            aggressionController = GetComponent<PatientAggressionController>();
+        }
+
+        if (aggressionController == null)
+        {
+            aggressionController = gameObject.AddComponent<PatientAggressionController>();
+        }
+
+        aggressionController.Begin(activeSanity, activeBodyPrefab.GameplayRoot, profile);
+    }
+
+    private PatientAggressionProfile ResolveAggressionProfile()
+    {
+        CustomerCaseProvider provider = activeCustomer != null ? activeCustomer.GetComponent<CustomerCaseProvider>() : null;
+        return provider != null && provider.CaseData != null ? provider.CaseData.AggressionProfile : null;
     }
 
     private void HandleToolSelected(string toolId)

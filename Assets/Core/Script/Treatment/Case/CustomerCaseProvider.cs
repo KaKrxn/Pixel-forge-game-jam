@@ -6,4 +6,9 @@ public sealed class CustomerCaseProvider : MonoBehaviour
 
     public TreatmentCaseData CaseData => caseData;
     public bool HasCase => caseData != null;
+
+    public void SetCase(TreatmentCaseData nextCase)
+    {
+        caseData = nextCase;
+    }
 }

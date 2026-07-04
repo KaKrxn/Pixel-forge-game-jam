@@ -43,6 +43,8 @@ public sealed class TongsMiniGame : MonoBehaviour
     [Header("UI")]
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Tongs";
+    [Header("Obstacle")]
+    [SerializeField] private PatientAggressionController aggressionController;
     [Header("Rules")]
     [SerializeField] private bool requireTongsEquipped = true;
     [SerializeField] private bool autoFindParasitesInChildren = true;
@@ -61,6 +63,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     private bool completionRaised;
     private bool tongsEquipped;
     private bool usingBodyPrefabAnchors;
+    private TreatmentBodyPrefab activeBodyPrefab;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -134,6 +137,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         overlay?.SelectTool(overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
+        BeginAggression();
         flow?.SetTreatmentStress(false);
     }
 
@@ -148,6 +152,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         UnsubscribeParasites();
         ClearSpawnedParasites();
         ReplaceRuntimeRoot(body);
+        activeBodyPrefab = body;
         parasiteRoot = body.ParasiteRoot != null ? body.ParasiteRoot : body.GameplayRoot;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetParasiteAnchorTransforms());
@@ -161,6 +166,8 @@ public sealed class TongsMiniGame : MonoBehaviour
         EndActiveHold();
         isRunning = false;
         usingBodyPrefabAnchors = false;
+        activeBodyPrefab = null;
+        aggressionController?.Stop();
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -170,6 +177,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         EndActiveHold();
         isRunning = false;
+        aggressionController?.Pause();
         SetRootVisible(false);
         overlay?.Deactivate(CompleteMiniGame);
         flow?.SetTreatmentStress(false);
@@ -180,6 +188,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         SetRootVisible(true);
         ApplyRootBodySorting();
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
+        aggressionController?.Resume();
 
         if (isComplete)
         {
@@ -200,6 +209,34 @@ public sealed class TongsMiniGame : MonoBehaviour
         }
 
         SetTongsEquipped(toolId == overlayToolId);
+    }
+
+    private void BeginAggression()
+    {
+        PatientAggressionProfile profile = ResolveAggressionProfile();
+        if (profile == null || activeBodyPrefab == null || activeSanity == null)
+        {
+            aggressionController?.Stop();
+            return;
+        }
+
+        if (aggressionController == null)
+        {
+            aggressionController = GetComponent<PatientAggressionController>();
+        }
+
+        if (aggressionController == null)
+        {
+            aggressionController = gameObject.AddComponent<PatientAggressionController>();
+        }
+
+        aggressionController.Begin(activeSanity, activeBodyPrefab.GameplayRoot, profile);
+    }
+
+    private PatientAggressionProfile ResolveAggressionProfile()
+    {
+        CustomerCaseProvider provider = activeCustomer != null ? activeCustomer.GetComponent<CustomerCaseProvider>() : null;
+        return provider != null && provider.CaseData != null ? provider.CaseData.AggressionProfile : null;
     }
 
     public void EquipTongs()

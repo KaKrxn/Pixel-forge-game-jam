@@ -11,12 +11,19 @@ public enum ClinicFlowState
     TreatmentReady,
     TreatmentActive,
     CustomerLeaving,
+    CounterBreather,
+    AllCustomersComplete,
+    GameOver,
     Complete
 }
 
 public sealed class GameFlow : MonoBehaviour
 {
     [SerializeField] private CustomerAgent firstCustomer;
+    [SerializeField] private bool useCustomerQueue;
+    [SerializeField] private CustomerQueueBuilder customerQueueBuilder;
+    [SerializeField] private CustomerSpawner customerSpawner;
+    [SerializeField] private bool autoStartNextQueuedCustomer;
     [SerializeField] private Dialog dialog;
     [SerializeField] private RoomTransition roomTransition;
     [SerializeField] private Treatment treatment;
@@ -29,6 +36,9 @@ public sealed class GameFlow : MonoBehaviour
 
     private CustomerAgent activeCustomer;
     private Sanity activeSanity;
+    private readonly CustomerQueueRuntime customerQueue = new CustomerQueueRuntime();
+    private bool queueRunning;
+    private bool activeCustomerSpawnedByQueue;
 
     private void Awake()
     {
@@ -39,7 +49,17 @@ public sealed class GameFlow : MonoBehaviour
     {
         SetCandleAtCounter(true);
 
-        if (startOnPlay && firstCustomer != null)
+        if (!startOnPlay)
+        {
+            return;
+        }
+
+        if (useCustomerQueue && TryStartCustomerQueue())
+        {
+            return;
+        }
+
+        if (firstCustomer != null)
         {
             StartFirstCustomer();
         }
@@ -52,7 +72,68 @@ public sealed class GameFlow : MonoBehaviour
 
     public void StartFirstCustomer()
     {
-        activeCustomer = firstCustomer;
+        queueRunning = false;
+        customerQueue.Clear();
+        BeginCustomer(firstCustomer, spawnedByQueue: false);
+    }
+
+    public bool TryStartCustomerQueue()
+    {
+        if (customerQueueBuilder == null || customerSpawner == null)
+        {
+            return false;
+        }
+
+        customerQueue.SetQueue(customerQueueBuilder.BuildQueue());
+        if (customerQueue.Current == null)
+        {
+            customerQueue.Clear();
+            return false;
+        }
+
+        queueRunning = true;
+        return SpawnCurrentQueuedCustomer();
+    }
+
+    public void StartNextQueuedCustomer()
+    {
+        if (!queueRunning || CurrentState != ClinicFlowState.CounterBreather)
+        {
+            return;
+        }
+
+        SpawnCurrentQueuedCustomer();
+    }
+
+    private bool SpawnCurrentQueuedCustomer()
+    {
+        CustomerDefinition definition = customerQueue.Current;
+        if (definition == null || customerSpawner == null)
+        {
+            SetState(ClinicFlowState.AllCustomersComplete);
+            return false;
+        }
+
+        CustomerAgent customer = customerSpawner.Spawn(definition);
+        if (customer == null)
+        {
+            SetState(ClinicFlowState.GameOver);
+            return false;
+        }
+
+        BeginCustomer(customer, spawnedByQueue: true);
+        return true;
+    }
+
+    private void BeginCustomer(CustomerAgent customer, bool spawnedByQueue)
+    {
+        if (customer == null)
+        {
+            return;
+        }
+
+        activeCustomer = customer;
+        activeCustomerSpawnedByQueue = spawnedByQueue;
         activeSanity = activeCustomer != null ? activeCustomer.GetComponent<Sanity>() : null;
         if (activeSanity != null)
         {
@@ -163,7 +244,37 @@ public sealed class GameFlow : MonoBehaviour
             activeSanity.StopMonitoring();
         }
 
-        SetState(ClinicFlowState.Complete);
+        CustomerAgent completedCustomer = activeCustomer;
+        bool shouldAdvanceQueue = queueRunning && activeCustomerSpawnedByQueue;
+
+        activeCustomer = null;
+        activeSanity = null;
+        activeCustomerSpawnedByQueue = false;
+
+        if (shouldAdvanceQueue && completedCustomer != null)
+        {
+            Destroy(completedCustomer.gameObject);
+        }
+
+        if (!shouldAdvanceQueue)
+        {
+            SetState(ClinicFlowState.Complete);
+            return;
+        }
+
+        if (customerQueue.Advance())
+        {
+            SetState(ClinicFlowState.CounterBreather);
+            if (autoStartNextQueuedCustomer)
+            {
+                StartNextQueuedCustomer();
+            }
+
+            return;
+        }
+
+        queueRunning = false;
+        SetState(ClinicFlowState.AllCustomersComplete);
     }
 
     public void SetTreatmentStress(bool active)
@@ -192,7 +303,7 @@ public sealed class GameFlow : MonoBehaviour
     private void TriggerTransformation()
     {
         SetTreatmentStress(false);
-        SetState(ClinicFlowState.Complete);
+        SetState(ClinicFlowState.GameOver);
         Debug.Log("Sanity reached maximum. Transformation placeholder triggered.");
     }
 
@@ -216,6 +327,16 @@ public sealed class GameFlow : MonoBehaviour
         if (firstCustomer == null)
         {
             firstCustomer = FindFirstObjectByType<CustomerAgent>();
+        }
+
+        if (customerQueueBuilder == null)
+        {
+            customerQueueBuilder = FindFirstObjectByType<CustomerQueueBuilder>();
+        }
+
+        if (customerSpawner == null)
+        {
+            customerSpawner = FindFirstObjectByType<CustomerSpawner>();
         }
 
         if (candle == null)

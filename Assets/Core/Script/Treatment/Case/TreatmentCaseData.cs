@@ -7,11 +7,13 @@ public sealed class TreatmentCaseData : ScriptableObject
     [SerializeField] private string caseId;
     [SerializeField] private string customerDisplayName = "Customer";
     [SerializeField] private DialogData dialogData;
+    [SerializeField] private PatientAggressionProfile aggressionProfile;
     [SerializeField] private List<TreatmentAreaRequirement> requiredTreatments = new List<TreatmentAreaRequirement>();
 
     public string CaseId => caseId ?? string.Empty;
     public string CustomerDisplayName => string.IsNullOrWhiteSpace(customerDisplayName) ? "Customer" : customerDisplayName;
     public DialogData DialogData => dialogData;
+    public PatientAggressionProfile AggressionProfile => aggressionProfile;
     public IReadOnlyList<TreatmentAreaRequirement> RequiredTreatments => requiredTreatments;
     public int RequiredTreatmentCount => requiredTreatments != null ? requiredTreatments.Count : 0;
 

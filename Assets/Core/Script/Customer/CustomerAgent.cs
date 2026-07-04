@@ -74,6 +74,31 @@ public sealed class CustomerAgent : MonoBehaviour
         enterStep = outsideDoorPoint != null ? EnterStep.WalkingToOutsideDoor : EnterStep.WalkingToCounter;
     }
 
+    public void ConfigurePath(
+        Transform nextSpawnPoint,
+        Transform nextOutsideDoorPoint,
+        Transform nextInsideDoorPoint,
+        Transform nextCounterPoint,
+        Transform nextExitPoint)
+    {
+        spawnPoint = nextSpawnPoint;
+        outsideDoorPoint = nextOutsideDoorPoint;
+        insideDoorPoint = nextInsideDoorPoint;
+        counterPoint = nextCounterPoint;
+        exitPoint = nextExitPoint;
+    }
+
+    public void ConfigureBubble(Bubble nextBubble)
+    {
+        bubble = nextBubble;
+        HideBubble();
+    }
+
+    public void ConfigureDoor(Door nextDoor)
+    {
+        door = nextDoor;
+    }
+
     public void BeginExit()
     {
         enterStep = EnterStep.None;
