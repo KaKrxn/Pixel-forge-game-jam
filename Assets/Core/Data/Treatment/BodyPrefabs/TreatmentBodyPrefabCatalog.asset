@@ -16,6 +16,36 @@ MonoBehaviour:
   - miniGameType: 1
     area: 2
     prefab: {fileID: 445157146805285791, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
+  - miniGameType: 1
+    area: 0
+    prefab: {fileID: 3589087854902526985, guid: 1f715c7d969e8744e955ad37d58c4367, type: 3}
+  - miniGameType: 1
+    area: 1
+    prefab: {fileID: 8852466910210119702, guid: 6efe0f604ff98d14e8dafb06a5e87174, type: 3}
+  - miniGameType: 1
+    area: 3
+    prefab: {fileID: 4665051793849837049, guid: 467cce45633d9294a8ce625dbcaf4111, type: 3}
+  - miniGameType: 2
+    area: 2
+    prefab: {fileID: 2153847615148599529, guid: 33d2e0c4bda96cf48ba635647cfdeb90, type: 3}
+  - miniGameType: 2
+    area: 0
+    prefab: {fileID: 8707598172206570758, guid: b1d9106fd4ad71846b5d673bcbfbdc90, type: 3}
   - miniGameType: 2
     area: 1
-    prefab: {fileID: 6881667527978592673, guid: 2195e8cd8009d7c4c97d59711759737f, type: 3}
+    prefab: {fileID: 5963946996359077799, guid: 2d7035b7d1ddea548a11dae8741fad11, type: 3}
+  - miniGameType: 2
+    area: 3
+    prefab: {fileID: 6792579084680055635, guid: 7fba32ff832989d48a057b54735263bb, type: 3}
+  - miniGameType: 3
+    area: 2
+    prefab: {fileID: 3783932116116851234, guid: 30ec00fc27517a142899a9fe434c35ce, type: 3}
+  - miniGameType: 3
+    area: 0
+    prefab: {fileID: 1028127625099304472, guid: 8ed39f9c7f7585b489f04156d89f4754, type: 3}
+  - miniGameType: 3
+    area: 1
+    prefab: {fileID: 5725856020711111611, guid: bd3cf31c964496945ba67b0fe2ad25f5, type: 3}
+  - miniGameType: 3
+    area: 3
+    prefab: {fileID: 873321343576434094, guid: 94ae44a0eb63d6348b871cdfa15bd42f, type: 3}

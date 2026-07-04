@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 6881667527978592673}
   - component: {fileID: 7861667527978592673}
   m_Layer: 0
-  m_Name: Knife_Torsoo_BodyPrefab
+  m_Name: Knife_Torsoo_BodyPrefabs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

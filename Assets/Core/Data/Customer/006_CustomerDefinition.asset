@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7ea56ea55f454c87963fb0b79fd7e301, type: 3}
-  m_Name: CustomerDefinition
+  m_Name: 006_CustomerDefinition
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
-  customerId: 000
-  displayName: Rinna
+  customerId: 
+  displayName: 
   customerPrefab: {fileID: 0}
-  caseData: {fileID: 11400000, guid: 50b2c95037b34bd438fb0a3a93a1e7db, type: 2}
+  caseData: {fileID: 0}

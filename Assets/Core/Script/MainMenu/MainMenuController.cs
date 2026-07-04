@@ -18,7 +18,9 @@ public sealed class MainMenuController : MonoBehaviour
 
     [Header("Scenes")]
     [SerializeField] private string gameSceneName = "GameScene";
+    [SerializeField] private string loadingSceneName = "LoadingScene";
     [SerializeField] private string creditSceneName = "EndCedit";
+    [SerializeField] private bool useLoadingSceneForPlay = true;
 
     [Header("Timing")]
     [SerializeField] private bool showMainOnStart = true;
@@ -66,7 +68,7 @@ public sealed class MainMenuController : MonoBehaviour
 
     public void Play()
     {
-        LoadScene(gameSceneName);
+        LoadGameScene();
     }
 
     public void OpenCredits()
@@ -88,6 +90,24 @@ public sealed class MainMenuController : MonoBehaviour
         }
 
         StartDelayedAction(() => SceneManager.LoadScene(sceneName));
+    }
+
+    private void LoadGameScene()
+    {
+        if (string.IsNullOrWhiteSpace(gameSceneName))
+        {
+            Debug.LogWarning("MainMenuController cannot load the game because the game scene name is empty.");
+            return;
+        }
+
+        if (!useLoadingSceneForPlay || string.IsNullOrWhiteSpace(loadingSceneName))
+        {
+            LoadScene(gameSceneName);
+            return;
+        }
+
+        SceneLoadRequest.SetTarget(gameSceneName);
+        LoadScene(loadingSceneName);
     }
 
     private void StartDelayedAction(System.Action action)

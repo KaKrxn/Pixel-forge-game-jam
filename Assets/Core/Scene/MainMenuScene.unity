@@ -1240,8 +1240,10 @@ MonoBehaviour:
   quitButton: {fileID: 1182016490}
   creditButton: {fileID: 391818679}
   backButton: {fileID: 2088921845}
-  gameSceneName: GameScene
+  gameSceneName: Game_Test_Flow
+  loadingSceneName: LoadingScene
   creditSceneName: EndCedit
+  useLoadingSceneForPlay: 1
   showMainOnStart: 1
   actionDelay: 0.08
 --- !u!4 &414263462
@@ -2729,7 +2731,7 @@ Transform:
   m_GameObject: {fileID: 1395089389}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 87.70889, y: 745.38794, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
