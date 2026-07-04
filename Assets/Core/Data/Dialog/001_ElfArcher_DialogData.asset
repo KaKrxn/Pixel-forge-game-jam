@@ -1,0 +1,144 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
+  m_Name: 001_ElfArcher_DialogData
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Doctor
+  customerDisplayName: Elf Archer
+  customerBlipClip: {fileID: 0}
+  customerBlipClips: []
+  lines:
+  - speaker: 1
+    text: "You are not with the Church... are you?"
+  - speaker: 0
+    text: "No. I only treat those who are sent here."
+  - speaker: 1
+    text: "Good. Then at least you do not speak for them."
+  - speaker: 0
+    text: "You don't trust the Church?"
+  - speaker: 1
+    text: "I trust those who act more than those who stand watching from the doorway."
+  - speaker: 0
+    text: "If you were sent here, that means there is still a way to treat you."
+  - speaker: 1
+    text: "I hope so. Those beyond saving do not usually make it this far."
+  normalConversation1:
+  - speaker: 1
+    text: "You are not with the Church... are you?"
+  - speaker: 0
+    text: "No. I only treat those who are sent here."
+  - speaker: 1
+    text: "Good. Then at least you do not speak for them."
+  - speaker: 0
+    text: "You don't trust the Church?"
+  - speaker: 1
+    text: "I trust those who act more than those who stand watching from the doorway."
+  - speaker: 0
+    text: "If you were sent here, that means there is still a way to treat you."
+  - speaker: 1
+    text: "I hope so. Those beyond saving do not usually make it this far."
+  normalConversation2:
+  - speaker: 1
+    text: "Before we begin... you will not ask me to place my bow out of reach, will you?"
+  - speaker: 0
+    text: "If it makes you feel safer, you may keep it close."
+  - speaker: 1
+    text: "Good. I do not like sitting in an unfamiliar place with nothing to defend myself."
+  - speaker: 0
+    text: "I won't separate you from what makes you feel safe."
+  - speaker: 1
+    text: "Good. Many begin by asking me to put it down, then tell me to wait alone."
+  - speaker: 0
+    text: "I won't leave you waiting like that."
+  - speaker: 1
+    text: "Then be quick. I do not wish to remain with this condition any longer."
+  aggressiveConversation: []
+  painDialogue:
+    minor:
+    - speaker: 1
+      text: "Careful. I can still feel everything."
+    - speaker: 1
+      text: "Can you be gentler? I am not made of wood."
+    - speaker: 1
+      text: "Ngh... if you are going to do that, warn me first."
+    - speaker: 1
+      text: "I can endure it. Do not make me regret allowing you to treat me."
+    moderate:
+    - speaker: 1
+      text: "Ngh... do not treat my body like something for trial and error."
+    - speaker: 1
+      text: "Stop. I need to steady myself."
+    - speaker: 1
+      text: "Pain like this makes me question whether you are helping me or making it worse."
+    severe:
+    - speaker: 1
+      text: "Agh... stop!"
+    - speaker: 1
+      text: "The pain is scattering my thoughts."
+    - speaker: 1
+      text: "Do not force that any further. I am not here to die on this table."
+  aggressivePainDialogue:
+    mild: []
+    moderate: []
+    severe: []
+  sanityDialogue:
+    above20:
+    - speaker: 1
+      text: "I can still keep my mind steady... but do not give me reason to doubt what you are doing."
+    - speaker: 1
+      text: "Something is moving inside my thoughts, but it has not won."
+    - speaker: 1
+      text: "My hands are still steady. That means I still have control."
+    - speaker: 1
+      text: "I hear strange sounds... but I can still tell what is real and what is not."
+    above50:
+    - speaker: 1
+      text: "The voices are getting louder... I dislike the feeling of something holding my hand from within."
+    - speaker: 1
+      text: "Do not approach too quickly. I am not certain I can stay still enough."
+    - speaker: 1
+      text: "I remember that I must breathe... but my body is listening less and less."
+    - speaker: 1
+      text: "If I say something strange, do not believe all of it."
+    above80:
+    - speaker: 1
+      text: "Step back... not because I wish to harm you."
+    - speaker: 1
+      text: "I know I should remain still, but something inside me refuses."
+    - speaker: 1
+      text: "Do not let it use my hands in my place."
+    - speaker: 1
+      text: "I do not want to become something others must draw a bow against."
+  aggressiveSanityDialogue:
+    above20: []
+    above50: []
+    above80: []
+  abandonedTreatmentDialogue:
+    above0:
+    - speaker: 1
+      text: "Why have you stopped? I am still here."
+    - speaker: 1
+      text: "If I must wait, tell me first."
+    above50:
+    - speaker: 1
+      text: "Silence again... I hate when people tell me to wait and never return."
+    - speaker: 1
+      text: "Do not leave me guessing whether you have abandoned me."
+    above80:
+    - speaker: 1
+      text: "If you intend to leave me here, at least say it plainly."
+    - speaker: 1
+      text: "I do not want to end like someone no one came back for."
+  aggressiveAbandonedTreatmentDialogue:
+    above0: []
+    above50: []
+    above80: []

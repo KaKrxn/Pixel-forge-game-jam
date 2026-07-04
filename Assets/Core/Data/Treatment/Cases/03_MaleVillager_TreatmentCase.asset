@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c974a11f55ef5148bad9207f75384d2, type: 3}
-  m_Name: 05_TreatmentCase
+  m_Name: 03_MaleVillager_TreatmentCase
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
-  caseId: 
-  customerDisplayName: Customer
-  dialogData: {fileID: 0}
+  caseId: male_villager
+  customerDisplayName: Male Villager
+  dialogData: {fileID: 11400000, guid: 49854fec88e6eb44caf0e395cfb6906f, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments: []

@@ -1,0 +1,248 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
+  m_Name: 003_WhiteWolfTraveler_DialogData
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Doctor
+  customerDisplayName: White Wolf
+  customerBlipClip: {fileID: 0}
+  customerBlipClips: []
+  lines:
+  - speaker: 1
+    text: "Hey there, friend... sorry for dropping by like this."
+  - speaker: 0
+    text: "It's alright. Take a seat and rest for a moment."
+  - speaker: 1
+    text: "Got snagged by a strange thorn. At first, I thought it was nothing."
+  - speaker: 0
+    text: "How are you feeling now?"
+  - speaker: 1
+    text: "It's started spreading deeper inside me... but I'm still holding up, friend."
+  normalConversation1:
+  - speaker: 1
+    text: "Hey there, friend... sorry for dropping by like this."
+  - speaker: 0
+    text: "It's alright. Take a seat and rest for a moment."
+  - speaker: 1
+    text: "Got snagged by a strange thorn. At first, I thought it was nothing."
+  - speaker: 0
+    text: "How are you feeling now?"
+  - speaker: 1
+    text: "It's started spreading deeper inside me... but I'm still holding up, friend."
+  normalConversation2:
+  - speaker: 1
+    text: "Hey, friend. If you're still taking patients, I'd appreciate a hand."
+  - speaker: 0
+    text: "Of course. Come in and let me take a look."
+  - speaker: 1
+    text: "I've walked farther than I expected. This wound just won't stop spreading."
+  - speaker: 0
+    text: "I'll examine it first. Don't push yourself too hard."
+  - speaker: 1
+    text: "Thanks, friend. If my hands start shaking, try not to hold it against me."
+  - speaker: 0
+    text: "I won't. Just tell me if the pain gets worse."
+  - speaker: 1
+    text: "You'll know. I usually keep quiet, but this thing's making a poor job of that."
+  - speaker: 0
+    text: "I'll examine it first. Don't push yourself too hard."
+  - speaker: 1
+    text: "Thanks, friend. If my hands start shaking, try not to hold it against me."
+  aggressiveConversation:
+  - speaker: 1
+    text: "Careful, friend. I'm not in the best mood to be poked at."
+  - speaker: 0
+    text: "I understand. I'll be careful."
+  - speaker: 1
+    text: "That's not what I mean. I can feel my body wanting to snap at anything that gets close."
+  - speaker: 0
+    text: "Is the pain causing it?"
+  - speaker: 1
+    text: "Pain, infection, bad luck... take your pick."
+  - speaker: 0
+    text: "I need you to stay as still as you can."
+  - speaker: 1
+    text: "I'm trying. But if I jerk, don't assume I'm picking a fight."
+  - speaker: 1
+    text: "If I wanted a fight, I'd at least stand up first."
+  - speaker: 1
+    text: "Before you start, friend... if I bare my teeth, ignore it."
+  - speaker: 0
+    text: "Ignore it?"
+  - speaker: 1
+    text: "Unless I actually bite you. Then maybe take it seriously."
+  - speaker: 0
+    text: "I'll do my best to prevent that."
+  - speaker: 1
+    text: "Good. I don't fancy apologizing with my mouth full of regret."
+  - speaker: 0
+    text: "Tell me if you feel yourself losing control."
+  - speaker: 1
+    text: "You'll hear it before I say it. My throat's already trying to growl without asking me."
+  painDialogue:
+    minor:
+    - speaker: 1
+      text: "Ngh... I'm alright, friend."
+    - speaker: 1
+      text: "That stings, but I've had worse."
+    - speaker: 1
+      text: "Keep going. I can take it."
+    - speaker: 1
+      text: "Just a scratch... well, maybe a little more than a scratch."
+    moderate:
+    - speaker: 1
+      text: "Mind slowing down a little, friend?"
+    - speaker: 1
+      text: "Ugh... that went deeper than I expected."
+    - speaker: 1
+      text: "Give me a breath. Just one."
+    - speaker: 1
+      text: "I'm trying to stay still, but my legs don't like the idea."
+    severe:
+    - speaker: 1
+      text: "Aaagh... friend, stop for a second... I wasn't ready for that."
+    - speaker: 1
+      text: "Damn... that hurt all the way through."
+    - speaker: 1
+      text: "Hold on. If I move, it's not because I want to."
+    - speaker: 1
+      text: "Don't let it dig any deeper. I can feel it pushing back."
+  aggressivePainDialogue:
+    mild:
+    - speaker: 1
+      text: "Easy, friend. I'm trying not to twitch."
+    - speaker: 1
+      text: "That hurt more than I expected."
+    - speaker: 1
+      text: "Keep your hands steady. I'll do the same."
+    - speaker: 1
+      text: "Heh... if I growl, pretend you didn't hear it."
+    moderate:
+    - speaker: 1
+      text: "Back up a little. My legs aren't listening right."
+    - speaker: 1
+      text: "Damn it... sorry. That wasn't aimed at you."
+    - speaker: 1
+      text: "Give me a second before this body decides to do something stupid."
+    - speaker: 1
+      text: "I can feel it pulling through the wound. Makes me want to tear the whole thing out."
+    severe:
+    - speaker: 1
+      text: "Move back, friend!"
+    - speaker: 1
+      text: "No, don't run. Just give me space."
+    - speaker: 1
+      text: "Aaagh! My body wants to throw itself off this table!"
+    - speaker: 1
+      text: "If I snap at you, hit me if you have to. I won't hold it against you."
+    - speaker: 1
+      text: "Damn this thing... it's trying to make me fight you."
+  sanityDialogue:
+    above20:
+    - speaker: 1
+      text: "Ugh... my head's starting to feel heavy, friend."
+    - speaker: 1
+      text: "The room's getting a little far away, but I still hear you."
+    - speaker: 1
+      text: "I can feel something crawling along the thorn marks."
+    - speaker: 1
+      text: "I'm still here. Just give me a second to keep it that way."
+    above50:
+    - speaker: 1
+      text: "Friend... I've been lost in the wilderness before. But this feels worse than any forest I've ever wandered."
+    - speaker: 1
+      text: "Feels like my own body is trying to take a different trail."
+    - speaker: 1
+      text: "I keep smelling leaves and wet bark... but we're indoors, aren't we?"
+    - speaker: 1
+      text: "If I start growling, don't take it personal. I don't think it'll be aimed at you."
+    above80:
+    - speaker: 1
+      text: "Damn it... I hate this feeling, friend."
+    - speaker: 1
+      text: "My teeth keep clenching on their own. That's not a good sign."
+    - speaker: 1
+      text: "If I lunge, step back fast. I don't want your blood on me."
+    - speaker: 1
+      text: "Something inside me wants to run. Something else wants to hunt. I don't like either one."
+  aggressiveSanityDialogue:
+    above20:
+    - speaker: 1
+      text: "I'm still holding the reins, friend."
+    - speaker: 1
+      text: "Something's making me restless. I don't like it."
+    - speaker: 1
+      text: "My claws keep tensing. That's not me looking for trouble."
+    - speaker: 1
+      text: "If I sound angry, I'm mostly just trying not to panic."
+    above50:
+    - speaker: 1
+      text: "Friend... I'm starting to feel cornered, and that's bad for everyone."
+    - speaker: 1
+      text: "The wound keeps telling me to run. Or bite. Can't tell which."
+    - speaker: 1
+      text: "I know you're helping, but my body doesn't seem convinced."
+    - speaker: 1
+      text: "Don't step in too fast. I might move before I think."
+    above80:
+    - speaker: 1
+      text: "Something inside me is hunting for a way out."
+    - speaker: 1
+      text: "If I bare my teeth, don't answer with your hands near my mouth."
+    - speaker: 1
+      text: "I don't want to hurt you. Remember that if I forget."
+    - speaker: 1
+      text: "It's not fear anymore. It's turning into instinct."
+  abandonedTreatmentDialogue:
+    above0:
+    - speaker: 1
+      text: "Hey, friend... you're still here, right?"
+    - speaker: 1
+      text: "I can wait, but don't make me guess where you went."
+    above50:
+    - speaker: 1
+      text: "Hey, friend... I've been alone in the woods before. But this silence feels different."
+    - speaker: 1
+      text: "Don't leave me listening to this thing move."
+    - speaker: 1
+      text: "I'll hold on a bit longer. Just... don't take too long."
+    above80:
+    - speaker: 1
+      text: "If I get back up and I'm not myself anymore... don't come near me, friend."
+    - speaker: 1
+      text: "Friend, if you're still there, say something."
+    - speaker: 1
+      text: "I don't want to wake up standing over someone."
+    - speaker: 1
+      text: "If you have a plan, now would be a good time to use it."
+  aggressiveAbandonedTreatmentDialogue:
+    above0:
+    - speaker: 1
+      text: "Friend? Bad time to go quiet."
+    - speaker: 1
+      text: "I can stay calm, but I need to know you're still there."
+    above50:
+    - speaker: 1
+      text: "Don't leave me alone with this feeling."
+    - speaker: 1
+      text: "I've been lost before, but this is different. This is inside my own skin."
+    - speaker: 1
+      text: "Friend, say something before I start listening to the wrong voice."
+    above80:
+    - speaker: 1
+      text: "If you're gone, stay gone until I stop moving."
+    - speaker: 1
+      text: "No... damn it, I didn't mean that. Come back carefully."
+    - speaker: 1
+      text: "I don't know what I'll do if this body gets up."
+    - speaker: 1
+      text: "Friend, if I turn on you, don't hesitate."
