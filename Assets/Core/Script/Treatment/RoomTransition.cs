@@ -17,6 +17,10 @@ public sealed class RoomTransition : MonoBehaviour
 
     public bool IsInTreatmentRoom { get; private set; }
 
+    public event Action<RoomTransitionDirection> TransitionStarted;
+    public event Action<RoomTransitionDirection> RoomSwitched;
+    public event Action<RoomTransitionDirection> TransitionFinished;
+
     private Coroutine transitionRoutine;
 
     private void Awake()
@@ -52,9 +56,16 @@ public sealed class RoomTransition : MonoBehaviour
 
     private void StartBlinkTransition(bool counterRoomVisible, Vector3 cameraPosition, Action completed)
     {
+        RoomTransitionDirection direction = counterRoomVisible
+            ? RoomTransitionDirection.ToCounter
+            : RoomTransitionDirection.ToTreatment;
+
         if (!isActiveAndEnabled || fadeCanvasGroup == null)
         {
+            TransitionStarted?.Invoke(direction);
             ApplyImmediate(counterRoomVisible, cameraPosition);
+            RoomSwitched?.Invoke(direction);
+            TransitionFinished?.Invoke(direction);
             completed?.Invoke();
             return;
         }
@@ -64,15 +75,17 @@ public sealed class RoomTransition : MonoBehaviour
             StopCoroutine(transitionRoutine);
         }
 
-        transitionRoutine = StartCoroutine(BlinkTransition(counterRoomVisible, cameraPosition, completed));
+        transitionRoutine = StartCoroutine(BlinkTransition(counterRoomVisible, cameraPosition, direction, completed));
     }
 
-    private IEnumerator BlinkTransition(bool counterRoomVisible, Vector3 cameraPosition, Action completed)
+    private IEnumerator BlinkTransition(bool counterRoomVisible, Vector3 cameraPosition, RoomTransitionDirection direction, Action completed)
     {
+        TransitionStarted?.Invoke(direction);
         SetFade(0f, blocksRaycasts: true);
         yield return Fade(0f, 1f, closeEyeDuration);
 
         ApplyImmediate(counterRoomVisible, cameraPosition);
+        RoomSwitched?.Invoke(direction);
 
         if (closedEyeHoldDuration > 0f)
         {
@@ -82,6 +95,7 @@ public sealed class RoomTransition : MonoBehaviour
         yield return Fade(1f, 0f, openEyeDuration);
         SetFade(0f, blocksRaycasts: false);
         transitionRoutine = null;
+        TransitionFinished?.Invoke(direction);
         completed?.Invoke();
     }
 
