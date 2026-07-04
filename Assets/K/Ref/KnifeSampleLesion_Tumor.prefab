@@ -210,7 +210,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: e8d687840f974e7e9ec346ca8c4b5c40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -320,4 +320,4 @@ MonoBehaviour:
   lineWidth: 0.06
   dotsPerUnit: 4
   lineColor: {r: 1, g: 1, b: 1, a: 1}
-  lineMaterial: {fileID: 0}
+  lineMaterial: {fileID: 2100000, guid: e8d687840f974e7e9ec346ca8c4b5c40, type: 2}
