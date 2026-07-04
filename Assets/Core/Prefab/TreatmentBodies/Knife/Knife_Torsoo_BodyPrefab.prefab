@@ -197,7 +197,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7005992570315594272}
   - component: {fileID: 5963946996359077799}
-  - component: {fileID: 2627748403729921237}
+  - component: {fileID: -8737903622147788738}
   m_Layer: 0
   m_Name: Knife_Torsoo_BodyPrefab
   m_TagString: Untagged
@@ -244,7 +244,7 @@ MonoBehaviour:
   enforceBodySpriteSorting: 1
   bodySortingLayerName: Main
   bodySortingOrder: 20
-  parasiteRoot: {fileID: 8367556473548492508}
+  parasiteRoot: {fileID: 0}
   parasiteSpawnAnchors: []
   lesionRoot: {fileID: 9130214084153886800}
   lesionSpawnAnchors:
@@ -255,7 +255,7 @@ MonoBehaviour:
   - {fileID: 7533072138589041275}
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &2627748403729921237
+--- !u!114 &-8737903622147788738
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -269,7 +269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::KnifeMiniGame
   flow: {fileID: 0}
   root: {fileID: 6400688003469276451}
-  lesionRoot: {fileID: 9130214084153886800}
+  lesionRoot: {fileID: 8367556473548492508}
   lesions: []
   lesionSpawnOptions:
   - lesionType: 1
@@ -277,8 +277,15 @@ MonoBehaviour:
   - lesionType: 0
     lesionPrefab: {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
   lesionSpawnAnchors: []
-  lesionPrefabs: []
-  spawnAnchors: []
+  lesionPrefabs:
+  - {fileID: 1764347367109524641, guid: 82ed756a551c8ee49b29fd3a7e6c6c19, type: 3}
+  - {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
+  spawnAnchors:
+  - {fileID: 7130228480449890428}
+  - {fileID: 856725545692450672}
+  - {fileID: 7862787060981727792}
+  - {fileID: 2923789392572989142}
+  - {fileID: 7533072138589041275}
   spawnLesionsOnBegin: 0
   minLesions: 2
   maxLesions: 5
@@ -291,6 +298,7 @@ MonoBehaviour:
   autoCompleteWhenAllLesionsDone: 1
   startHidden: 1
   useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!1 &7542624280017080147
 GameObject:
   m_ObjectHideFlags: 0

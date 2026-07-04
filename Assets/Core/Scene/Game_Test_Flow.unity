@@ -628,165 +628,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 108766482}
   m_CullTransparentMesh: 1
---- !u!1 &141601375
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 141601379}
-  - component: {fileID: 141601377}
-  - component: {fileID: 141601378}
-  - component: {fileID: 141601376}
-  m_Layer: 0
-  m_Name: NeedleSamplePustule_Small
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &141601376
+--- !u!114 &141601376 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6549846161124506502, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+  m_PrefabInstance: {fileID: 998713546373141794}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141601375}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e83b804397b4c24a9eae90dfac65332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pustule
-  type: 0
-  pustuleRadius: 0.32
-  pierceTime: 0.4
-  drainSpeed: 0.6
-  painPerSecond: 0.22
-  painDrainRate: 0.4
-  painSpikeAmount: 25
-  strayPenaltyPerSecond: 8
-  rollbackPerSecond: 0.3
-  jitterStrength: 0
-  jitterFrequency: 1.8
-  hideWhenCompleted: 1
-  targetRenderer: {fileID: 141601377}
-  normalColor: {r: 0.96, g: 0.72, b: 0.34, a: 1}
-  piercedColor: {r: 1, g: 0.86, b: 0.46, a: 1}
-  completedColor: {r: 1, g: 1, b: 1, a: 0.2}
-  fullVisualRoot: {fileID: 0}
-  emptyVisualRoot: {fileID: 0}
---- !u!212 &141601377
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141601375}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 166060543
-  m_SortingLayer: 6
-  m_SortingOrder: 32
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b6ce9bb76f6847f4da313e6b4d1a07ce, type: 3}
-  m_Color: {r: 1, g: 0.75, b: 0.32, a: 0.95}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 0.91333336, y: 0.92333335}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!58 &141601378
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141601375}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.45
---- !u!4 &141601379
+--- !u!4 &141601379 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+  m_PrefabInstance: {fileID: 998713546373141794}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141601375}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.75, y: 0.18, z: 0}
-  m_LocalScale: {x: 0.45, y: 0.45, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 216467450}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &145645325
 GameObject:
   m_ObjectHideFlags: 0
@@ -3198,6 +3055,7 @@ MonoBehaviour:
   treatment: {fileID: 491569615}
   candle: {fileID: 684896821}
   startOnPlay: 1
+  debugTreatmentFlow: 1
 --- !u!4 &491569614
 Transform:
   m_ObjectHideFlags: 0
@@ -3234,7 +3092,8 @@ MonoBehaviour:
   returnButton: {fileID: 700368882}
   resumeButton: {fileID: 383437217}
   anatomyController: {fileID: 1045452156}
-  tongsMiniGame: {fileID: 629271884}
+  tongsMiniGame: {fileID: 0}
+  debugTreatmentFlow: 1
 --- !u!114 &491569616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5025,6 +4884,7 @@ MonoBehaviour:
   autoCompleteWhenAllParasitesDone: 1
   completeTreatmentOnButton: 0
   useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!4 &629271885 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5764395938817389039, guid: 8e3a10402929e2d4baefc4f6086f46f3, type: 3}
@@ -7129,6 +6989,7 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.86, b: 0.42, a: 1}
   healthyColor: {r: 0.82, g: 0.82, b: 0.82, a: 1}
   treatedColor: {r: 0.48, g: 0.66, b: 0.58, a: 1}
+  debugTreatmentFlow: 1
 --- !u!114 &855375089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7615,6 +7476,7 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.86, b: 0.42, a: 1}
   healthyColor: {r: 0.82, g: 0.82, b: 0.82, a: 1}
   treatedColor: {r: 0.48, g: 0.66, b: 0.58, a: 1}
+  debugTreatmentFlow: 1
 --- !u!114 &919960090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8418,9 +8280,9 @@ MonoBehaviour:
   - {fileID: 919960089}
   - {fileID: 1660565451}
   tongsArea: 2
-  tongsMiniGame: {fileID: 629271884}
-  knifeMiniGame: {fileID: 0}
-  needleMiniGame: {fileID: 1910242605}
+  tongsMiniGame: {fileID: 1057718144}
+  knifeMiniGame: {fileID: 1246265299}
+  needleMiniGame: {fileID: 2018895436}
   bodyPrefabSpawner: {fileID: 1045452157}
   miniGameFlow: {fileID: 491569613}
   miniGameInputCamera: {fileID: 519420031}
@@ -8428,6 +8290,7 @@ MonoBehaviour:
   knifeAreas: 000000000100000003000000
   needleAreas: 
   autoTreatInfectedAreasWithoutMiniGame: 1
+  debugTreatmentFlow: 1
 --- !u!114 &1045452157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8443,6 +8306,83 @@ MonoBehaviour:
   catalog: {fileID: 11400000, guid: 6015f858ebbeb524e8c8a0769e624da9, type: 2}
   bodyParent: {fileID: 1692959104}
   logWarnings: 1
+  debugTreatmentFlow: 1
+--- !u!1 &1057718142
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1057718143}
+  - component: {fileID: 1057718144}
+  m_Layer: 0
+  m_Name: TongsMiniGameRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1057718143
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057718142}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1692959104}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1057718144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057718142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0174fbd055f564ea59a712facaffa8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TongsMiniGame
+  flow: {fileID: 491569613}
+  root: {fileID: 1057718142}
+  parasiteRoot: {fileID: 0}
+  parasites: []
+  parasiteSpawnOptions:
+  - parasiteType: {fileID: 11400000, guid: 96bf053eaf5d9a143ba100748a2dbf86, type: 2}
+    parasitePrefab: {fileID: 4232482866242300531, guid: abe5b6abe09fada4cb23c0b43a80f6f0, type: 3}
+  - parasiteType: {fileID: 11400000, guid: 4105fa47b05940c385217694bf0dbe90, type: 2}
+    parasitePrefab: {fileID: 4232482866242300531, guid: 5a5331714d1d02d4eb67ca756a4ed8f8, type: 3}
+  - parasiteType: {fileID: 11400000, guid: 0c17ed264d60431a8d668369d65c09fd, type: 2}
+    parasitePrefab: {fileID: 4232482866242300531, guid: 24d83dd0cee55484bb0ecf2f80c108f9, type: 3}
+  spawnAnchors: []
+  alignParasiteAnchorToSpawnPoint: 1
+  spawnParasitesOnBegin: 0
+  minParasites: 3
+  maxParasites: 7
+  parasiteSortingOrderStart: 27
+  parasiteSortingOrderStep: 4
+  debugSpawn: 1
+  inputCamera: {fileID: 519420031}
+  worldInputPlaneZ: 0
+  fallbackHitRadius: 0.45
+  overlay: {fileID: 582104043}
+  overlayToolId: Tongs
+  aggressionController: {fileID: 0}
+  requireTongsEquipped: 1
+  autoFindParasitesInChildren: 1
+  startHidden: 1
+  autoCompleteWhenAllParasitesDone: 1
+  completeTreatmentOnButton: 0
+  useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!1 &1061172423
 GameObject:
   m_ObjectHideFlags: 0
@@ -8799,6 +8739,7 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.86, b: 0.42, a: 1}
   healthyColor: {r: 0.82, g: 0.82, b: 0.82, a: 1}
   treatedColor: {r: 0.48, g: 0.66, b: 0.58, a: 1}
+  debugTreatmentFlow: 1
 --- !u!114 &1148077748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9090,6 +9031,75 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1246265297
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1246265298}
+  - component: {fileID: 1246265299}
+  m_Layer: 0
+  m_Name: KnifeMiniGameRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1246265298
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246265297}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1692959104}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1246265299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246265297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c78d4b9207bc47bf969924e1779a2984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KnifeMiniGame
+  flow: {fileID: 491569613}
+  root: {fileID: 1246265297}
+  lesionRoot: {fileID: 0}
+  lesions: []
+  lesionSpawnOptions:
+  - lesionType: 1
+    lesionPrefab: {fileID: 1764347367109524641, guid: 82ed756a551c8ee49b29fd3a7e6c6c19, type: 3}
+  - lesionType: 0
+    lesionPrefab: {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
+  lesionSpawnAnchors: []
+  lesionPrefabs: []
+  spawnAnchors: []
+  spawnLesionsOnBegin: 0
+  minLesions: 2
+  maxLesions: 5
+  inputCamera: {fileID: 519420031}
+  worldInputPlaneZ: 0
+  overlay: {fileID: 582104043}
+  overlayToolId: Knife
+  pullToolId: Tongs
+  aggressionController: {fileID: 0}
+  autoCompleteWhenAllLesionsDone: 1
+  startHidden: 1
+  useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!1 &1248159359
 GameObject:
   m_ObjectHideFlags: 0
@@ -9253,165 +9263,22 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &1313359938
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1313359942}
-  - component: {fileID: 1313359940}
-  - component: {fileID: 1313359941}
-  - component: {fileID: 1313359939}
-  m_Layer: 0
-  m_Name: NeedleSamplePustule_Big
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1313359939
+--- !u!114 &1313359939 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 996828289250549444, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+  m_PrefabInstance: {fileID: 8103942145733355481}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313359938}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e83b804397b4c24a9eae90dfac65332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pustule
-  type: 1
-  pustuleRadius: 0.4
-  pierceTime: 0.5
-  drainSpeed: 0.4
-  painPerSecond: 0.28
-  painDrainRate: 0.4
-  painSpikeAmount: 25
-  strayPenaltyPerSecond: 8
-  rollbackPerSecond: 0.3
-  jitterStrength: 0.15
-  jitterFrequency: 1.8
-  hideWhenCompleted: 1
-  targetRenderer: {fileID: 1313359940}
-  normalColor: {r: 0.96, g: 0.72, b: 0.34, a: 1}
-  piercedColor: {r: 1, g: 0.86, b: 0.46, a: 1}
-  completedColor: {r: 1, g: 1, b: 1, a: 0.2}
-  fullVisualRoot: {fileID: 0}
-  emptyVisualRoot: {fileID: 0}
---- !u!212 &1313359940
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313359938}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 166060543
-  m_SortingLayer: 6
-  m_SortingOrder: 32
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b6ce9bb76f6847f4da313e6b4d1a07ce, type: 3}
-  m_Color: {r: 0.95, g: 0.56, b: 0.18, a: 0.95}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 0.91333336, y: 0.92333335}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!58 &1313359941
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313359938}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.45
---- !u!4 &1313359942
+--- !u!4 &1313359942 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+  m_PrefabInstance: {fileID: 8103942145733355481}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1313359938}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.75, y: -0.12, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 216467450}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1333585121
 GameObject:
   m_ObjectHideFlags: 0
@@ -10707,6 +10574,7 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.86, b: 0.42, a: 1}
   healthyColor: {r: 0.82, g: 0.82, b: 0.82, a: 1}
   treatedColor: {r: 0.48, g: 0.66, b: 0.58, a: 1}
+  debugTreatmentFlow: 1
 --- !u!114 &1509333484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11709,6 +11577,7 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.86, b: 0.42, a: 1}
   healthyColor: {r: 0.82, g: 0.82, b: 0.82, a: 1}
   treatedColor: {r: 0.48, g: 0.66, b: 0.58, a: 1}
+  debugTreatmentFlow: 1
 --- !u!114 &1660565452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11975,6 +11844,9 @@ Transform:
   - {fileID: 582104039}
   - {fileID: 629271882}
   - {fileID: 1910242606}
+  - {fileID: 1057718143}
+  - {fileID: 1246265298}
+  - {fileID: 2018895435}
   m_Father: {fileID: 1839294940}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1704769053
@@ -13765,6 +13637,7 @@ MonoBehaviour:
   autoCompleteWhenAllPustulesDone: 1
   startHidden: 1
   useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!4 &1910242606
 Transform:
   m_ObjectHideFlags: 0
@@ -14300,6 +14173,7 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.86, b: 0.42, a: 1}
   healthyColor: {r: 0.82, g: 0.82, b: 0.82, a: 1}
   treatedColor: {r: 0.48, g: 0.66, b: 0.58, a: 1}
+  debugTreatmentFlow: 1
 --- !u!114 &2006545399
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14483,6 +14357,74 @@ MonoBehaviour:
   hoverScale: 1.04
   hoverTiltAngle: 2.5
   motionSpeed: 16
+--- !u!1 &2018895434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2018895435}
+  - component: {fileID: 2018895436}
+  m_Layer: 0
+  m_Name: NeedleMiniGameRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2018895435
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2018895434}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1692959104}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2018895436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2018895434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63d566e61ba34af3ae8e3fc31e88eb39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NeedleMiniGame
+  flow: {fileID: 491569613}
+  root: {fileID: 2018895434}
+  pustuleRoot: {fileID: 0}
+  pustules: []
+  pustuleSpawnOptions:
+  - pustuleType: 0
+    pustulePrefab: {fileID: 6549846161124506502, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+  - pustuleType: 1
+    pustulePrefab: {fileID: 996828289250549444, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+  pustuleSpawnAnchors: []
+  pustulePrefabs: []
+  spawnAnchors: []
+  spawnPustulesOnBegin: 0
+  minPustules: 3
+  maxPustules: 7
+  inputCamera: {fileID: 519420031}
+  worldInputPlaneZ: 0
+  overlay: {fileID: 582104043}
+  overlayToolId: Needle
+  aggressionController: {fileID: 0}
+  autoCompleteWhenAllPustulesDone: 1
+  startHidden: 1
+  useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!1 &2026238772
 GameObject:
   m_ObjectHideFlags: 0
@@ -15430,6 +15372,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2133821387}
   m_CullTransparentMesh: 1
+--- !u!1001 &998713546373141794
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 216467450}
+    m_Modifications:
+    - target: {fileID: 417698281427364095, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_Name
+      value: NeedleSamplePustule_Small
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6580123983932427691, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2b40d895b91d3ff44bc96afbac83ddf8, type: 3}
 --- !u!1001 &2462198361837984106
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15523,6 +15522,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b19bee5ad158afd448dee0cf81044123, type: 3}
+--- !u!1001 &8103942145733355481
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 216467450}
+    m_Modifications:
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873806205639772774, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1982004478124225135, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
+      propertyPath: m_Name
+      value: NeedleSamplePustule_Big
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 32413464b0942044da7c4c59d2fa4b3e, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

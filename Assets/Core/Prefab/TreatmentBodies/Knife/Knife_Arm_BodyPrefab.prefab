@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1263302405268037011}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.2000003, y: 0.6, z: 0}
+  m_LocalPosition: {x: -5.2000003, y: 0.100000024, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -87,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 4998763838241869052}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.2000004, y: -0.19999999, z: 0}
+  m_LocalPosition: {x: -0.9000004, y: 0.000000014901161, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -276,7 +276,7 @@ Transform:
   m_GameObject: {fileID: 6866712824923518026}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.5000005, y: 0.5, z: 0}
+  m_LocalPosition: {x: -2.6000004, y: -0.100000024, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -292,7 +292,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7156376880985388595}
   - component: {fileID: 2153847615148599529}
-  - component: {fileID: 6608749032861586428}
+  - component: {fileID: -2561672558194448285}
   m_Layer: 0
   m_Name: Knife_Arm_BodyPrefab
   m_TagString: Untagged
@@ -349,7 +349,7 @@ MonoBehaviour:
   - {fileID: 5974246591435017949}
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &6608749032861586428
+--- !u!114 &-2561672558194448285
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -372,7 +372,12 @@ MonoBehaviour:
     lesionPrefab: {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
   lesionSpawnAnchors: []
   lesionPrefabs: []
-  spawnAnchors: []
+  spawnAnchors:
+  - {fileID: 8871994707015795802}
+  - {fileID: 9035930862748874908}
+  - {fileID: 2133987770935795685}
+  - {fileID: 1731205538829682257}
+  - {fileID: 5974246591435017949}
   spawnLesionsOnBegin: 0
   minLesions: 2
   maxLesions: 5
@@ -385,6 +390,7 @@ MonoBehaviour:
   autoCompleteWhenAllLesionsDone: 1
   startHidden: 1
   useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!1 &7342396421237383183
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,7 +447,7 @@ Transform:
   m_GameObject: {fileID: 8087577068595747503}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.1000004, y: -0.5, z: 0}
+  m_LocalPosition: {x: -4.0000005, y: -0.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -1,10 +1,15 @@
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
 {
     [SerializeField] private TreatmentBodyPrefabCatalog catalog;
     [SerializeField] private Transform bodyParent;
     [SerializeField] private bool logWarnings = true;
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     private TreatmentBodyPrefab activeBody;
 
@@ -12,6 +17,7 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
 
     public bool TrySpawn(TreatmentMiniGameType miniGameType, BodyArea area, out TreatmentBodyPrefab body)
     {
+        LogDebug($"TrySpawn request miniGameType={miniGameType} area={area} catalog={DescribeObject(catalog)} bodyParent={DescribeObject(bodyParent)} activeBodyBefore={DescribeBody(activeBody)}");
         ClearActiveBody();
 
         if (catalog == null)
@@ -24,15 +30,20 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
         if (!catalog.TryGetPrefab(miniGameType, area, out TreatmentBodyPrefab prefab) || prefab == null)
         {
             LogWarning($"No body prefab entry found for {miniGameType} + {area}. Existing mini game scene references will be used.");
+            LogDebug($"TrySpawn failed: catalog has no prefab for {miniGameType}/{area}");
             body = null;
             return false;
         }
 
+        LogDebug($"TrySpawn catalog prefab={DescribeBody(prefab)} prefabAssetName={prefab.name}");
+        HideInactiveBodyPrefabs();
         Transform parent = bodyParent != null ? bodyParent : transform;
         activeBody = Instantiate(prefab, parent);
         activeBody.name = $"{miniGameType}_{area}_Body";
         activeBody.ApplyBodySpriteSorting();
+        HideInactiveBodyPrefabs(activeBody);
         body = activeBody;
+        LogDebug($"TrySpawn spawned activeBody={DescribeBody(activeBody)} parent={DescribeObject(parent)}");
 
         if (!activeBody.Matches(miniGameType, area))
         {
@@ -44,10 +55,16 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
 
     public void ClearActiveBody()
     {
+        LogDebug($"ClearActiveBody activeBody={DescribeBody(activeBody)}");
         if (activeBody == null)
         {
+            HideInactiveBodyPrefabs();
             return;
         }
+
+#if UNITY_EDITOR
+        ClearEditorSelectionIfInside(activeBody.gameObject);
+#endif
 
         if (Application.isPlaying)
         {
@@ -59,6 +76,25 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
         }
 
         activeBody = null;
+        HideInactiveBodyPrefabs();
+    }
+
+    private void HideInactiveBodyPrefabs(TreatmentBodyPrefab visibleBody = null)
+    {
+        Transform parent = bodyParent != null ? bodyParent : transform;
+        TreatmentBodyPrefab[] bodies = parent.GetComponentsInChildren<TreatmentBodyPrefab>(true);
+        LogDebug($"HideInactiveBodyPrefabs parent={DescribeObject(parent)} visibleBody={DescribeBody(visibleBody)} found={bodies.Length}");
+        for (int i = 0; i < bodies.Length; i++)
+        {
+            TreatmentBodyPrefab body = bodies[i];
+            if (body == null || body == visibleBody)
+            {
+                continue;
+            }
+
+            body.gameObject.SetActive(false);
+            LogDebug($"HideInactiveBodyPrefabs disabled {DescribeBody(body)}");
+        }
     }
 
     private void LogWarning(string message)
@@ -67,5 +103,59 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
         {
             Debug.LogWarning($"[TreatmentBodyPrefabSpawner] {message}", this);
         }
+    }
+
+#if UNITY_EDITOR
+    private static void ClearEditorSelectionIfInside(GameObject target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        GameObject[] selectedObjects = Selection.gameObjects;
+        for (int i = 0; i < selectedObjects.Length; i++)
+        {
+            GameObject selectedObject = selectedObjects[i];
+            if (selectedObject == null)
+            {
+                continue;
+            }
+
+            if (selectedObject == target || selectedObject.transform.IsChildOf(target.transform))
+            {
+                Selection.activeObject = null;
+                return;
+            }
+        }
+    }
+#endif
+
+    private void LogDebug(string message)
+    {
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][BodyPrefabSpawner] {message}", this);
+        }
+    }
+
+    private static string DescribeObject(Object target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        return $"{target.name} ({target.GetType().Name})";
+    }
+
+    private static string DescribeBody(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return "null";
+        }
+
+        return $"{body.name} ({body.MiniGameType}/{body.Area}, active={body.gameObject.activeSelf})";
     }
 }

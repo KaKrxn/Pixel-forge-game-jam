@@ -58,6 +58,8 @@ public sealed class NeedleMiniGame : MonoBehaviour
     [SerializeField] private bool autoCompleteWhenAllPustulesDone = true;
     [SerializeField] private bool startHidden = true;
     [SerializeField] private bool useUnscaledTime;
+    [Header("Debug")]
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     private readonly List<Pustule> spawnedPustules = new List<Pustule>();
     private CustomerAgent activeCustomer;
@@ -77,6 +79,25 @@ public sealed class NeedleMiniGame : MonoBehaviour
     public NeedleToolState ToolState => toolState;
 
     public event Action MiniGameCompleted;
+
+    public void ConfigureRuntimeContext(GameFlow runtimeFlow, Camera runtimeInputCamera, MiniGameOverlay runtimeOverlay)
+    {
+        LogTreatmentFlow($"ConfigureRuntimeContext flow={DescribeObject(runtimeFlow)} camera={DescribeObject(runtimeInputCamera)} overlay={DescribeObject(runtimeOverlay)}");
+        if (runtimeFlow != null)
+        {
+            flow = runtimeFlow;
+        }
+
+        if (runtimeInputCamera != null)
+        {
+            inputCamera = runtimeInputCamera;
+        }
+
+        if (runtimeOverlay != null)
+        {
+            overlay = runtimeOverlay;
+        }
+    }
 
     private void Awake()
     {
@@ -124,6 +145,10 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     public void Begin(CustomerAgent customer)
     {
+        LogTreatmentFlow($"Begin customer={DescribeObject(customer)} rootBefore={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
+        EnsureRootActiveForBegin();
+        TryApplyParentBodyPrefab();
+
         activeCustomer = customer;
         activeSanity = customer != null ? customer.GetComponent<Sanity>() : null;
         activePustule = null;
@@ -148,8 +173,10 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     public void ApplyBodyPrefab(TreatmentBodyPrefab body)
     {
+        LogTreatmentFlow($"ApplyBodyPrefab body={DescribeBody(body)} currentRoot={DescribeObject(root)}");
         if (body == null)
         {
+            LogTreatmentFlow("ApplyBodyPrefab skipped because body is null; using inspector anchors/fallback.");
             return;
         }
 
@@ -170,12 +197,29 @@ public sealed class NeedleMiniGame : MonoBehaviour
             }
         }
 
+        LogTreatmentFlow($"ApplyBodyPrefab applied root={DescribeObject(root)} pustuleRoot={DescribeObject(pustuleRoot)} spawnAnchors={spawnAnchors.Count} pustuleSpawnAnchors={pustuleSpawnAnchors.Count}");
         RefreshPustuleList();
         SubscribePustules();
     }
 
+    private void TryApplyParentBodyPrefab()
+    {
+        LogTreatmentFlow($"TryApplyParentBodyPrefab activeBody={DescribeBody(activeBodyPrefab)} parent={DescribeBody(GetComponentInParent<TreatmentBodyPrefab>(true))}");
+        if (activeBodyPrefab != null)
+        {
+            return;
+        }
+
+        TreatmentBodyPrefab parentBody = GetComponentInParent<TreatmentBodyPrefab>(true);
+        if (parentBody != null)
+        {
+            ApplyBodyPrefab(parentBody);
+        }
+    }
+
     public void Stop()
     {
+        LogTreatmentFlow($"Stop root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndAction();
         isRunning = false;
         activeBodyPrefab = null;
@@ -187,6 +231,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     public void Pause()
     {
+        LogTreatmentFlow($"Pause root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndAction();
         isRunning = false;
         aggressionController?.Pause();
@@ -197,6 +242,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     public void Resume()
     {
+        LogTreatmentFlow($"Resume root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
         aggressionController?.Resume();
@@ -441,7 +487,9 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     private void PreparePustules()
     {
-        if (spawnPustulesOnBegin && HasAnyPustulePrefabSource() && HasAnyPustuleAnchorSource())
+        // Spawn whenever pustule prefabs + anchors exist, matching TongsMiniGame (which spawns on
+        // configured anchors regardless of the spawn-on-begin flag). Falls back to pre-placed pustules.
+        if (HasAnyPustulePrefabSource() && HasAnyPustuleAnchorSource())
         {
             SpawnPustules();
             return;
@@ -899,16 +947,64 @@ public sealed class NeedleMiniGame : MonoBehaviour
     private void SetRootVisible(bool visible)
     {
         GameObject target = root != null ? root : gameObject;
+        LogTreatmentFlow($"SetRootVisible visible={visible} target={DescribeObject(target)}");
         target.SetActive(visible);
+    }
+
+    private void EnsureRootActiveForBegin()
+    {
+        // The mini game's own GameObject can be left inactive by startHidden in Awake (when root
+        // still pointed at this object). After ApplyBodyPrefab reassigns root to the spawned body,
+        // SetRootVisible only activates the body, so re-activate this object here or Update() never runs.
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
+        GameObject target = root != null ? root : gameObject;
+        LogTreatmentFlow($"EnsureRootActiveForBegin target={DescribeObject(target)} activeBefore={(target != null && target.activeSelf)}");
+        if (target != null && !target.activeSelf)
+        {
+            target.SetActive(true);
+        }
     }
 
     private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
     {
+        LogTreatmentFlow($"ReplaceRuntimeRoot oldRoot={DescribeObject(root)} newBody={DescribeBody(body)}");
         if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
         {
             root.SetActive(false);
         }
 
         root = body.gameObject;
+    }
+
+    private void LogTreatmentFlow(string message)
+    {
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][NeedleMiniGame] {message}", this);
+        }
+    }
+
+    private static string DescribeObject(UnityEngine.Object target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        return $"{target.name} ({target.GetType().Name})";
+    }
+
+    private static string DescribeBody(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return "null";
+        }
+
+        return $"{body.name} ({body.MiniGameType}/{body.Area}, active={body.gameObject.activeSelf})";
     }
 }

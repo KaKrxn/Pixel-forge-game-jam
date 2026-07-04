@@ -13,6 +13,8 @@ public sealed class BodyPartButton : MonoBehaviour, IPointerEnterHandler, IPoint
     [SerializeField] private Color hoverColor = new Color(1f, 0.86f, 0.42f, 1f);
     [SerializeField] private Color healthyColor = new Color(0.82f, 0.82f, 0.82f, 1f);
     [SerializeField] private Color treatedColor = new Color(0.48f, 0.66f, 0.58f, 1f);
+    [Header("Debug")]
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     private Image image;
     private RectTransform rectTransform;
@@ -76,7 +78,13 @@ public sealed class BodyPartButton : MonoBehaviour, IPointerEnterHandler, IPoint
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!IsSelectable())
+        bool selectable = IsSelectable();
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][BodyPartButton] Click object={name} area={area} selectable={selectable} controller={(controller != null ? controller.name : "null")} state={state}", this);
+        }
+
+        if (!selectable)
         {
             return;
         }

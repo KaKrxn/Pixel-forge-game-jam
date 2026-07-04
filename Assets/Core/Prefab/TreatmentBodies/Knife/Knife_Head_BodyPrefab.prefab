@@ -356,7 +356,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8130410806944288889}
   - component: {fileID: 8707598172206570758}
-  - component: {fileID: -3820043561066461920}
+  - component: {fileID: -4308483477644052899}
   m_Layer: 0
   m_Name: Knife_Head_BodyPrefab
   m_TagString: Untagged
@@ -415,7 +415,7 @@ MonoBehaviour:
   - {fileID: 1701154751981534778}
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &-3820043561066461920
+--- !u!114 &-4308483477644052899
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -447,6 +447,7 @@ MonoBehaviour:
   autoCompleteWhenAllLesionsDone: 1
   startHidden: 1
   useUnscaledTime: 0
+  debugTreatmentFlow: 1
 --- !u!1 &7285114197631858760
 GameObject:
   m_ObjectHideFlags: 0

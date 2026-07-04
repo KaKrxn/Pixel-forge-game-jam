@@ -14,6 +14,8 @@ public sealed class Treatment : MonoBehaviour
     [SerializeField] private Button resumeButton;
     [SerializeField] private AnatomyController anatomyController;
     [SerializeField] private TongsMiniGame tongsMiniGame;
+    [Header("Debug")]
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     private CustomerAgent activeCustomer;
     private bool isAtCounter;
@@ -71,6 +73,7 @@ public sealed class Treatment : MonoBehaviour
 
     public void Begin(CustomerAgent customer)
     {
+        LogTreatmentFlow($"Begin customer={DescribeObject(customer)} anatomy={DescribeObject(anatomyController)} legacyTongs={DescribeObject(tongsMiniGame)} roomTransition={DescribeObject(roomTransition)}");
         activeCustomer = customer;
         isAtCounter = false;
         flow?.SetCandleAtCounter(false);
@@ -110,6 +113,7 @@ public sealed class Treatment : MonoBehaviour
 
     private void ReturnToCounter()
     {
+        LogTreatmentFlow($"ReturnToCounter canReturn={(anatomyController == null || anatomyController.CanReturnToCounter)} anatomy={DescribeObject(anatomyController)}");
         if (anatomyController != null && !anatomyController.CanReturnToCounter)
         {
             return;
@@ -139,6 +143,7 @@ public sealed class Treatment : MonoBehaviour
 
     private void ResumeTreatment()
     {
+        LogTreatmentFlow($"ResumeTreatment anatomy={DescribeObject(anatomyController)} legacyTongs={DescribeObject(tongsMiniGame)}");
         isAtCounter = false;
         flow?.SetCandleAtCounter(false);
         Hide();
@@ -161,6 +166,7 @@ public sealed class Treatment : MonoBehaviour
 
     private void CompleteTreatmentCase()
     {
+        LogTreatmentFlow($"CompleteTreatmentCase activeCustomer={DescribeObject(activeCustomer)} anatomy={DescribeObject(anatomyController)} legacyTongs={DescribeObject(tongsMiniGame)}");
         flow?.SetTreatmentStress(false);
         flow?.SetCandleAtCounter(false);
         anatomyController?.Stop();
@@ -171,34 +177,41 @@ public sealed class Treatment : MonoBehaviour
 
     private void BeginTreatmentContent()
     {
+        LogTreatmentFlow($"BeginTreatmentContent anatomy={DescribeObject(anatomyController)} legacyTongs={DescribeObject(tongsMiniGame)}");
         if (anatomyController != null)
         {
+            LogTreatmentFlow("BeginTreatmentContent route=AnatomyController.Begin");
             anatomyController.Begin(activeCustomer);
             return;
         }
 
         if (tongsMiniGame != null)
         {
+            LogTreatmentFlow("BeginTreatmentContent route=LegacyTongsMiniGame.Begin");
             tongsMiniGame.Begin(activeCustomer);
         }
     }
 
     private void ResumeTreatmentContent()
     {
+        LogTreatmentFlow($"ResumeTreatmentContent anatomy={DescribeObject(anatomyController)} legacyTongs={DescribeObject(tongsMiniGame)}");
         if (anatomyController != null)
         {
+            LogTreatmentFlow("ResumeTreatmentContent route=AnatomyController.ResumeAtAnatomyLevel");
             anatomyController.ResumeAtAnatomyLevel();
             return;
         }
 
         if (tongsMiniGame != null)
         {
+            LogTreatmentFlow("ResumeTreatmentContent route=LegacyTongsMiniGame.Resume");
             tongsMiniGame.Resume();
         }
     }
 
     private void RefreshText()
     {
+        LogTreatmentFlow($"RefreshText isAtCounter={isAtCounter} anatomyCanComplete={(anatomyController != null && anatomyController.CanCompleteTreatment)} anatomyCanReturn={(anatomyController == null || anatomyController.CanReturnToCounter)}");
         if (titleText != null)
         {
             titleText.text = isAtCounter ? "Counter Room" : "Treatment Room";
@@ -233,5 +246,23 @@ public sealed class Treatment : MonoBehaviour
         {
             resumeButton.gameObject.SetActive(isAtCounter);
         }
+    }
+
+    private void LogTreatmentFlow(string message)
+    {
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][Treatment] {message}", this);
+        }
+    }
+
+    private static string DescribeObject(Object target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        return $"{target.name} ({target.GetType().Name})";
     }
 }

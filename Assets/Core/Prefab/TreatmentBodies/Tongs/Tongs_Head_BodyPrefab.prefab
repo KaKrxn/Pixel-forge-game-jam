@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 75023662960876740}
   - component: {fileID: 3589087854902526985}
-  - component: {fileID: -5106469912543859634}
   m_Layer: 0
   m_Name: Tongs_Head_BodyPrefab
   m_TagString: Untagged
@@ -72,43 +71,6 @@ MonoBehaviour:
   lesionSpawnAnchors: []
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &-5106469912543859634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 180699751293295934}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da0174fbd055f564ea59a712facaffa8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TongsMiniGame
-  flow: {fileID: 0}
-  root: {fileID: 0}
-  parasiteRoot: {fileID: 0}
-  parasites: []
-  parasiteSpawnOptions: []
-  spawnAnchors: []
-  alignParasiteAnchorToSpawnPoint: 1
-  spawnParasitesOnBegin: 0
-  minParasites: 3
-  maxParasites: 7
-  parasiteSortingOrderStart: 27
-  parasiteSortingOrderStep: 4
-  debugSpawn: 1
-  inputCamera: {fileID: 0}
-  worldInputPlaneZ: 0
-  fallbackHitRadius: 0.45
-  overlay: {fileID: 0}
-  overlayToolId: Tongs
-  aggressionController: {fileID: 0}
-  requireTongsEquipped: 1
-  autoFindParasitesInChildren: 1
-  startHidden: 1
-  autoCompleteWhenAllParasitesDone: 1
-  completeTreatmentOnButton: 0
-  useUnscaledTime: 0
 --- !u!1 &227122350034122995
 GameObject:
   m_ObjectHideFlags: 0

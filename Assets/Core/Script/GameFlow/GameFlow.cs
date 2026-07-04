@@ -29,6 +29,8 @@ public sealed class GameFlow : MonoBehaviour
     [SerializeField] private Treatment treatment;
     [SerializeField] private Candle candle;
     [SerializeField] private bool startOnPlay = true;
+    [Header("Debug")]
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     public ClinicFlowState CurrentState { get; private set; } = ClinicFlowState.Idle;
 
@@ -127,6 +129,7 @@ public sealed class GameFlow : MonoBehaviour
 
     private void BeginCustomer(CustomerAgent customer, bool spawnedByQueue)
     {
+        LogTreatmentFlow($"BeginCustomer customer={DescribeObject(customer)} spawnedByQueue={spawnedByQueue}");
         if (customer == null)
         {
             return;
@@ -177,6 +180,7 @@ public sealed class GameFlow : MonoBehaviour
 
     public void CompleteDialog()
     {
+        LogTreatmentFlow($"CompleteDialog state={CurrentState} activeCustomer={DescribeObject(activeCustomer)} treatment={DescribeObject(treatment)} roomTransition={DescribeObject(roomTransition)}");
         if (CurrentState != ClinicFlowState.DialogActive)
         {
             return;
@@ -187,6 +191,7 @@ public sealed class GameFlow : MonoBehaviour
 
         if (treatment != null)
         {
+            LogTreatmentFlow("CompleteDialog route=Treatment.Begin");
             SetState(ClinicFlowState.TreatmentActive);
             treatment.Begin(activeCustomer);
             return;
@@ -198,6 +203,7 @@ public sealed class GameFlow : MonoBehaviour
 
     public void CompleteTreatment(CustomerAgent customer)
     {
+        LogTreatmentFlow($"CompleteTreatment customer={DescribeObject(customer)} activeCustomer={DescribeObject(activeCustomer)} state={CurrentState}");
         if (customer != activeCustomer || (CurrentState != ClinicFlowState.TreatmentReady && CurrentState != ClinicFlowState.TreatmentActive))
         {
             return;
@@ -279,11 +285,13 @@ public sealed class GameFlow : MonoBehaviour
 
     public void SetTreatmentStress(bool active)
     {
+        LogTreatmentFlow($"SetTreatmentStress active={active} activeSanity={DescribeObject(activeSanity)}");
         activeSanity?.SetTreatmentStress(active);
     }
 
     public void SetCandleAtCounter(bool atCounter)
     {
+        LogTreatmentFlow($"SetCandleAtCounter atCounter={atCounter} candle={DescribeObject(candle)}");
         candle?.SetAtCounter(atCounter);
     }
 
@@ -363,6 +371,25 @@ public sealed class GameFlow : MonoBehaviour
         }
 
         CurrentState = nextState;
+        LogTreatmentFlow($"SetState {CurrentState}");
         StateChanged?.Invoke(CurrentState);
+    }
+
+    private void LogTreatmentFlow(string message)
+    {
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][GameFlow] {message}", this);
+        }
+    }
+
+    private static string DescribeObject(UnityEngine.Object target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        return $"{target.name} ({target.GetType().Name})";
     }
 }

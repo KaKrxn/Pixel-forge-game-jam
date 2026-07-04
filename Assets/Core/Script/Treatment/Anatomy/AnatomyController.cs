@@ -47,6 +47,8 @@ public sealed class AnatomyController : MonoBehaviour
     };
     [SerializeField] private List<BodyArea> needleAreas = new List<BodyArea>();
     [SerializeField] private bool autoTreatInfectedAreasWithoutMiniGame = true;
+    [Header("Debug")]
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     private readonly Dictionary<BodyArea, PartState> areaStates = new Dictionary<BodyArea, PartState>();
     private CustomerAgent activeCustomer;
@@ -97,6 +99,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void Begin(CustomerAgent customer)
     {
+        LogTreatmentFlow($"Begin customer={DescribeObject(customer)} caseSource={caseSource} fallback={fallbackToManualIfCustomerCaseMissing} infectionMode={infectionMode}");
         activeCustomer = customer;
         activeArea = BodyArea.Arm;
         activeMiniGameType = TreatmentMiniGameType.None;
@@ -113,6 +116,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void ResumeAtAnatomyLevel()
     {
+        LogTreatmentFlow($"ResumeAtAnatomyLevel hasBegun={hasBegun} activeCustomer={DescribeObject(activeCustomer)}");
         if (!hasBegun)
         {
             Begin(activeCustomer);
@@ -127,6 +131,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void PauseForCounter()
     {
+        LogTreatmentFlow($"PauseForCounter isMiniGameRunning={isMiniGameRunning} activeMiniGameType={activeMiniGameType}");
         if (isMiniGameRunning)
         {
             if (tongsMiniGame != null)
@@ -150,13 +155,14 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void Stop()
     {
+        LogTreatmentFlow($"Stop activeArea={activeArea} activeMiniGameType={activeMiniGameType} activeBody={DescribeBody(bodyPrefabSpawner != null ? bodyPrefabSpawner.ActiveBody : null)}");
         hasBegun = false;
         isInsidePart = false;
         isMiniGameRunning = false;
         activeMiniGameType = TreatmentMiniGameType.None;
         activeCaseRuntime = null;
         StopActiveMiniGames();
-        ClearRuntimeKnifeMiniGameIfOwnedByActiveBody();
+        ClearRuntimeMiniGamesIfOwnedByActiveBody();
         if (bodyPrefabSpawner != null)
         {
             bodyPrefabSpawner.ClearActiveBody();
@@ -173,6 +179,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void EnterArea(BodyArea area)
     {
+        LogTreatmentFlow($"EnterArea requested area={area} canSelect={CanSelectArea(area)} currentState={GetState(area)} activeCase={DescribeActiveCase()}");
         if (!CanSelectArea(area))
         {
             return;
@@ -195,6 +202,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void ExitCurrentPart()
     {
+        LogTreatmentFlow($"ExitCurrentPart isInsidePart={isInsidePart} isMiniGameRunning={isMiniGameRunning}");
         if (!isInsidePart || isMiniGameRunning)
         {
             return;
@@ -205,6 +213,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     public void MarkAreaTreated(BodyArea area)
     {
+        LogTreatmentFlow($"MarkAreaTreated area={area}");
         activeCaseRuntime?.MarkTreated(area);
         MarkAreaState(area, PartState.Treated);
         RefreshAllPartVisuals();
@@ -219,18 +228,30 @@ public sealed class AnatomyController : MonoBehaviour
     private void EnterInfectedArea(BodyArea area)
     {
         TreatmentMiniGameType miniGameType = GetMiniGameTypeForArea(area);
+        LogTreatmentFlow($"EnterInfectedArea area={area} resolvedMiniGameType={miniGameType} tongsRef={DescribeObject(tongsMiniGame)} knifeRef={DescribeObject(knifeMiniGame)} needleRef={DescribeObject(needleMiniGame)}");
         switch (miniGameType)
         {
-            case TreatmentMiniGameType.Tongs when tongsMiniGame != null:
+            case TreatmentMiniGameType.Tongs:
+                TreatmentBodyPrefab tongsBody = SpawnBodyPrefabForArea(TreatmentMiniGameType.Tongs, area, tongsMiniGame);
+                TongsMiniGame resolvedTongsMiniGame = ResolveTongsMiniGame(tongsBody);
+                LogTreatmentFlow($"Tongs route area={area} body={DescribeBody(tongsBody)} resolvedMiniGame={DescribeObject(resolvedTongsMiniGame)}");
+                if (resolvedTongsMiniGame == null)
+                {
+                    break;
+                }
+
+                BindTongsMiniGame(resolvedTongsMiniGame);
+                ConfigureTongsMiniGame(resolvedTongsMiniGame);
                 StartMiniGame(TreatmentMiniGameType.Tongs);
-                tongsMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Tongs, area, tongsMiniGame));
-                tongsMiniGame.Begin(activeCustomer);
+                resolvedTongsMiniGame.ApplyBodyPrefab(tongsBody);
+                resolvedTongsMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
 
             case TreatmentMiniGameType.Knife:
                 TreatmentBodyPrefab knifeBody = SpawnBodyPrefabForArea(TreatmentMiniGameType.Knife, area, knifeMiniGame);
                 KnifeMiniGame resolvedKnifeMiniGame = ResolveKnifeMiniGame(knifeBody);
+                LogTreatmentFlow($"Knife route area={area} body={DescribeBody(knifeBody)} resolvedMiniGame={DescribeObject(resolvedKnifeMiniGame)}");
                 if (resolvedKnifeMiniGame == null)
                 {
                     break;
@@ -244,10 +265,20 @@ public sealed class AnatomyController : MonoBehaviour
                 FoldForMiniGame();
                 return;
 
-            case TreatmentMiniGameType.Needle when needleMiniGame != null:
+            case TreatmentMiniGameType.Needle:
+                TreatmentBodyPrefab needleBody = SpawnBodyPrefabForArea(TreatmentMiniGameType.Needle, area, needleMiniGame);
+                NeedleMiniGame resolvedNeedleMiniGame = ResolveNeedleMiniGame(needleBody);
+                LogTreatmentFlow($"Needle route area={area} body={DescribeBody(needleBody)} resolvedMiniGame={DescribeObject(resolvedNeedleMiniGame)}");
+                if (resolvedNeedleMiniGame == null)
+                {
+                    break;
+                }
+
+                BindNeedleMiniGame(resolvedNeedleMiniGame);
+                ConfigureNeedleMiniGame(resolvedNeedleMiniGame);
                 StartMiniGame(TreatmentMiniGameType.Needle);
-                needleMiniGame.ApplyBodyPrefab(SpawnBodyPrefabForArea(TreatmentMiniGameType.Needle, area, needleMiniGame));
-                needleMiniGame.Begin(activeCustomer);
+                resolvedNeedleMiniGame.ApplyBodyPrefab(needleBody);
+                resolvedNeedleMiniGame.Begin(activeCustomer);
                 FoldForMiniGame();
                 return;
         }
@@ -276,17 +307,19 @@ public sealed class AnatomyController : MonoBehaviour
     // mini game still calls back here even though this GameObject is inactive.
     private void FoldForMiniGame()
     {
+        LogTreatmentFlow($"FoldForMiniGame activeArea={activeArea} activeMiniGameType={activeMiniGameType}");
         SetPartMessageVisible(false);
         SetRootVisible(false);
     }
 
     private void ShowAnatomyLevel(string message)
     {
+        LogTreatmentFlow($"ShowAnatomyLevel message='{message}' activeBodyBeforeClear={DescribeBody(bodyPrefabSpawner != null ? bodyPrefabSpawner.ActiveBody : null)}");
         isInsidePart = false;
         isMiniGameRunning = false;
         activeMiniGameType = TreatmentMiniGameType.None;
         StopActiveMiniGames();
-        ClearRuntimeKnifeMiniGameIfOwnedByActiveBody();
+        ClearRuntimeMiniGamesIfOwnedByActiveBody();
         if (bodyPrefabSpawner != null)
         {
             bodyPrefabSpawner.ClearActiveBody();
@@ -300,6 +333,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     private void ResolveInfection()
     {
+        LogTreatmentFlow("ResolveInfection begin");
         areaStates.Clear();
         activeCaseRuntime = null;
         foreach (BodyArea area in Enum.GetValues(typeof(BodyArea)))
@@ -309,24 +343,28 @@ public sealed class AnatomyController : MonoBehaviour
 
         if (caseSource == TreatmentCaseSource.CustomerCase && TryApplyCustomerCase())
         {
+            LogTreatmentFlow($"ResolveInfection used customer case {DescribeActiveCase()}");
             return;
         }
 
         if (caseSource == TreatmentCaseSource.CustomerCase && !fallbackToManualIfCustomerCaseMissing)
         {
             Debug.LogWarning("No TreatmentCaseData was found on the active customer. AnatomyController will start with no infected areas.");
+            LogTreatmentFlow("ResolveInfection stopped because customer case is missing and fallback is disabled.");
             return;
         }
 
         if (caseSource == TreatmentCaseSource.Random || (caseSource == TreatmentCaseSource.CustomerCase && infectionMode == InfectionMode.Random))
         {
             ApplyRandomInfection();
+            LogTreatmentFlow("ResolveInfection used random infection fallback.");
             return;
         }
 
         if (caseSource == TreatmentCaseSource.Manual || caseSource == TreatmentCaseSource.CustomerCase || infectionMode == InfectionMode.Manual)
         {
             ApplyManualInfection();
+            LogTreatmentFlow("ResolveInfection used manual infection fallback.");
             return;
         }
     }
@@ -335,6 +373,7 @@ public sealed class AnatomyController : MonoBehaviour
     {
         CustomerCaseProvider caseProvider = activeCustomer != null ? activeCustomer.GetComponent<CustomerCaseProvider>() : null;
         TreatmentCaseData caseData = caseProvider != null ? caseProvider.CaseData : null;
+        LogTreatmentFlow($"TryApplyCustomerCase activeCustomer={DescribeObject(activeCustomer)} caseProvider={DescribeObject(caseProvider)} caseData={DescribeObject(caseData)} requiredCount={(caseData != null ? caseData.RequiredTreatmentCount : 0)}");
         if (caseData == null || caseData.RequiredTreatmentCount == 0)
         {
             return false;
@@ -343,6 +382,8 @@ public sealed class AnatomyController : MonoBehaviour
         activeCaseRuntime = new TreatmentCaseRuntime(caseData);
         foreach (BodyArea area in activeCaseRuntime.GetRequiredAreas())
         {
+            activeCaseRuntime.TryGetMiniGameType(area, out TreatmentMiniGameType miniGameType);
+            LogTreatmentFlow($"Customer case requirement area={area} miniGameType={miniGameType}");
             areaStates[area] = PartState.Infected;
         }
 
@@ -426,12 +467,14 @@ public sealed class AnatomyController : MonoBehaviour
 
     private void StartMiniGame(TreatmentMiniGameType miniGameType)
     {
+        LogTreatmentFlow($"StartMiniGame miniGameType={miniGameType} activeArea={activeArea}");
         activeMiniGameType = miniGameType;
         isMiniGameRunning = true;
     }
 
     private void CompleteActiveMiniGameArea()
     {
+        LogTreatmentFlow($"CompleteActiveMiniGameArea activeArea={activeArea} activeMiniGameType={activeMiniGameType}");
         isMiniGameRunning = false;
         activeMiniGameType = TreatmentMiniGameType.None;
         MarkAreaTreated(activeArea);
@@ -441,47 +484,87 @@ public sealed class AnatomyController : MonoBehaviour
     {
         if (activeCaseRuntime != null && activeCaseRuntime.TryGetMiniGameType(area, out TreatmentMiniGameType miniGameType))
         {
+            LogTreatmentFlow($"GetMiniGameTypeForArea area={area} source=CustomerCase miniGameType={miniGameType}");
             return miniGameType;
         }
 
         if (area == tongsArea)
         {
+            LogTreatmentFlow($"GetMiniGameTypeForArea area={area} source=FallbackTongs tongsArea={tongsArea}");
             return TreatmentMiniGameType.Tongs;
         }
 
         if (knifeAreas != null && knifeAreas.Contains(area))
         {
+            LogTreatmentFlow($"GetMiniGameTypeForArea area={area} source=FallbackKnife knifeAreas={FormatAreaList(knifeAreas)}");
             return TreatmentMiniGameType.Knife;
         }
 
         if (needleAreas != null && needleAreas.Contains(area))
         {
+            LogTreatmentFlow($"GetMiniGameTypeForArea area={area} source=FallbackNeedle needleAreas={FormatAreaList(needleAreas)}");
             return TreatmentMiniGameType.Needle;
         }
 
+        LogTreatmentFlow($"GetMiniGameTypeForArea area={area} source=None");
         return TreatmentMiniGameType.None;
     }
 
     private TreatmentBodyPrefab SpawnBodyPrefabForArea(TreatmentMiniGameType miniGameType, BodyArea area, Component miniGame)
     {
-        if (miniGame != null && miniGame.GetComponentInParent<TreatmentBodyPrefab>(true) != null)
+        LogTreatmentFlow($"SpawnBodyPrefabForArea request miniGameType={miniGameType} area={area} miniGameRef={DescribeObject(miniGame)}");
+        TreatmentBodyPrefab existingBody = miniGame != null ? miniGame.GetComponentInParent<TreatmentBodyPrefab>(true) : null;
+        if (existingBody != null)
         {
-            return null;
+            LogTreatmentFlow($"SpawnBodyPrefabForArea existing parent body={DescribeBody(existingBody)} matches={existingBody.Matches(miniGameType, area)}");
+            if (existingBody.Matches(miniGameType, area))
+            {
+                return existingBody;
+            }
+
+            Debug.LogWarning($"Mini game {miniGame.name} is already inside TreatmentBodyPrefab {existingBody.name}, but it does not match {miniGameType}/{area}. Spawning the matching catalog body instead.");
         }
 
         ResolveBodyPrefabSpawner();
         if (bodyPrefabSpawner != null && bodyPrefabSpawner.TrySpawn(miniGameType, area, out TreatmentBodyPrefab body))
         {
+            LogTreatmentFlow($"SpawnBodyPrefabForArea spawner returned body={DescribeBody(body)}");
             return body;
         }
 
+        LogTreatmentFlow($"SpawnBodyPrefabForArea failed for miniGameType={miniGameType} area={area} spawner={DescribeObject(bodyPrefabSpawner)}");
         return null;
+    }
+
+    private TongsMiniGame ResolveTongsMiniGame(TreatmentBodyPrefab body)
+    {
+        LogTreatmentFlow($"ResolveTongsMiniGame body={DescribeBody(body)}");
+        if (body != null && body.TryGetComponent(out TongsMiniGame bodyMiniGame))
+        {
+            LogTreatmentFlow($"ResolveTongsMiniGame found on body root {DescribeObject(bodyMiniGame)}");
+            return bodyMiniGame;
+        }
+
+        if (body != null)
+        {
+            bodyMiniGame = body.GetComponentInChildren<TongsMiniGame>(true);
+            if (bodyMiniGame != null)
+            {
+                LogTreatmentFlow($"ResolveTongsMiniGame found in body children {DescribeObject(bodyMiniGame)}");
+                return bodyMiniGame;
+            }
+        }
+
+        LogTreatmentFlow($"ResolveTongsMiniGame using inspector fallback {DescribeObject(tongsMiniGame)}");
+        return tongsMiniGame != null ? tongsMiniGame : null;
     }
 
     private KnifeMiniGame ResolveKnifeMiniGame(TreatmentBodyPrefab body)
     {
+        LogTreatmentFlow($"ResolveKnifeMiniGame body={DescribeBody(body)}");
         if (body != null && body.TryGetComponent(out KnifeMiniGame bodyMiniGame))
         {
+            LogTreatmentFlow($"ResolveKnifeMiniGame found on body root {DescribeObject(bodyMiniGame)}");
             return bodyMiniGame;
         }
 
@@ -490,15 +573,59 @@ public sealed class AnatomyController : MonoBehaviour
             bodyMiniGame = body.GetComponentInChildren<KnifeMiniGame>(true);
             if (bodyMiniGame != null)
             {
+                LogTreatmentFlow($"ResolveKnifeMiniGame found in body children {DescribeObject(bodyMiniGame)}");
                 return bodyMiniGame;
             }
         }
 
+        LogTreatmentFlow($"ResolveKnifeMiniGame using inspector fallback {DescribeObject(knifeMiniGame)}");
         return knifeMiniGame != null ? knifeMiniGame : null;
+    }
+
+    private NeedleMiniGame ResolveNeedleMiniGame(TreatmentBodyPrefab body)
+    {
+        LogTreatmentFlow($"ResolveNeedleMiniGame body={DescribeBody(body)}");
+        if (body != null && body.TryGetComponent(out NeedleMiniGame bodyMiniGame))
+        {
+            LogTreatmentFlow($"ResolveNeedleMiniGame found on body root {DescribeObject(bodyMiniGame)}");
+            return bodyMiniGame;
+        }
+
+        if (body != null)
+        {
+            bodyMiniGame = body.GetComponentInChildren<NeedleMiniGame>(true);
+            if (bodyMiniGame != null)
+            {
+                LogTreatmentFlow($"ResolveNeedleMiniGame found in body children {DescribeObject(bodyMiniGame)}");
+                return bodyMiniGame;
+            }
+        }
+
+        LogTreatmentFlow($"ResolveNeedleMiniGame using inspector fallback {DescribeObject(needleMiniGame)}");
+        return needleMiniGame != null ? needleMiniGame : null;
+    }
+
+    private void BindTongsMiniGame(TongsMiniGame resolvedMiniGame)
+    {
+        LogTreatmentFlow($"BindTongsMiniGame current={DescribeObject(tongsMiniGame)} resolved={DescribeObject(resolvedMiniGame)}");
+        if (resolvedMiniGame == null || tongsMiniGame == resolvedMiniGame)
+        {
+            return;
+        }
+
+        if (tongsMiniGame != null)
+        {
+            tongsMiniGame.MiniGameCompleted -= HandleTongsCompleted;
+        }
+
+        tongsMiniGame = resolvedMiniGame;
+        tongsMiniGame.MiniGameCompleted -= HandleTongsCompleted;
+        tongsMiniGame.MiniGameCompleted += HandleTongsCompleted;
     }
 
     private void BindKnifeMiniGame(KnifeMiniGame resolvedMiniGame)
     {
+        LogTreatmentFlow($"BindKnifeMiniGame current={DescribeObject(knifeMiniGame)} resolved={DescribeObject(resolvedMiniGame)}");
         if (resolvedMiniGame == null || knifeMiniGame == resolvedMiniGame)
         {
             return;
@@ -514,8 +641,45 @@ public sealed class AnatomyController : MonoBehaviour
         knifeMiniGame.MiniGameCompleted += HandleKnifeCompleted;
     }
 
+    private void BindNeedleMiniGame(NeedleMiniGame resolvedMiniGame)
+    {
+        LogTreatmentFlow($"BindNeedleMiniGame current={DescribeObject(needleMiniGame)} resolved={DescribeObject(resolvedMiniGame)}");
+        if (resolvedMiniGame == null || needleMiniGame == resolvedMiniGame)
+        {
+            return;
+        }
+
+        if (needleMiniGame != null)
+        {
+            needleMiniGame.MiniGameCompleted -= HandleNeedleCompleted;
+        }
+
+        needleMiniGame = resolvedMiniGame;
+        needleMiniGame.MiniGameCompleted -= HandleNeedleCompleted;
+        needleMiniGame.MiniGameCompleted += HandleNeedleCompleted;
+    }
+
+    private void ConfigureTongsMiniGame(TongsMiniGame resolvedMiniGame)
+    {
+        LogTreatmentFlow($"ConfigureTongsMiniGame target={DescribeObject(resolvedMiniGame)} flow={DescribeObject(miniGameFlow)} camera={DescribeObject(miniGameInputCamera)} overlay={DescribeObject(miniGameOverlay)}");
+        if (resolvedMiniGame != null)
+        {
+            resolvedMiniGame.ConfigureRuntimeContext(miniGameFlow, miniGameInputCamera, miniGameOverlay);
+        }
+    }
+
     private void ConfigureKnifeMiniGame(KnifeMiniGame resolvedMiniGame)
     {
+        LogTreatmentFlow($"ConfigureKnifeMiniGame target={DescribeObject(resolvedMiniGame)} flow={DescribeObject(miniGameFlow)} camera={DescribeObject(miniGameInputCamera)} overlay={DescribeObject(miniGameOverlay)}");
+        if (resolvedMiniGame != null)
+        {
+            resolvedMiniGame.ConfigureRuntimeContext(miniGameFlow, miniGameInputCamera, miniGameOverlay);
+        }
+    }
+
+    private void ConfigureNeedleMiniGame(NeedleMiniGame resolvedMiniGame)
+    {
+        LogTreatmentFlow($"ConfigureNeedleMiniGame target={DescribeObject(resolvedMiniGame)} flow={DescribeObject(miniGameFlow)} camera={DescribeObject(miniGameInputCamera)} overlay={DescribeObject(miniGameOverlay)}");
         if (resolvedMiniGame != null)
         {
             resolvedMiniGame.ConfigureRuntimeContext(miniGameFlow, miniGameInputCamera, miniGameOverlay);
@@ -524,6 +688,7 @@ public sealed class AnatomyController : MonoBehaviour
 
     private void StopActiveMiniGames()
     {
+        LogTreatmentFlow($"StopActiveMiniGames tongs={DescribeObject(tongsMiniGame)} knife={DescribeObject(knifeMiniGame)} needle={DescribeObject(needleMiniGame)}");
         if (tongsMiniGame != null)
         {
             tongsMiniGame.Stop();
@@ -540,20 +705,85 @@ public sealed class AnatomyController : MonoBehaviour
         }
     }
 
-    private void ClearRuntimeKnifeMiniGameIfOwnedByActiveBody()
+    private void ClearRuntimeMiniGamesIfOwnedByActiveBody()
     {
-        if (knifeMiniGame == null || bodyPrefabSpawner == null || bodyPrefabSpawner.ActiveBody == null)
+        LogTreatmentFlow($"ClearRuntimeMiniGamesIfOwnedByActiveBody activeBody={DescribeBody(bodyPrefabSpawner != null ? bodyPrefabSpawner.ActiveBody : null)}");
+        if (bodyPrefabSpawner == null || bodyPrefabSpawner.ActiveBody == null)
         {
             return;
         }
 
-        if (knifeMiniGame.GetComponentInParent<TreatmentBodyPrefab>(true) != bodyPrefabSpawner.ActiveBody)
+        TreatmentBodyPrefab activeBody = bodyPrefabSpawner.ActiveBody;
+        if (tongsMiniGame != null && tongsMiniGame.GetComponentInParent<TreatmentBodyPrefab>(true) == activeBody)
         {
-            return;
+            LogTreatmentFlow($"Clearing runtime tongs mini game {DescribeObject(tongsMiniGame)} owned by {DescribeBody(activeBody)}");
+            tongsMiniGame.MiniGameCompleted -= HandleTongsCompleted;
+            tongsMiniGame = null;
         }
 
-        knifeMiniGame.MiniGameCompleted -= HandleKnifeCompleted;
-        knifeMiniGame = null;
+        if (knifeMiniGame != null && knifeMiniGame.GetComponentInParent<TreatmentBodyPrefab>(true) == activeBody)
+        {
+            LogTreatmentFlow($"Clearing runtime knife mini game {DescribeObject(knifeMiniGame)} owned by {DescribeBody(activeBody)}");
+            knifeMiniGame.MiniGameCompleted -= HandleKnifeCompleted;
+            knifeMiniGame = null;
+        }
+
+        if (needleMiniGame != null && needleMiniGame.GetComponentInParent<TreatmentBodyPrefab>(true) == activeBody)
+        {
+            LogTreatmentFlow($"Clearing runtime needle mini game {DescribeObject(needleMiniGame)} owned by {DescribeBody(activeBody)}");
+            needleMiniGame.MiniGameCompleted -= HandleNeedleCompleted;
+            needleMiniGame = null;
+        }
+    }
+
+    private void LogTreatmentFlow(string message)
+    {
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][Anatomy] {message}", this);
+        }
+    }
+
+    private static string DescribeObject(UnityEngine.Object target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        return $"{target.name} ({target.GetType().Name})";
+    }
+
+    private static string DescribeBody(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return "null";
+        }
+
+        return $"{body.name} ({body.MiniGameType}/{body.Area}, active={body.gameObject.activeSelf})";
+    }
+
+    private string DescribeActiveCase()
+    {
+        if (activeCaseRuntime == null)
+        {
+            return "none";
+        }
+
+        List<string> requirements = new List<string>();
+        foreach (BodyArea area in activeCaseRuntime.GetRequiredAreas())
+        {
+            activeCaseRuntime.TryGetMiniGameType(area, out TreatmentMiniGameType miniGameType);
+            requirements.Add($"{area}:{miniGameType}");
+        }
+
+        return string.Join(", ", requirements);
+    }
+
+    private static string FormatAreaList(List<BodyArea> areas)
+    {
+        return areas == null || areas.Count == 0 ? "[]" : $"[{string.Join(", ", areas)}]";
     }
 
     private void ResolveBodyPrefabSpawner()

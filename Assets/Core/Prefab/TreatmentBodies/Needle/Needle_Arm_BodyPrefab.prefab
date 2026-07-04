@@ -331,7 +331,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7937356438979252520}
   - component: {fileID: 3783932116116851234}
-  - component: {fileID: 6470078297028328202}
   m_Layer: 0
   m_Name: Needle_Arm_BodyPrefab
   m_TagString: Untagged
@@ -394,37 +393,6 @@ MonoBehaviour:
   - {fileID: 9120407367986259627}
   - {fileID: 7675482798641787253}
   - {fileID: 500778319883515656}
---- !u!114 &6470078297028328202
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5962751252451505200}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63d566e61ba34af3ae8e3fc31e88eb39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NeedleMiniGame
-  flow: {fileID: 0}
-  root: {fileID: 0}
-  pustuleRoot: {fileID: 0}
-  pustules: []
-  pustuleSpawnOptions: []
-  pustuleSpawnAnchors: []
-  pustulePrefabs: []
-  spawnAnchors: []
-  spawnPustulesOnBegin: 0
-  minPustules: 3
-  maxPustules: 7
-  inputCamera: {fileID: 0}
-  worldInputPlaneZ: 0
-  overlay: {fileID: 0}
-  overlayToolId: Needle
-  aggressionController: {fileID: 0}
-  autoCompleteWhenAllPustulesDone: 1
-  startHidden: 1
-  useUnscaledTime: 0
 --- !u!1 &6514634581543388499
 GameObject:
   m_ObjectHideFlags: 0

@@ -52,6 +52,8 @@ public sealed class TongsMiniGame : MonoBehaviour
     [SerializeField] private bool autoCompleteWhenAllParasitesDone = true;
     [SerializeField] private bool completeTreatmentOnButton;
     [SerializeField] private bool useUnscaledTime;
+    [Header("Debug")]
+    [SerializeField] private bool debugTreatmentFlow = true;
 
     private CustomerAgent activeCustomer;
     private Sanity activeSanity;
@@ -71,6 +73,25 @@ public sealed class TongsMiniGame : MonoBehaviour
     public Parasite ActiveParasite => activeParasite;
 
     public event Action MiniGameCompleted;
+
+    public void ConfigureRuntimeContext(GameFlow runtimeFlow, Camera runtimeInputCamera, MiniGameOverlay runtimeOverlay)
+    {
+        LogTreatmentFlow($"ConfigureRuntimeContext flow={DescribeObject(runtimeFlow)} camera={DescribeObject(runtimeInputCamera)} overlay={DescribeObject(runtimeOverlay)}");
+        if (runtimeFlow != null)
+        {
+            flow = runtimeFlow;
+        }
+
+        if (runtimeInputCamera != null)
+        {
+            inputCamera = runtimeInputCamera;
+        }
+
+        if (runtimeOverlay != null)
+        {
+            overlay = runtimeOverlay;
+        }
+    }
 
     private void Awake()
     {
@@ -117,7 +138,9 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void Begin(CustomerAgent customer)
     {
+        LogTreatmentFlow($"Begin customer={DescribeObject(customer)} rootBefore={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EnsureRootActiveForBegin();
+        TryApplyParentBodyPrefab();
         ApplyRootBodySorting();
 
         activeCustomer = customer;
@@ -143,9 +166,11 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void ApplyBodyPrefab(TreatmentBodyPrefab body)
     {
+        LogTreatmentFlow($"ApplyBodyPrefab body={DescribeBody(body)} currentRoot={DescribeObject(root)}");
         if (body == null)
         {
             usingBodyPrefabAnchors = false;
+            LogTreatmentFlow("ApplyBodyPrefab skipped because body is null; using inspector anchors/fallback.");
             return;
         }
 
@@ -157,12 +182,29 @@ public sealed class TongsMiniGame : MonoBehaviour
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetParasiteAnchorTransforms());
         usingBodyPrefabAnchors = true;
+        LogTreatmentFlow($"ApplyBodyPrefab applied root={DescribeObject(root)} parasiteRoot={DescribeObject(parasiteRoot)} spawnAnchors={spawnAnchors.Count}");
         RefreshParasiteList();
         SubscribeParasites();
     }
 
+    private void TryApplyParentBodyPrefab()
+    {
+        LogTreatmentFlow($"TryApplyParentBodyPrefab activeBody={DescribeBody(activeBodyPrefab)} parent={DescribeBody(GetComponentInParent<TreatmentBodyPrefab>(true))}");
+        if (activeBodyPrefab != null)
+        {
+            return;
+        }
+
+        TreatmentBodyPrefab parentBody = GetComponentInParent<TreatmentBodyPrefab>(true);
+        if (parentBody != null)
+        {
+            ApplyBodyPrefab(parentBody);
+        }
+    }
+
     public void Stop()
     {
+        LogTreatmentFlow($"Stop root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndActiveHold();
         isRunning = false;
         usingBodyPrefabAnchors = false;
@@ -175,6 +217,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void Pause()
     {
+        LogTreatmentFlow($"Pause root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndActiveHold();
         isRunning = false;
         aggressionController?.Pause();
@@ -185,6 +228,7 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void Resume()
     {
+        LogTreatmentFlow($"Resume root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         SetRootVisible(true);
         ApplyRootBodySorting();
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
@@ -1007,15 +1051,23 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     private void SetRootVisible(bool visible)
     {
-        if (root != null)
-        {
-            root.SetActive(visible);
-        }
+        LogTreatmentFlow($"SetRootVisible visible={visible} root={DescribeObject(root)}");
+        GameObject target = root != null ? root : gameObject;
+        target.SetActive(visible);
     }
 
     private void EnsureRootActiveForBegin()
     {
+        // This component's own GameObject is deactivated by startHidden in Awake (root pointed at it
+        // then). After ApplyBodyPrefab reassigns root to the spawned body, SetRootVisible only activates
+        // the body, so this object stays inactive and Update() never runs (clicks are ignored).
+        if (!gameObject.activeSelf)
+        {
+            gameObject.SetActive(true);
+        }
+
         GameObject target = root != null ? root : gameObject;
+        LogTreatmentFlow($"EnsureRootActiveForBegin target={DescribeObject(target)} activeBefore={(target != null && target.activeSelf)}");
         if (target != null && !target.activeSelf)
         {
             target.SetActive(true);
@@ -1034,11 +1086,40 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
     {
+        LogTreatmentFlow($"ReplaceRuntimeRoot oldRoot={DescribeObject(root)} newBody={DescribeBody(body)}");
         if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
         {
             root.SetActive(false);
         }
 
         root = body.gameObject;
+    }
+
+    private void LogTreatmentFlow(string message)
+    {
+        if (debugTreatmentFlow)
+        {
+            Debug.Log($"[TreatmentFlow][TongsMiniGame] {message}", this);
+        }
+    }
+
+    private static string DescribeObject(UnityEngine.Object target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        return $"{target.name} ({target.GetType().Name})";
+    }
+
+    private static string DescribeBody(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return "null";
+        }
+
+        return $"{body.name} ({body.MiniGameType}/{body.Area}, active={body.gameObject.activeSelf})";
     }
 }
