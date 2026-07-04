@@ -426,7 +426,11 @@ public sealed class Parasite : MonoBehaviour
         Vector2 followOffset = new Vector2(worldOffset.x, 0f);
         Vector2 clampedOffset = Vector2.ClampMagnitude(followOffset * visualFollowStrength, maxDistance);
         Vector3 localOffset = transform.InverseTransformVector(new Vector3(clampedOffset.x, clampedOffset.y, 0f));
-        visual.localPosition = visualBaseLocalPosition + localOffset;
+        // Only apply the lateral (X) follow + tilt. Preserve the vertical position so the upward
+        // "emerge from the wound" driven by ParasiteReveal.SetProgress is not overwritten each frame.
+        Vector3 targetLocalPosition = visualBaseLocalPosition + localOffset;
+        targetLocalPosition.y = visual.localPosition.y;
+        visual.localPosition = targetLocalPosition;
 
         float tilt = maxDistance > 0f ? Mathf.Clamp(clampedOffset.x / maxDistance, -1f, 1f) * -maxVisualTiltDegrees : 0f;
         visual.localRotation = visualBaseLocalRotation * Quaternion.Euler(0f, 0f, tilt);

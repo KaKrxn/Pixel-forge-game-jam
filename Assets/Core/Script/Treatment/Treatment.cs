@@ -14,6 +14,7 @@ public sealed class Treatment : MonoBehaviour
     [SerializeField] private Button resumeButton;
     [SerializeField] private AnatomyController anatomyController;
     [SerializeField] private TongsMiniGame tongsMiniGame;
+    [SerializeField] private TreatmentPatientPresenter patientPresenter;
     [Header("Debug")]
     [SerializeField] private bool debugTreatmentFlow = true;
 
@@ -172,12 +173,14 @@ public sealed class Treatment : MonoBehaviour
         anatomyController?.Stop();
         tongsMiniGame?.Stop();
         Hide();
+        patientPresenter?.ReturnToCounterForExit(activeCustomer);
         flow?.CompleteTreatment(activeCustomer);
     }
 
     private void BeginTreatmentContent()
     {
         LogTreatmentFlow($"BeginTreatmentContent anatomy={DescribeObject(anatomyController)} legacyTongs={DescribeObject(tongsMiniGame)}");
+        patientPresenter?.MoveToTreatment(activeCustomer);
         if (anatomyController != null)
         {
             LogTreatmentFlow("BeginTreatmentContent route=AnatomyController.Begin");
