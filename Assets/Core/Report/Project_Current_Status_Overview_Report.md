@@ -109,13 +109,16 @@ Current responsibilities:
 - Customer can exit after treatment completion.
 - Customer sorting layer changes support the illusion of entering through the shop / door area.
 - Customer can hold a `TreatmentCaseData` reference through `CustomerCaseProvider`.
+- Customer queue data/runtime support has started through `CustomerDefinition`, `CustomerQueueBuilder`, `CustomerQueueRuntime`, and `CustomerSpawner`.
+- `GameFlow` can optionally run a queued customer path while keeping the original `firstCustomer` fallback.
+- `CounterBreather`, `AllCustomersComplete`, and `GameOver` states now exist at code level.
 
-Status: **Basic customer enter / counter / exit flow is implemented, with case data support.**
+Status: **Basic customer enter / counter / exit flow is implemented. Customer queue runtime code exists, but still needs Unity scene setup and Play Mode validation.**
 
 Remaining work:
 
-- Multi-customer queue / random patient spawning is not finalized.
-- Patient selection and case assignment beyond the current test case is not finalized.
+- Multi-customer queue / random patient spawning needs Unity setup and validation.
+- Real patient roster and final case assignment beyond test definitions are not finalized.
 
 ---
 
@@ -828,6 +831,7 @@ Remaining work:
 - Anchor-driven parasite / lesion / pustule spawning support.
 - Knife Tumor/Bulge and Needle Small/Big visual-state support.
 - Treatment Body Prefab Catalog runtime support.
+- Customer Queue data/runtime foundation.
 - Main Menu scripts.
 
 ### Partially Complete / Needs Scene or Content Setup
@@ -838,7 +842,7 @@ Remaining work:
 - Final parasite, lesion, pustule, wound, body, and tool art are not complete.
 - Final treatment SFX/VFX are not complete.
 - Head and Leg do not have unique final mini game content yet.
-- Multi-customer queue flow has a design report but is not implemented yet.
+- Multi-customer queue flow has initial runtime code but still needs scene setup and Play Mode validation.
 - Anatomy and mini game UI need final art pass.
 - Body prefab catalog content setup is still in progress.
 - Selected spawn point visuals need final art/scale setup per body prefab.
@@ -847,7 +851,7 @@ Remaining work:
 
 - Transformation fail state.
 - Full patient roster.
-- Customer queue runtime, counter breather pacing, and case assignment beyond the current test setup.
+- Customer queue content, counter breather UI/interaction, and final case assignment beyond the current test setup.
 - Case-specific rewards / difficulty / tuning.
 - Final cut guide visual for Knife.
 - Final UI art pass.
@@ -863,12 +867,16 @@ This report was updated from the current workspace state on July 4, 2026. It inc
 Recent verification:
 
 - Unity Play Mode user validation passed for this slice: customer dialog -> Treatment Room -> Anatomy -> Torso Knife -> fallback Anatomy / Torso treated -> Arm Tongs -> fallback Anatomy / Arm treated.
+- `dotnet build Assembly-CSharp.csproj` passed after adding the initial Customer Queue runtime code.
+- `dotnet build Assembly-CSharp-Editor.csproj` passed after adding the initial Customer Queue runtime code.
 - `git diff --check` passed for the latest touched treatment flow files before commit.
 - Full `Complete Test` validation is intentionally paused because `Case_Test_MixedTreatment` still includes `Leg -> Needle`.
 
 Notable current local / in-progress areas:
 
 - `Assets/Core/Script/Treatment/Case/`
+- `Assets/Core/Script/Customer/`
+- `Assets/Core/Script/GameFlow/GameFlow.cs`
 - `Assets/Core/Script/Treatment/BodyPrefab/`
 - `Assets/Core/Script/Treatment/Knife/`
 - `Assets/Core/Script/Treatment/Needle/`
@@ -918,7 +926,12 @@ Important project rule:
 5. Wire or verify final `TreatmentBodyPrefabCatalog` usage in the treatment flow.
 6. Finish the Candle refill interaction at the Counter return state.
 7. Create real patient case assets beyond `Case_Test_MixedTreatment`, including cases that route to Needle.
-8. Implement the Customer Spawn Queue runtime from `Customer_Spawn_Queue_System_Design_Report.md` when the current single-customer loop is stable.
+8. Set up and validate the Customer Spawn Queue scene path:
+   - Create 2-3 `CustomerDefinition` assets.
+   - Add/assign `CustomerQueueBuilder`.
+   - Add/assign `CustomerSpawner` waypoints and door.
+   - Enable `GameFlow.useCustomerQueue`.
+   - Connect a future Next Customer button/interactable to `GameFlow.StartNextQueuedCustomer()`.
 9. Replace Anatomy placeholder body parts with final sprites and verify hit testing.
 10. Finalize shared MiniGameOverlay visuals, tool icons, and SFX.
 11. Balance Sanity, Candle drain/refill, Tongs pain, Knife pain, and Needle pain.

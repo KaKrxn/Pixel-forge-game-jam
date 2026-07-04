@@ -4,7 +4,7 @@
 **Module:** Game Loop - Customer Spawn, Queue, and Multi-Patient Run  
 **Engine:** Unity 6000.3.17f1, 2D  
 **Document status:** Adjusted design specification for the current project  
-**Last updated:** July 3, 2026
+**Last updated:** July 4, 2026
 
 ---
 
@@ -527,6 +527,30 @@ Mid-treatment save should stay out of scope for now.
 
 ## 12. Implementation Plan
 
+Current implementation checkpoint:
+
+- Phase 1 data/runtime scripts have been added:
+  - `CustomerDefinition.cs`
+  - `CustomerQueueBuilder.cs`
+  - `CustomerQueueRuntime.cs`
+- `CustomerCaseProvider.SetCase(TreatmentCaseData nextCase)` has been added for runtime case assignment.
+- Phase 2 spawner script has been added:
+  - `CustomerSpawner.cs`
+- `CustomerAgent` now exposes runtime setup methods:
+  - `ConfigurePath(...)`
+  - `ConfigureBubble(...)`
+  - `ConfigureDoor(...)`
+- Phase 3 `GameFlow` queue hook has started:
+  - Optional `useCustomerQueue` path.
+  - `firstCustomer` fallback remains intact.
+  - New states: `CounterBreather`, `AllCustomersComplete`, and `GameOver`.
+  - `CustomerLeft` can advance the queue instead of always ending at `Complete`.
+  - `StartNextQueuedCustomer()` exists for a future button/interactable.
+- Queue building now skips invalid `CustomerDefinition` assets so unfinished customer data does not stop the runtime flow.
+- Code build verification passed for `Assembly-CSharp.csproj` and `Assembly-CSharp-Editor.csproj`.
+
+Unity scene setup and Play Mode validation are still required before this should be treated as a finished runtime feature.
+
 ### Phase 1 - Data Layer
 
 Create:
@@ -732,7 +756,7 @@ Do not remove `firstCustomer` immediately. It is still useful for quick scene te
 
 ## 15. Current-Compatible Summary
 
-The Customer Spawn & Queue system should become a layer above the existing single-customer loop.
+The Customer Spawn & Queue system is now partially implemented as a layer above the existing single-customer loop.
 
 It should use:
 
@@ -746,7 +770,7 @@ GameFlow -> loop customers with CounterBreather
 
 The current `TreatmentCaseData`, `Dialog`, `CustomerCaseProvider`, `CustomerAgent`, `CustomerLayer`, Candle, Sanity, Anatomy, and mini-game systems should remain the core runtime path.
 
-The first implementation should prove:
+The next validation should prove:
 
 ```text
 Customer A enters -> dialog/case/treatment -> exits

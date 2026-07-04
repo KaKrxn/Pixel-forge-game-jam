@@ -15,6 +15,7 @@ MonoBehaviour:
   caseId: test_arm_tongs
   customerDisplayName: Tongs Test Customer
   dialogData: {fileID: 11400000, guid: 0279b89aa91043c42ad89328cb701904, type: 2}
+  aggressionProfile: {fileID: 11400000, guid: d3df43875a1f64946bc4695ec26c4e68, type: 2}
   requiredTreatments:
   - area: 2
     miniGameType: 1
