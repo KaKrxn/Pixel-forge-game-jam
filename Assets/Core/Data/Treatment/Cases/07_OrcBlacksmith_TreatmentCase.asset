@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
-  m_Name: 003_DialogData
-  m_EditorClassIdentifier: Assembly-CSharp::DialogData
-  playerDisplayName: Player
+  m_Script: {fileID: 11500000, guid: 3c974a11f55ef5148bad9207f75384d2, type: 3}
+  m_Name: 07_OrcBlacksmith_TreatmentCase
+  m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
+  caseId: 
   customerDisplayName: Customer
-  customerBlipClip: {fileID: 0}
-  customerBlipClips: []
-  lines: []
+  dialogData: {fileID: 0}
+  aggressionProfile: {fileID: 0}
+  requiredTreatments: []

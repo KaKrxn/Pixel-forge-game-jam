@@ -1,0 +1,156 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
+  m_Name: 002_MaleVillager_DialogData
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Doctor
+  customerDisplayName: Male Villager
+  customerBlipClip: {fileID: 0}
+  customerBlipClips: []
+  lines:
+  - speaker: 1
+    text: "I... I came here because... wait... there was something on my face."
+  - speaker: 0
+    text: "Come in. Sit down slowly. I'll examine you."
+  - speaker: 1
+    text: "My face... it isn't right. It smells like wet soil... like rot... but it's me."
+  - speaker: 0
+    text: "Try not to touch it. I'll take a closer look first."
+  - speaker: 1
+    text: "Don't breathe too close. The dust... the dust comes out when I speak."
+  - speaker: 0
+    text: "I understand. I'll be careful."
+  - speaker: 1
+    text: "Careful... yes. Careful is good. I forgot why... but it's good."
+  normalConversation1:
+  - speaker: 1
+    text: "I... I came here because... wait... there was something on my face."
+  - speaker: 0
+    text: "Come in. Sit down slowly. I'll examine you."
+  - speaker: 1
+    text: "My face... it isn't right. It smells like wet soil... like rot... but it's me."
+  - speaker: 0
+    text: "Try not to touch it. I'll take a closer look first."
+  - speaker: 1
+    text: "Don't breathe too close. The dust... the dust comes out when I speak."
+  - speaker: 0
+    text: "I understand. I'll be careful."
+  - speaker: 1
+    text: "Careful... yes. Careful is good. I forgot why... but it's good."
+  normalConversation2:
+  - speaker: 1
+    text: "Doctor... I think I walked here. Did I walk here?"
+  - speaker: 0
+    text: "You did. You're safe for now. Tell me what happened."
+  - speaker: 1
+    text: "There were small spots first. Like mushrooms after rain. Then they opened... and I could hear them."
+  - speaker: 0
+    text: "You could hear them?"
+  - speaker: 1
+    text: "Not with my ears. Inside. Behind my eyes. They keep saying... no, no, that wasn't me."
+  - speaker: 0
+    text: "I'll begin with an examination. Stay as still as you can."
+  - speaker: 1
+    text: "Still... yes. If I stop moving, maybe they stop growing."
+  aggressiveConversation: []
+  painDialogue:
+    minor:
+    - speaker: 1
+      text: "Ah..."
+    - speaker: 1
+      text: "That... that was me, right?"
+    - speaker: 1
+      text: "It stings... just a little."
+    - speaker: 1
+      text: "I can still feel it. I think I can."
+    moderate:
+    - speaker: 1
+      text: "Ngh... wait... wait, I lost the thought."
+    - speaker: 1
+      text: "It hurts behind my face."
+    - speaker: 1
+      text: "Don't press there... something presses back."
+    - speaker: 1
+      text: "I smell blood. Is that mine? Is it mine?"
+    severe:
+    - speaker: 1
+      text: "Ah! No, no, no... not there!"
+    - speaker: 1
+      text: "It's pulling inside my head!"
+    - speaker: 1
+      text: "Stop... stop before it opens more!"
+    - speaker: 1
+      text: "I can't tell where my skin ends anymore!"
+  aggressivePainDialogue:
+    mild: []
+    moderate: []
+    severe: []
+  sanityDialogue:
+    above20:
+    - speaker: 1
+      text: "It's... inside..."
+    - speaker: 1
+      text: "I can hear you. I think I can hear you."
+    - speaker: 1
+      text: "My head feels full of damp soil."
+    - speaker: 1
+      text: "Wait... I... what was I saying?"
+    above50:
+    - speaker: 1
+      text: "The spores... they're moving when I breathe."
+    - speaker: 1
+      text: "I know this room. I know... no, I don't know this room."
+    - speaker: 1
+      text: "Something is thinking before I do."
+    - speaker: 1
+      text: "Don't let me sleep. If I sleep, it grows faster. I know it does."
+    above80:
+    - speaker: 1
+      text: "My face is not my face. My mouth is... not waiting for me."
+    - speaker: 1
+      text: "The voices are growing roots in my head."
+    - speaker: 1
+      text: "If I start laughing, don't listen. I don't want to laugh."
+    - speaker: 1
+      text: "It's opening. Doctor... something is opening."
+  aggressiveSanityDialogue:
+    above20: []
+    above50: []
+    above80: []
+  abandonedTreatmentDialogue:
+    above0:
+    - speaker: 1
+      text: "Doctor... are you there?"
+    - speaker: 1
+      text: "I'll sit still. I can sit still. I think."
+    above50:
+    - speaker: 1
+      text: "Don't leave me with the sound."
+    - speaker: 1
+      text: "The room is getting far away... come back."
+    - speaker: 1
+      text: "It keeps telling me to breathe deeper."
+    - speaker: 1
+      text: "I don't want to breathe it in again."
+    above80:
+    - speaker: 1
+      text: "If you leave me here... I might stand up wrong."
+    - speaker: 1
+      text: "Something is waiting for you to stop watching."
+    - speaker: 1
+      text: "I can feel it looking through me."
+    - speaker: 1
+      text: "Doctor... if I speak with another voice, don't answer it."
+  aggressiveAbandonedTreatmentDialogue:
+    above0: []
+    above50: []
+    above80: []

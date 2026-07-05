@@ -1,0 +1,140 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
+  m_Name: 005_GoblinLaborer_DialogData
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Doctor
+  customerDisplayName: Goblin Laborer
+  customerBlipClip: {fileID: 0}
+  customerBlipClips: []
+  lines:
+  - speaker: 1
+    text: "First thing, Doc... if my hand knocks something over in your shop, I didn't do it on purpose."
+  - speaker: 0
+    text: "That hand moves on its own?"
+  - speaker: 1
+    text: "Yeah. It acts like it knows better than me what to grab and what to shove away."
+  - speaker: 0
+    text: "I'll try to hold it still before we begin treatment."
+  - speaker: 1
+    text: "Good. But if it smacks you in the face, don't put that on my bill. Charge the thing inside instead."
+  normalConversation1:
+  - speaker: 1
+    text: "First thing, Doc... if my hand knocks something over in your shop, I didn't do it on purpose."
+  - speaker: 0
+    text: "That hand moves on its own?"
+  - speaker: 1
+    text: "Yeah. It acts like it knows better than me what to grab and what to shove away."
+  - speaker: 0
+    text: "I'll try to hold it still before we begin treatment."
+  - speaker: 1
+    text: "Good. But if it smacks you in the face, don't put that on my bill. Charge the thing inside instead."
+  normalConversation2:
+  - speaker: 1
+    text: "I'm not asking you to cut it off. Just... make it listen to me again. That's enough."
+  - speaker: 0
+    text: "I'll try to save as much of it as I can."
+  - speaker: 1
+    text: "Good. This hand used to do more work than my mouth, and that's saying something."
+  - speaker: 0
+    text: "How badly has it started slipping out of your control?"
+  - speaker: 1
+    text: "Bad enough that I have to keep it away from sharp things every time an ugly thought crosses my mind."
+  - speaker: 0
+    text: "Then we'll begin carefully."
+  - speaker: 1
+    text: "Thanks. Just don't take too long. I still want to be the one ordering my own hand around."
+  aggressiveConversation: []
+  painDialogue:
+    minor:
+    - speaker: 1
+      text: "Ngh..."
+    - speaker: 1
+      text: "Easy there."
+    - speaker: 1
+      text: "I'm still holding up."
+    - speaker: 1
+      text: "Hey, watch it a little."
+    moderate:
+    - speaker: 1
+      text: "Ow! Hold on a second."
+    - speaker: 1
+      text: "I'll try to keep still for you, Doc."
+    - speaker: 1
+      text: "No need to rush. I'm working on staying still here."
+    - speaker: 1
+      text: "Press that hard again and I'm going to twitch. Fair warning."
+    severe:
+    - speaker: 1
+      text: "Agh! It's not listening to me anymore!"
+    - speaker: 1
+      text: "Step back a bit. My hand's about to swing!"
+    - speaker: 1
+      text: "It hurts like someone's yanking the cords inside me."
+    - speaker: 1
+      text: "Don't let go. If it gets loose, I might not be able to stop it."
+  aggressivePainDialogue:
+    mild: []
+    moderate: []
+    severe: []
+  sanityDialogue:
+    above20:
+    - speaker: 1
+      text: "My head's still clear. My hand just wants to argue."
+    - speaker: 1
+      text: "If it moves before I say anything, that's not me."
+    - speaker: 1
+      text: "I still know where I'm sitting. That's good enough for now."
+    - speaker: 1
+      text: "Feels like there's pressure building in my fingers. I hate it."
+    above50:
+    - speaker: 1
+      text: "I tell it to stay still, but it's listening to some other voice instead."
+    - speaker: 1
+      text: "Don't ask me why my hand's moving. I'd like to know too."
+    - speaker: 1
+      text: "It's starting to remember its own way around. Not mine."
+    - speaker: 1
+      text: "If I tell you to stop, but my arm pulls you closer, don't trust the arm."
+    above80:
+    - speaker: 1
+      text: "My hand isn't my hand anymore... not all of it."
+    - speaker: 1
+      text: "It wants to grab something. I don't know what, and I don't want to know."
+    - speaker: 1
+      text: "If it lunges at you, I didn't give the order."
+    - speaker: 1
+      text: "Don't let it drag me with it. I'm still here."
+  aggressiveSanityDialogue:
+    above20: []
+    above50: []
+    above80: []
+  abandonedTreatmentDialogue:
+    above0:
+    - speaker: 1
+      text: "Doc, why did you stop? My hand didn't stop with you."
+    - speaker: 1
+      text: "Don't give it time to think for me."
+    above50:
+    - speaker: 1
+      text: "Hey, come back. It's starting to clench on its own."
+    - speaker: 1
+      text: "If you're taking a break, tell me first. I'll figure out how to sit on it."
+    above80:
+    - speaker: 1
+      text: "I can't hold it anymore. Get back here!"
+    - speaker: 1
+      text: "If I hurt someone now, I don't know if I'll get the chance to apologize."
+  aggressiveAbandonedTreatmentDialogue:
+    above0: []
+    above50: []
+    above80: []

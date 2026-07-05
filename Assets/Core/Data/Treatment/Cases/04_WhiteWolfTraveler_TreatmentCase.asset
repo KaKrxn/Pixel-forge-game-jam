@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c974a11f55ef5148bad9207f75384d2, type: 3}
-  m_Name: 07_TreatmentCase
+  m_Name: 04_WhiteWolfTraveler_TreatmentCase
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
-  caseId: 
-  customerDisplayName: Customer
-  dialogData: {fileID: 0}
+  caseId: white_wolf_traveler
+  customerDisplayName: White Wolf
+  dialogData: {fileID: 11400000, guid: 455bb223ef548054dab149468653aeaf, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments: []

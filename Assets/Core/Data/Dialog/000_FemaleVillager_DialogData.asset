@@ -1,0 +1,162 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c8d6a3f91e49d4aa5c3bba42d7a0e1, type: 3}
+  m_Name: 000_FemaleVillager_DialogData
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  playerDisplayName: Doctor
+  customerDisplayName: Female Villager
+  customerBlipClip: {fileID: 0}
+  customerBlipClips: []
+  lines:
+  - speaker: 1
+    text: "Please... help me."
+  - speaker: 0
+    text: "Come in. I'll take a look."
+  - speaker: 1
+    text: "I don't know how far it's spread... but I can feel it moving inside me all the time."
+  - speaker: 0
+    text: "It's alright. I'll examine you carefully first."
+  - speaker: 1
+    text: "...Thank you."
+  normalConversation1:
+  - speaker: 1
+    text: "Please... help me."
+  - speaker: 0
+    text: "Come in. I'll take a look."
+  - speaker: 1
+    text: "I don't know how far it's spread... but I can feel it moving inside me all the time."
+  - speaker: 0
+    text: "It's alright. I'll examine you carefully first."
+  - speaker: 1
+    text: "...Thank you."
+  normalConversation2:
+  - speaker: 1
+    text: "Um... I'm sorry for bothering you."
+  - speaker: 0
+    text: "You're not bothering me. Where does it hurt the most?"
+  - speaker: 1
+    text: "It started as a tiny wound... but after I got home, it felt like something was crawling beneath my skin."
+  - speaker: 0
+    text: "I'll examine it first, then we'll begin treatment."
+  - speaker: 1
+    text: "If I cry out... or move suddenly... please don't be upset with me. I'm really scared."
+  - speaker: 0
+    text: "It's alright. I'll take it slowly."
+  aggressiveConversation:
+  - speaker: 1
+    text: "Don't touch me yet."
+  - speaker: 0
+    text: "I won't do anything until I understand your condition."
+  - speaker: 1
+    text: "Understand? You don't understand anything. You just look at me like I'm already lost."
+  - speaker: 0
+    text: "That's not true. I'm trying to help you."
+  - speaker: 1
+    text: "Then hurry up and help me!"
+  painDialogue:
+    minor:
+    - speaker: 1
+      text: "Ah..."
+    - speaker: 1
+      text: "Nngh... I'm alright."
+    - speaker: 1
+      text: "That spot stings a little."
+    moderate:
+    - speaker: 1
+      text: "Ah... could you be a little gentler?"
+    - speaker: 1
+      text: "It hurts deep inside..."
+    - speaker: 1
+      text: "Could I have a moment to catch my breath?"
+    severe:
+    - speaker: 1
+      text: "Ah! Please stop for a second!"
+    - speaker: 1
+      text: "It hurts... it hurts so much... I can't take it..."
+  aggressivePainDialogue:
+    mild:
+    - speaker: 1
+      text: "It makes me angry for no reason... I hate it."
+    - speaker: 1
+      text: "Please keep going. Just... be careful with me."
+    moderate:
+    - speaker: 1
+      text: "Stop looking at me like that!"
+    - speaker: 1
+      text: "No! I'm sorry. I know you're only trying to help."
+    - speaker: 1
+      text: "Don't touch there—! Sorry... sorry, I didn't mean to shout."
+    - speaker: 1
+      text: "Why is it so hard to stay calm?"
+    severe:
+    - speaker: 1
+      text: "Get away from me!"
+    - speaker: 1
+      text: "No! Don't actually leave. Please... I don't know why I said that."
+    - speaker: 1
+      text: "I hate this. I hate you. I hate— no, no, I don't mean that!"
+    - speaker: 1
+      text: "It's making me say things. Or maybe it's me. I don't know anymore."
+    - speaker: 1
+      text: "If I hurt you, please don't think I wanted to."
+  sanityDialogue:
+    above20:
+    - speaker: 1
+      text: "I'm still aware of what's happening... my heart is just racing a little."
+    - speaker: 1
+      text: "Everything outside sounds strangely distant... but I can still hear you."
+    - speaker: 1
+      text: "It feels like something is constantly moving beneath my skin."
+    - speaker: 1
+      text: "If I start breathing too hard... please don't be alarmed."
+    above50:
+    - speaker: 1
+      text: "I can't tell anymore... what's pain and what's moving inside me."
+    - speaker: 1
+      text: "Could you keep talking to me? I don't want to listen to my own thoughts."
+    - speaker: 1
+      text: "It feels like this body doesn't belong to me anymore."
+    - speaker: 1
+      text: "I'm afraid that if I close my eyes... I won't want to open them again."
+    above80:
+    - speaker: 1
+      text: "Please don't let me become one of them."
+    - speaker: 1
+      text: "I'm still here... aren't I?"
+    - speaker: 1
+      text: "The voices are getting so loud... I can barely hear myself."
+    - speaker: 1
+      text: "If I start moving strangely... please don't come too close."
+  aggressiveSanityDialogue:
+    above20: []
+    above50: []
+    above80: []
+  abandonedTreatmentDialogue:
+    above0:
+    - speaker: 1
+      text: "Doctor... are you still there?"
+    - speaker: 1
+      text: "I'm supposed to stay still, right?"
+    above50:
+    - speaker: 1
+      text: "Please don't leave me alone with these voices..."
+    - speaker: 1
+      text: "It's moving again... could you come back and check on me?"
+    above80:
+    - speaker: 1
+      text: "If you don't come back... I'm afraid I won't be myself anymore."
+    - speaker: 1
+      text: "Please... don't let me disappear here."
+  aggressiveAbandonedTreatmentDialogue:
+    above0: []
+    above50: []
+    above80: []
