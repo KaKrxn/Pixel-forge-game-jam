@@ -184,7 +184,7 @@ MonoBehaviour:
   customerVisual: {fileID: 0}
   door: {fileID: 0}
   footstepSource: {fileID: 0}
-  footstepLoopClip: {fileID: 8300000, guid: d7c2e3ab3eab4634999e3f305fc72154, type: 3}
+  footstepLoopClip: {fileID: 0}
   footstepVolume: 1
   footstepStepDistance: 0.45
   footstepMinInterval: 0.12
