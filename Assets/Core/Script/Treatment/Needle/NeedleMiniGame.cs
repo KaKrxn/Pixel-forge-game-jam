@@ -165,6 +165,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
         ResetPustules();
         SetRootVisible(true);
         overlay?.Activate(CompleteMiniGame, HandleToolSelected, overlayToolId);
+        overlay?.SelectTool(overlayToolId);
         RefreshCompletionState();
         RefreshMeters();
         BeginAggression();
@@ -180,6 +181,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
             return;
         }
 
+        EnsurePustulePrefabFallbacksFromPlacedPustules();
         UnsubscribePustules();
         ClearSpawnedPustules();
         ReplaceRuntimeRoot(body);
@@ -972,12 +974,51 @@ public sealed class NeedleMiniGame : MonoBehaviour
     private void ReplaceRuntimeRoot(TreatmentBodyPrefab body)
     {
         LogTreatmentFlow($"ReplaceRuntimeRoot oldRoot={DescribeObject(root)} newBody={DescribeBody(body)}");
-        if (root != null && root != body.gameObject && root.TryGetComponent(out TreatmentBodyPrefab _))
+        if (root != null && root != body.gameObject)
         {
-            root.SetActive(false);
+            if (root == gameObject)
+            {
+                HideSceneRootChildren();
+            }
+            else
+            {
+                root.SetActive(false);
+            }
         }
 
         root = body.gameObject;
+    }
+
+    private void EnsurePustulePrefabFallbacksFromPlacedPustules()
+    {
+        if (HasAnyPustulePrefabSource())
+        {
+            return;
+        }
+
+        RefreshPustuleList();
+        for (int i = 0; i < pustules.Count; i++)
+        {
+            Pustule pustule = pustules[i];
+            if (pustule != null && !pustulePrefabs.Contains(pustule))
+            {
+                pustulePrefabs.Add(pustule);
+            }
+        }
+
+        LogTreatmentFlow($"EnsurePustulePrefabFallbacksFromPlacedPustules collected={pustulePrefabs.Count}");
+    }
+
+    private void HideSceneRootChildren()
+    {
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            GameObject child = transform.GetChild(i).gameObject;
+            if (child != null)
+            {
+                child.SetActive(false);
+            }
+        }
     }
 
     private void LogTreatmentFlow(string message)

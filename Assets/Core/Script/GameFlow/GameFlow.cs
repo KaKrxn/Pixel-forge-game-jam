@@ -110,7 +110,20 @@ public sealed class GameFlow : MonoBehaviour
     private bool SpawnCurrentQueuedCustomer()
     {
         CustomerDefinition definition = customerQueue.Current;
-        if (definition == null || customerSpawner == null)
+        if (definition == null)
+        {
+            SetState(ClinicFlowState.AllCustomersComplete);
+            return false;
+        }
+
+        if (customerQueue.CurrentIndex == 0 && firstCustomer != null)
+        {
+            ApplyDefinitionToCustomer(firstCustomer, definition);
+            BeginCustomer(firstCustomer, spawnedByQueue: true);
+            return true;
+        }
+
+        if (customerSpawner == null)
         {
             SetState(ClinicFlowState.AllCustomersComplete);
             return false;
@@ -125,6 +138,24 @@ public sealed class GameFlow : MonoBehaviour
 
         BeginCustomer(customer, spawnedByQueue: true);
         return true;
+    }
+
+    private static void ApplyDefinitionToCustomer(CustomerAgent customer, CustomerDefinition definition)
+    {
+        if (customer == null || definition == null)
+        {
+            return;
+        }
+
+        customer.name = string.IsNullOrWhiteSpace(definition.CustomerId)
+            ? customer.name
+            : definition.CustomerId;
+
+        CustomerCaseProvider caseProvider = customer.GetComponent<CustomerCaseProvider>();
+        if (caseProvider != null)
+        {
+            caseProvider.SetCase(definition.CaseData);
+        }
     }
 
     private void BeginCustomer(CustomerAgent customer, bool spawnedByQueue)
@@ -346,6 +377,13 @@ public sealed class GameFlow : MonoBehaviour
         {
             customerSpawner = FindFirstObjectByType<CustomerSpawner>();
         }
+
+        if (customerSpawner == null && firstCustomer != null)
+        {
+            customerSpawner = gameObject.AddComponent<CustomerSpawner>();
+        }
+
+        customerSpawner?.ConfigureMissingFromTemplate(firstCustomer);
 
         if (candle == null)
         {

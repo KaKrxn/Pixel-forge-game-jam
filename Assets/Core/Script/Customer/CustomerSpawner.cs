@@ -11,6 +11,49 @@ public sealed class CustomerSpawner : MonoBehaviour
     [SerializeField] private Door door;
     [SerializeField] private bool logWarnings = true;
 
+    public void ConfigureMissingFromTemplate(CustomerAgent template)
+    {
+        if (template == null)
+        {
+            return;
+        }
+
+        if (customerParent == null)
+        {
+            customerParent = template.transform.parent;
+        }
+
+        if (spawnPoint == null)
+        {
+            spawnPoint = template.SpawnPoint;
+        }
+
+        if (outsideDoorPoint == null)
+        {
+            outsideDoorPoint = template.OutsideDoorPoint;
+        }
+
+        if (insideDoorPoint == null)
+        {
+            insideDoorPoint = template.InsideDoorPoint;
+        }
+
+        if (counterPoint == null)
+        {
+            counterPoint = template.CounterPoint;
+        }
+
+        if (exitPoint == null)
+        {
+            exitPoint = template.ExitPoint;
+        }
+
+        if (door == null)
+        {
+            door = template.Door;
+        }
+    }
+
     public CustomerAgent Spawn(CustomerDefinition definition)
     {
         if (definition == null)

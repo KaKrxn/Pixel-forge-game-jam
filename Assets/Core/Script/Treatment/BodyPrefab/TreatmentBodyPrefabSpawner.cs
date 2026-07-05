@@ -36,12 +36,12 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
         }
 
         LogDebug($"TrySpawn catalog prefab={DescribeBody(prefab)} prefabAssetName={prefab.name}");
-        HideInactiveBodyPrefabs();
+        CleanupInactiveBodyPrefabs();
         Transform parent = bodyParent != null ? bodyParent : transform;
         activeBody = Instantiate(prefab, parent);
         activeBody.name = $"{miniGameType}_{area}_Body";
         activeBody.ApplyBodySpriteSorting();
-        HideInactiveBodyPrefabs(activeBody);
+        CleanupInactiveBodyPrefabs(activeBody);
         body = activeBody;
         LogDebug($"TrySpawn spawned activeBody={DescribeBody(activeBody)} parent={DescribeObject(parent)}");
 
@@ -58,32 +58,21 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
         LogDebug($"ClearActiveBody activeBody={DescribeBody(activeBody)}");
         if (activeBody == null)
         {
-            HideInactiveBodyPrefabs();
+            CleanupInactiveBodyPrefabs();
             return;
         }
 
-#if UNITY_EDITOR
-        ClearEditorSelectionIfInside(activeBody.gameObject);
-#endif
-
-        if (Application.isPlaying)
-        {
-            Destroy(activeBody.gameObject);
-        }
-        else
-        {
-            DestroyImmediate(activeBody.gameObject);
-        }
+        DestroyBody(activeBody);
 
         activeBody = null;
-        HideInactiveBodyPrefabs();
+        CleanupInactiveBodyPrefabs();
     }
 
-    private void HideInactiveBodyPrefabs(TreatmentBodyPrefab visibleBody = null)
+    private void CleanupInactiveBodyPrefabs(TreatmentBodyPrefab visibleBody = null)
     {
         Transform parent = bodyParent != null ? bodyParent : transform;
         TreatmentBodyPrefab[] bodies = parent.GetComponentsInChildren<TreatmentBodyPrefab>(true);
-        LogDebug($"HideInactiveBodyPrefabs parent={DescribeObject(parent)} visibleBody={DescribeBody(visibleBody)} found={bodies.Length}");
+        LogDebug($"CleanupInactiveBodyPrefabs parent={DescribeObject(parent)} visibleBody={DescribeBody(visibleBody)} found={bodies.Length}");
         for (int i = 0; i < bodies.Length; i++)
         {
             TreatmentBodyPrefab body = bodies[i];
@@ -92,8 +81,48 @@ public sealed class TreatmentBodyPrefabSpawner : MonoBehaviour
                 continue;
             }
 
+            if (IsRuntimeBodyInstance(body))
+            {
+                LogDebug($"CleanupInactiveBodyPrefabs destroying stale runtime body {DescribeBody(body)}");
+                DestroyBody(body);
+                continue;
+            }
+
             body.gameObject.SetActive(false);
-            LogDebug($"HideInactiveBodyPrefabs disabled {DescribeBody(body)}");
+            LogDebug($"CleanupInactiveBodyPrefabs disabled scene body {DescribeBody(body)}");
+        }
+    }
+
+    private static bool IsRuntimeBodyInstance(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return false;
+        }
+
+        return body.name == $"{body.MiniGameType}_{body.Area}_Body" || body.name.EndsWith("(Clone)");
+    }
+
+    private static void DestroyBody(TreatmentBodyPrefab body)
+    {
+        if (body == null)
+        {
+            return;
+        }
+
+        GameObject target = body.gameObject;
+#if UNITY_EDITOR
+        ClearEditorSelectionIfInside(target);
+#endif
+        target.SetActive(false);
+
+        if (Application.isPlaying)
+        {
+            Destroy(target);
+        }
+        else
+        {
+            DestroyImmediate(target);
         }
     }
 

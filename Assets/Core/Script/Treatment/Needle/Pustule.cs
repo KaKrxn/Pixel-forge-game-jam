@@ -44,7 +44,7 @@ public sealed class Pustule : MonoBehaviour
     public bool IsCompleted => completed;
     public bool CanPierce => !completed && !isPierced;
     public bool CanSqueeze => !completed && isPierced && type == PustuleType.Small;
-    public bool CanDrain => !completed && isPierced && type == PustuleType.Big;
+    public bool CanDrain => !completed && isPierced;
 
     public event Action<Pustule> Completed;
     public event Action<float> PainChanged;

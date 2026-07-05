@@ -3151,10 +3151,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlow
   firstCustomer: {fileID: 310168016}
-  useCustomerQueue: 0
-  customerQueueBuilder: {fileID: 0}
+  useCustomerQueue: 1
+  customerQueueBuilder: {fileID: 491569617}
   customerSpawner: {fileID: 0}
-  autoStartNextQueuedCustomer: 0
+  autoStartNextQueuedCustomer: 1
   dialog: {fileID: 491569612}
   roomTransition: {fileID: 491569616}
   treatment: {fileID: 491569615}
@@ -3246,6 +3246,11 @@ MonoBehaviour:
   fixedStarter: {fileID: 11400000, guid: a69926e971c573d47ac66235b2a88701, type: 2}
   customerPool:
   - {fileID: 11400000, guid: a69926e971c573d47ac66235b2a88701, type: 2}
+  - {fileID: 11400000, guid: 6f83c755a6f562a47b2efb6b80ca6392, type: 2}
+  - {fileID: 11400000, guid: cb9d0c3d1289b6b43a60a04446d47e12, type: 2}
+  - {fileID: 11400000, guid: a1461b63d5bb2584289adcf6bdeb16c5, type: 2}
+  - {fileID: 11400000, guid: c7cc7b98dd7e1954583e63d6e45cf8a8, type: 2}
+  - {fileID: 11400000, guid: 5e2e0ed8df66050468fbf714586f1a65, type: 2}
   useFixedStarter: 1
   logQueueOrder: 1
 --- !u!114 &491569618
@@ -5339,12 +5344,12 @@ MonoBehaviour:
   lowLightThreshold: 30
   flickeringThreshold: 10
   drainOnPlay: 1
+  refillHitArea: {fileID: 684896823}
   sfxSource: {fileID: 0}
   refillCompleteClip: {fileID: 8300000, guid: 6c2dcc343c55bc04c80ed03c2514598b, type: 3}
   flickerClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   extinguishedClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   sfxVolume: 1
-  refillHitArea: {fileID: 684896823}
 --- !u!95 &684896822
 Animator:
   serializedVersion: 7
@@ -12529,7 +12534,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1910242605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13962,6 +13967,10 @@ PrefabInstance:
       propertyPath: outsideDoorPoint
       value: 
       objectReference: {fileID: 900000011}
+    - target: {fileID: 7124140612516472824, guid: b19bee5ad158afd448dee0cf81044123, type: 3}
+      propertyPath: footstepStepDistance
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7550109537361971556, guid: b19bee5ad158afd448dee0cf81044123, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.9300003

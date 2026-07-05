@@ -25,6 +25,13 @@ public sealed class CustomerAgent : MonoBehaviour
     private float footstepDistanceAccumulator;
     private float footstepCooldown;
 
+    public Transform SpawnPoint => spawnPoint;
+    public Transform OutsideDoorPoint => outsideDoorPoint;
+    public Transform InsideDoorPoint => insideDoorPoint;
+    public Transform CounterPoint => counterPoint;
+    public Transform ExitPoint => exitPoint;
+    public Door Door => door;
+
     private enum EnterStep
     {
         None,
@@ -280,7 +287,7 @@ public sealed class CustomerAgent : MonoBehaviour
 
         footstepSource.loop = false;
         footstepSource.volume = footstepVolume;
-        footstepDistanceAccumulator = footstepStepDistance;
+        footstepDistanceAccumulator = 0f;
         footstepCooldown = 0f;
     }
 
