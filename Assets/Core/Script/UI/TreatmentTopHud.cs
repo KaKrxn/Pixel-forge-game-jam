@@ -191,6 +191,13 @@ public sealed class TreatmentTopHud : MonoBehaviour
             Sprite portrait = ResolvePortrait();
             characterVisualImage.sprite = portrait;
             characterVisualImage.enabled = portrait != null;
+
+            if (portrait != null && characterVisualImage.color.a <= 0f)
+            {
+                Color color = characterVisualImage.color;
+                color.a = 1f;
+                characterVisualImage.color = color;
+            }
         }
     }
 
@@ -327,6 +334,11 @@ public sealed class TreatmentTopHud : MonoBehaviour
         if (characterVisualSprite != null)
         {
             return characterVisualSprite;
+        }
+
+        if (characterVisualImage != null && characterVisualImage.sprite != null)
+        {
+            return characterVisualImage.sprite;
         }
 
         if (useCustomerSpriteWhenEmpty && customer != null)

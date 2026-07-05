@@ -96,7 +96,7 @@ public static class TreatmentTopHudSetup
         visualPanelRect.anchoredPosition = new Vector2(0f, -102f);
         visualPanelRect.sizeDelta = new Vector2(224f, 136f);
 
-        Image characterVisual = CreatePanel("CharacterVisualImage", characterVisualPanel.transform, new Color(1f, 1f, 1f, 0f));
+        Image characterVisual = CreatePanel("CharacterVisualImage", characterVisualPanel.transform, Color.white);
         RectTransform visualImageRect = characterVisual.rectTransform;
         visualImageRect.anchorMin = Vector2.zero;
         visualImageRect.anchorMax = Vector2.one;
@@ -166,7 +166,7 @@ public static class TreatmentTopHudSetup
         Image visualImage = imageTransform != null ? imageTransform.GetComponent<Image>() : null;
         if (visualImage == null)
         {
-            visualImage = CreatePanel("CharacterVisualImage", panel.transform, new Color(1f, 1f, 1f, 0f));
+            visualImage = CreatePanel("CharacterVisualImage", panel.transform, Color.white);
         }
 
         RectTransform imageRect = visualImage.rectTransform;
