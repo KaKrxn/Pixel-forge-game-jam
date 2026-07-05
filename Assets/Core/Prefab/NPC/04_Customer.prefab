@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 1802289387597539757}
   - component: {fileID: 7391384537311868207}
   - component: {fileID: 5903917453684366965}
+  - component: {fileID: -387135935090021433}
   m_Layer: 0
   m_Name: 04_Customer
   m_TagString: Untagged
@@ -180,6 +181,7 @@ MonoBehaviour:
   stopDistance: 0.05
   bubble: {fileID: 7985754499085701208}
   customerLayer: {fileID: 1831335163454106368}
+  customerVisual: {fileID: 0}
   door: {fileID: 0}
   footstepSource: {fileID: 0}
   footstepLoopClip: {fileID: 8300000, guid: d7c2e3ab3eab4634999e3f305fc72154, type: 3}
@@ -275,7 +277,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: -10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 3566751390782418191, guid: 931d6037a1a92ea4ca6cd43d26994169, type: 3}
+  m_Sprite: {fileID: 1446532583643695378, guid: ed66159c32b3404478de7c6c25e106b8, type: 3}
   m_Color: {r: 0.82, g: 0.92, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -295,7 +297,7 @@ Animator:
   m_GameObject: {fileID: 1133218870710452088}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: -7814715314199993323, guid: 931d6037a1a92ea4ca6cd43d26994169, type: 3}
+  m_Controller: {fileID: -6208808737424151783, guid: ed66159c32b3404478de7c6c25e106b8, type: 3}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -319,7 +321,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d0b72f20f5c3064bb6b9a5de63f3859, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerCaseProvider
-  caseData: {fileID: 11400000, guid: 77778253b56f8614f9627dc197d792a2, type: 2}
+  caseData: {fileID: 11400000, guid: 458ce2b0905c87f46ab5520fd87c9696, type: 2}
+--- !u!114 &-387135935090021433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133218870710452088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f42f01049a49144f83ec0475d71ad6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerVisual
+  bodyRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  sickSprite: {fileID: 0}
+  sickController: {fileID: 0}
+  curedSprite: {fileID: 0}
+  curedController: {fileID: 0}
+  curedEffectRoot: {fileID: 0}
+  applySickOnAwake: 1
 --- !u!1 &1315323063019188640
 GameObject:
   m_ObjectHideFlags: 0

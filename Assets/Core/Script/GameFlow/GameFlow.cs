@@ -243,6 +243,7 @@ public sealed class GameFlow : MonoBehaviour
         SetTreatmentStress(false);
         activeSanity?.StopMonitoring();
         activeSanity?.ResetSanity();
+        customer.MarkCured(); // swap to the cured visual before the customer walks out
         SetState(ClinicFlowState.CustomerLeaving);
 
         if (roomTransition != null)
