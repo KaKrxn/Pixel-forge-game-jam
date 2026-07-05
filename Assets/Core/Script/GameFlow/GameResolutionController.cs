@@ -6,6 +6,11 @@ public sealed class GameResolutionController : MonoBehaviour
     [SerializeField] private GameResultPanel resultPanel;
     [SerializeField] private bool pauseTimeOnResolution = true;
     [SerializeField] private FailReason defaultGameOverReason = FailReason.SanityMaxed;
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip winClip;
+    [SerializeField] private AudioClip loseClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
 
     private bool resolved;
 
@@ -61,6 +66,7 @@ public sealed class GameResolutionController : MonoBehaviour
     private void ResolveWin()
     {
         resolved = true;
+        PlaySfx(winClip);
         resultPanel?.ShowWin();
         PauseTimeIfNeeded();
     }
@@ -68,6 +74,7 @@ public sealed class GameResolutionController : MonoBehaviour
     private void ResolveLose(FailReason reason)
     {
         resolved = true;
+        PlaySfx(loseClip);
         resultPanel?.ShowLose(reason);
         PauseTimeIfNeeded();
     }
@@ -91,5 +98,20 @@ public sealed class GameResolutionController : MonoBehaviour
         {
             resultPanel = FindFirstObjectByType<GameResultPanel>(FindObjectsInactive.Include);
         }
+
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+        }
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (clip == null || sfxSource == null)
+        {
+            return;
+        }
+
+        sfxSource.PlayOneShot(clip, sfxVolume);
     }
 }

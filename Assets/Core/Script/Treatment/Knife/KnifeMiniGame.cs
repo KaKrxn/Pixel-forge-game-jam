@@ -64,6 +64,14 @@ public sealed class KnifeMiniGame : MonoBehaviour
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Knife";
     [SerializeField] private string pullToolId = "Tongs";
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip knifeGrabClip;
+    [SerializeField] private AudioClip tongsGrabClip;
+    [SerializeField] private AudioClip sliceStartClip;
+    [SerializeField] private AudioClip pullStartClip;
+    [SerializeField] private AudioClip completeClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
     [Header("Obstacle")]
     [SerializeField] private PatientAggressionController aggressionController;
     [Header("Rules")]
@@ -113,6 +121,11 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     private void Awake()
     {
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+        }
+
         RefreshLesionList();
         SubscribeLesions();
 
@@ -276,12 +289,22 @@ public sealed class KnifeMiniGame : MonoBehaviour
     public void EquipKnife()
     {
         unsupportedToolSelected = false;
+        if (toolState != KnifeToolState.Knife)
+        {
+            PlaySfx(knifeGrabClip);
+        }
+
         toolState = KnifeToolState.Knife;
     }
 
     public void EquipTongs()
     {
         unsupportedToolSelected = false;
+        if (toolState != KnifeToolState.Tongs)
+        {
+            PlaySfx(tongsGrabClip);
+        }
+
         toolState = KnifeToolState.Tongs;
     }
 
@@ -369,6 +392,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
         activeLesion = target;
         activeActionMode = canUseTool ? KnifeActionMode.Slice : KnifeActionMode.Pull;
+        PlaySfx(canUseTool ? sliceStartClip : pullStartClip);
         meterLesion = target;
         RefreshMeters();
         flow?.SetTreatmentStress(true);
@@ -948,6 +972,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         }
 
         completionRaised = true;
+        PlaySfx(completeClip);
         Stop();
         MiniGameCompleted?.Invoke();
     }
@@ -957,6 +982,22 @@ public sealed class KnifeMiniGame : MonoBehaviour
         float progress = meterLesion != null ? meterLesion.OverallProgress : 0f;
         float pain = meterLesion != null ? meterLesion.PainLevel : 0f;
         overlay?.SetMeters(progress, pain);
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        if (sfxSource != null && sfxSource.gameObject.activeInHierarchy)
+        {
+            sfxSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position, sfxVolume);
     }
 
     private void SetCompleteButtonVisible(bool visible)

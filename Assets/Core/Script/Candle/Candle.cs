@@ -26,6 +26,12 @@ public sealed class Candle : MonoBehaviour
     [SerializeField] private float flickeringThreshold = 25f;
     [SerializeField] private bool drainOnPlay = true;
     [SerializeField] private Collider2D refillHitArea;
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip refillCompleteClip;
+    [SerializeField] private AudioClip flickerClip;
+    [SerializeField] private AudioClip extinguishedClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
 
     public float CurrentLight => currentLight;
     public float MaxLight => maxLight;
@@ -47,6 +53,11 @@ public sealed class Candle : MonoBehaviour
 
     private void Awake()
     {
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+        }
+
         currentLight = Mathf.Clamp(currentLight, 0f, maxLight);
         SetState(EvaluateState(), notify: false);
         LightChanged?.Invoke(currentLight, maxLight);
@@ -207,6 +218,7 @@ public sealed class Candle : MonoBehaviour
         }
 
         bool wasLit = IsLit;
+        bool wasFull = maxLight > 0f && currentLight >= maxLight;
         currentLight = Mathf.Clamp(currentLight + amount, 0f, maxLight);
         bool isLit = IsLit;
 
@@ -219,6 +231,11 @@ public sealed class Candle : MonoBehaviour
         else if (!wasLit && isLit)
         {
             Relit?.Invoke();
+        }
+
+        if (amount > 0f && !wasFull && maxLight > 0f && currentLight >= maxLight)
+        {
+            PlaySfx(refillCompleteClip);
         }
 
         SetState(isRefilling ? CandleLightState.Refilling : EvaluateState(), notify: true);
@@ -256,6 +273,25 @@ public sealed class Candle : MonoBehaviour
         if (notify)
         {
             StateChanged?.Invoke(CurrentState);
+
+            if (CurrentState == CandleLightState.Flickering)
+            {
+                PlaySfx(flickerClip);
+            }
+            else if (CurrentState == CandleLightState.Extinguished)
+            {
+                PlaySfx(extinguishedClip != null ? extinguishedClip : flickerClip);
+            }
         }
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (clip == null || sfxSource == null)
+        {
+            return;
+        }
+
+        sfxSource.PlayOneShot(clip, sfxVolume);
     }
 }
