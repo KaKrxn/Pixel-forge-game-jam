@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c974a11f55ef5148bad9207f75384d2, type: 3}
   m_Name: 05_YoungElfVillager_TreatmentCase
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
-  caseId: 
-  customerDisplayName: Customer
-  dialogData: {fileID: 0}
+  caseId: young_elf_villager
+  customerDisplayName: Young Elf Villager
+  dialogData: {fileID: 11400000, guid: ae5dc865d8a585d44af5dad0f0f3557f, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments: []

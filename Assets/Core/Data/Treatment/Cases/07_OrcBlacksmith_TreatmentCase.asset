@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c974a11f55ef5148bad9207f75384d2, type: 3}
   m_Name: 07_OrcBlacksmith_TreatmentCase
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
-  caseId: 
-  customerDisplayName: Customer
-  dialogData: {fileID: 0}
+  caseId: orc_blacksmith
+  customerDisplayName: Orc Blacksmith
+  dialogData: {fileID: 11400000, guid: 0778003562fe52243986780e1c41d5d5, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments: []
