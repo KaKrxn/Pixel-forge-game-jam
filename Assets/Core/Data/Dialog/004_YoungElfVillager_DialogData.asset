@@ -15,7 +15,12 @@ MonoBehaviour:
   playerDisplayName: Player
   customerDisplayName: Customer
   customerBlipClip: {fileID: 0}
-  customerBlipClips: []
+  customerBlipClips:
+  - {fileID: 8300000, guid: 023cfcbfb9325e543b13260751e6a474, type: 3}
+  - {fileID: 8300000, guid: e9378dd533c6ace4f90a98c4e858d58e, type: 3}
+  - {fileID: 8300000, guid: eecd2fa1baaa83540a8b7281c5ca8b32, type: 3}
+  - {fileID: 8300000, guid: 62c2c3ba15f70194e87acbaa518f53e1, type: 3}
+  - {fileID: 8300000, guid: 50e602c3f4dad13409cc20a22e16724c, type: 3}
   lines: []
   normalConversation1: []
   normalConversation2: []

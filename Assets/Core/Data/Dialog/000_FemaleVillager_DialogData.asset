@@ -15,127 +15,137 @@ MonoBehaviour:
   playerDisplayName: Doctor
   customerDisplayName: Female Villager
   customerBlipClip: {fileID: 0}
-  customerBlipClips: []
+  customerBlipClips:
+  - {fileID: 8300000, guid: 023cfcbfb9325e543b13260751e6a474, type: 3}
+  - {fileID: 8300000, guid: e9378dd533c6ace4f90a98c4e858d58e, type: 3}
+  - {fileID: 8300000, guid: eecd2fa1baaa83540a8b7281c5ca8b32, type: 3}
+  - {fileID: 8300000, guid: 62c2c3ba15f70194e87acbaa518f53e1, type: 3}
+  - {fileID: 8300000, guid: 50e602c3f4dad13409cc20a22e16724c, type: 3}
   lines:
   - speaker: 1
-    text: "Please... help me."
+    text: Please... help me.
   - speaker: 0
-    text: "Come in. I'll take a look."
+    text: Come in. I'll take a look.
   - speaker: 1
-    text: "I don't know how far it's spread... but I can feel it moving inside me all the time."
+    text: I don't know how far it's spread... but I can feel it moving inside me
+      all the time.
   - speaker: 0
-    text: "It's alright. I'll examine you carefully first."
+    text: It's alright. I'll examine you carefully first.
   - speaker: 1
-    text: "...Thank you."
+    text: ...Thank you.
   normalConversation1:
   - speaker: 1
-    text: "Please... help me."
+    text: Please... help me.
   - speaker: 0
-    text: "Come in. I'll take a look."
+    text: Come in. I'll take a look.
   - speaker: 1
-    text: "I don't know how far it's spread... but I can feel it moving inside me all the time."
+    text: I don't know how far it's spread... but I can feel it moving inside me
+      all the time.
   - speaker: 0
-    text: "It's alright. I'll examine you carefully first."
+    text: It's alright. I'll examine you carefully first.
   - speaker: 1
-    text: "...Thank you."
+    text: ...Thank you.
   normalConversation2:
   - speaker: 1
-    text: "Um... I'm sorry for bothering you."
+    text: Um... I'm sorry for bothering you.
   - speaker: 0
-    text: "You're not bothering me. Where does it hurt the most?"
+    text: You're not bothering me. Where does it hurt the most?
   - speaker: 1
-    text: "It started as a tiny wound... but after I got home, it felt like something was crawling beneath my skin."
+    text: It started as a tiny wound... but after I got home, it felt like something
+      was crawling beneath my skin.
   - speaker: 0
-    text: "I'll examine it first, then we'll begin treatment."
+    text: I'll examine it first, then we'll begin treatment.
   - speaker: 1
-    text: "If I cry out... or move suddenly... please don't be upset with me. I'm really scared."
+    text: If I cry out... or move suddenly... please don't be upset with me. I'm
+      really scared.
   - speaker: 0
-    text: "It's alright. I'll take it slowly."
+    text: It's alright. I'll take it slowly.
   aggressiveConversation:
   - speaker: 1
-    text: "Don't touch me yet."
+    text: Don't touch me yet.
   - speaker: 0
-    text: "I won't do anything until I understand your condition."
+    text: I won't do anything until I understand your condition.
   - speaker: 1
-    text: "Understand? You don't understand anything. You just look at me like I'm already lost."
+    text: Understand? You don't understand anything. You just look at me like I'm
+      already lost.
   - speaker: 0
-    text: "That's not true. I'm trying to help you."
+    text: That's not true. I'm trying to help you.
   - speaker: 1
-    text: "Then hurry up and help me!"
+    text: Then hurry up and help me!
   painDialogue:
     minor:
     - speaker: 1
-      text: "Ah..."
+      text: Ah...
     - speaker: 1
-      text: "Nngh... I'm alright."
+      text: Nngh... I'm alright.
     - speaker: 1
-      text: "That spot stings a little."
+      text: That spot stings a little.
     moderate:
     - speaker: 1
-      text: "Ah... could you be a little gentler?"
+      text: Ah... could you be a little gentler?
     - speaker: 1
-      text: "It hurts deep inside..."
+      text: It hurts deep inside...
     - speaker: 1
-      text: "Could I have a moment to catch my breath?"
+      text: Could I have a moment to catch my breath?
     severe:
     - speaker: 1
-      text: "Ah! Please stop for a second!"
+      text: Ah! Please stop for a second!
     - speaker: 1
-      text: "It hurts... it hurts so much... I can't take it..."
+      text: It hurts... it hurts so much... I can't take it...
   aggressivePainDialogue:
     mild:
     - speaker: 1
-      text: "It makes me angry for no reason... I hate it."
+      text: It makes me angry for no reason... I hate it.
     - speaker: 1
-      text: "Please keep going. Just... be careful with me."
+      text: Please keep going. Just... be careful with me.
     moderate:
     - speaker: 1
-      text: "Stop looking at me like that!"
+      text: Stop looking at me like that!
     - speaker: 1
-      text: "No! I'm sorry. I know you're only trying to help."
+      text: No! I'm sorry. I know you're only trying to help.
     - speaker: 1
-      text: "Don't touch there—! Sorry... sorry, I didn't mean to shout."
+      text: "Don't touch there\u2014! Sorry... sorry, I didn't mean to shout."
     - speaker: 1
-      text: "Why is it so hard to stay calm?"
+      text: Why is it so hard to stay calm?
     severe:
     - speaker: 1
-      text: "Get away from me!"
+      text: Get away from me!
     - speaker: 1
-      text: "No! Don't actually leave. Please... I don't know why I said that."
+      text: No! Don't actually leave. Please... I don't know why I said that.
     - speaker: 1
-      text: "I hate this. I hate you. I hate— no, no, I don't mean that!"
+      text: "I hate this. I hate you. I hate\u2014 no, no, I don't mean that!"
     - speaker: 1
-      text: "It's making me say things. Or maybe it's me. I don't know anymore."
+      text: It's making me say things. Or maybe it's me. I don't know anymore.
     - speaker: 1
-      text: "If I hurt you, please don't think I wanted to."
+      text: If I hurt you, please don't think I wanted to.
   sanityDialogue:
     above20:
     - speaker: 1
-      text: "I'm still aware of what's happening... my heart is just racing a little."
+      text: I'm still aware of what's happening... my heart is just racing a little.
     - speaker: 1
-      text: "Everything outside sounds strangely distant... but I can still hear you."
+      text: Everything outside sounds strangely distant... but I can still hear you.
     - speaker: 1
-      text: "It feels like something is constantly moving beneath my skin."
+      text: It feels like something is constantly moving beneath my skin.
     - speaker: 1
-      text: "If I start breathing too hard... please don't be alarmed."
+      text: If I start breathing too hard... please don't be alarmed.
     above50:
     - speaker: 1
-      text: "I can't tell anymore... what's pain and what's moving inside me."
+      text: I can't tell anymore... what's pain and what's moving inside me.
     - speaker: 1
-      text: "Could you keep talking to me? I don't want to listen to my own thoughts."
+      text: Could you keep talking to me? I don't want to listen to my own thoughts.
     - speaker: 1
-      text: "It feels like this body doesn't belong to me anymore."
+      text: It feels like this body doesn't belong to me anymore.
     - speaker: 1
-      text: "I'm afraid that if I close my eyes... I won't want to open them again."
+      text: I'm afraid that if I close my eyes... I won't want to open them again.
     above80:
     - speaker: 1
-      text: "Please don't let me become one of them."
+      text: Please don't let me become one of them.
     - speaker: 1
-      text: "I'm still here... aren't I?"
+      text: I'm still here... aren't I?
     - speaker: 1
-      text: "The voices are getting so loud... I can barely hear myself."
+      text: The voices are getting so loud... I can barely hear myself.
     - speaker: 1
-      text: "If I start moving strangely... please don't come too close."
+      text: If I start moving strangely... please don't come too close.
   aggressiveSanityDialogue:
     above20: []
     above50: []
@@ -143,19 +153,19 @@ MonoBehaviour:
   abandonedTreatmentDialogue:
     above0:
     - speaker: 1
-      text: "Doctor... are you still there?"
+      text: Doctor... are you still there?
     - speaker: 1
-      text: "I'm supposed to stay still, right?"
+      text: I'm supposed to stay still, right?
     above50:
     - speaker: 1
-      text: "Please don't leave me alone with these voices..."
+      text: Please don't leave me alone with these voices...
     - speaker: 1
-      text: "It's moving again... could you come back and check on me?"
+      text: It's moving again... could you come back and check on me?
     above80:
     - speaker: 1
-      text: "If you don't come back... I'm afraid I won't be myself anymore."
+      text: If you don't come back... I'm afraid I won't be myself anymore.
     - speaker: 1
-      text: "Please... don't let me disappear here."
+      text: Please... don't let me disappear here.
   aggressiveAbandonedTreatmentDialogue:
     above0: []
     above50: []

@@ -25,5 +25,8 @@ MonoBehaviour:
     miniGameType: 2
     designerNote: 
   - area: 2
-    miniGameType: 3
+    miniGameType: 2
+    designerNote: 
+  - area: 3
+    miniGameType: 1
     designerNote: 

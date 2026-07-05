@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Core/Scene/Game_Test_Flow.unity
     guid: 856fba6adf544a24494e0aa07f0c0f8b
   - enabled: 1
+    path: Assets/Core/Scene/EndCedit.unity
+    guid: 19633f19b96681945bfe5fdde777696c
+  - enabled: 0
     path: Assets/Core/Scene/GameScene.unity
     guid: 6c0b90fe7bb4eaa42843745a17adcce9
   - enabled: 0
