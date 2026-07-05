@@ -16,10 +16,14 @@ public sealed class CustomerAgent : MonoBehaviour
     [SerializeField] private AudioSource footstepSource;
     [SerializeField] private AudioClip footstepLoopClip;
     [SerializeField, Range(0f, 1f)] private float footstepVolume = 1f;
+    [SerializeField, Min(0.01f)] private float footstepStepDistance = 0.45f;
+    [SerializeField, Min(0f)] private float footstepMinInterval = 0.12f;
 
     private GameFlow flow;
     private EnterStep enterStep = EnterStep.None;
     private ExitStep exitStep = ExitStep.None;
+    private float footstepDistanceAccumulator;
+    private float footstepCooldown;
 
     private enum EnterStep
     {
@@ -131,7 +135,9 @@ public sealed class CustomerAgent : MonoBehaviour
             return;
         }
 
+        Vector3 beforePosition = transform.position;
         transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
+        TickFootsteps(Vector3.Distance(beforePosition, transform.position));
 
         if (Vector3.Distance(transform.position, target.position) <= stopDistance)
         {
@@ -148,7 +154,9 @@ public sealed class CustomerAgent : MonoBehaviour
             return;
         }
 
+        Vector3 beforePosition = transform.position;
         transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
+        TickFootsteps(Vector3.Distance(beforePosition, transform.position));
 
         if (Vector3.Distance(transform.position, target.position) <= stopDistance)
         {
@@ -270,18 +278,37 @@ public sealed class CustomerAgent : MonoBehaviour
             return;
         }
 
-        if (footstepSource.clip != footstepLoopClip)
-        {
-            footstepSource.clip = footstepLoopClip;
-        }
-
-        footstepSource.loop = true;
+        footstepSource.loop = false;
         footstepSource.volume = footstepVolume;
+        footstepDistanceAccumulator = footstepStepDistance;
+        footstepCooldown = 0f;
+    }
 
-        if (!footstepSource.isPlaying)
+    private void TickFootsteps(float movedDistance)
+    {
+        if (movedDistance <= 0.0001f || footstepLoopClip == null)
         {
-            footstepSource.Play();
+            return;
         }
+
+        ResolveFootstepSource();
+        if (footstepSource == null)
+        {
+            footstepSource = gameObject.AddComponent<AudioSource>();
+            footstepSource.playOnAwake = false;
+        }
+
+        footstepCooldown = Mathf.Max(0f, footstepCooldown - Time.deltaTime);
+        footstepDistanceAccumulator += movedDistance;
+
+        if (footstepDistanceAccumulator < footstepStepDistance || footstepCooldown > 0f)
+        {
+            return;
+        }
+
+        footstepDistanceAccumulator = 0f;
+        footstepCooldown = footstepMinInterval;
+        footstepSource.PlayOneShot(footstepLoopClip, footstepVolume);
     }
 
     private void StopFootsteps()
