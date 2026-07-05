@@ -16,4 +16,13 @@ MonoBehaviour:
   customerDisplayName: Female Villager
   dialogData: {fileID: 11400000, guid: 1d1ed348225e3be4cb543ffea4510ceb, type: 2}
   aggressionProfile: {fileID: 0}
-  requiredTreatments: []
+  requiredTreatments:
+  - area: 0
+    miniGameType: 1
+    designerNote: 
+  - area: 1
+    miniGameType: 2
+    designerNote: 
+  - area: 2
+    miniGameType: 3
+    designerNote: 

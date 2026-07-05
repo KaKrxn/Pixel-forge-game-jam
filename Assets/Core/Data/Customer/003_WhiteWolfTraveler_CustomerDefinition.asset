@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea56ea55f454c87963fb0b79fd7e301, type: 3}
   m_Name: 003_WhiteWolfTraveler_CustomerDefinition
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
-  customerId: 
-  displayName: 
-  customerPrefab: {fileID: 0}
-  caseData: {fileID: 0}
+  customerId: 003
+  displayName: WhiteWolfTraveler
+  customerPrefab: {fileID: 7124140612516472824, guid: fb65336778d2c724ab36fa6ef063d60b, type: 3}
+  caseData: {fileID: 11400000, guid: 77778253b56f8614f9627dc197d792a2, type: 2}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea56ea55f454c87963fb0b79fd7e301, type: 3}
   m_Name: 005_GoblinLaborer_CustomerDefinition
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
-  customerId: 
-  displayName: 
-  customerPrefab: {fileID: 0}
-  caseData: {fileID: 0}
+  customerId: 005
+  displayName: GoblinLaborer
+  customerPrefab: {fileID: 7124140612516472824, guid: 087036934d9756c41bae70ff9cc75632, type: 3}
+  caseData: {fileID: 11400000, guid: 073d30bcda9dfbf44b7d613ce521ef48, type: 2}

@@ -2007,17 +2007,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7550109537361971556, guid: b19bee5ad158afd448dee0cf81044123, type: 3}
   m_PrefabInstance: {fileID: 2462198361837984106}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &310168016 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7124140612516472824, guid: b19bee5ad158afd448dee0cf81044123, type: 3}
-  m_PrefabInstance: {fileID: 2462198361837984106}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2045c73836e10349a8522c82a2fd94c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CustomerAgent
 --- !u!114 &310168023 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5246842306267249666, guid: b19bee5ad158afd448dee0cf81044123, type: 3}
@@ -3234,6 +3223,7 @@ GameObject:
   - component: {fileID: 491569619}
   - component: {fileID: 491569620}
   - component: {fileID: 491569621}
+  - component: {fileID: 491569622}
   m_Layer: 0
   m_Name: GameFlowManager
   m_TagString: Untagged
@@ -3280,11 +3270,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ade7ce67d55532047ac0cb1dc5f1915e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFlow
-  firstCustomer: {fileID: 310168016}
-  useCustomerQueue: 0
-  customerQueueBuilder: {fileID: 0}
-  customerSpawner: {fileID: 0}
-  autoStartNextQueuedCustomer: 0
+  firstCustomer: {fileID: 0}
+  useCustomerQueue: 1
+  customerQueueBuilder: {fileID: 491569617}
+  customerSpawner: {fileID: 491569622}
+  autoStartNextQueuedCustomer: 1
   dialog: {fileID: 491569612}
   roomTransition: {fileID: 491569616}
   treatment: {fileID: 491569615}
@@ -3329,6 +3319,7 @@ MonoBehaviour:
   anatomyController: {fileID: 1045452156}
   tongsMiniGame: {fileID: 0}
   patientPresenter: {fileID: 491569619}
+  topHud: {fileID: 0}
   debugTreatmentFlow: 1
 --- !u!114 &491569616
 MonoBehaviour:
@@ -3367,6 +3358,10 @@ MonoBehaviour:
   fixedStarter: {fileID: 11400000, guid: a69926e971c573d47ac66235b2a88701, type: 2}
   customerPool:
   - {fileID: 11400000, guid: a69926e971c573d47ac66235b2a88701, type: 2}
+  - {fileID: 11400000, guid: 6f83c755a6f562a47b2efb6b80ca6392, type: 2}
+  - {fileID: 11400000, guid: cb9d0c3d1289b6b43a60a04446d47e12, type: 2}
+  - {fileID: 11400000, guid: a1461b63d5bb2584289adcf6bdeb16c5, type: 2}
+  - {fileID: 11400000, guid: 5e2e0ed8df66050468fbf714586f1a65, type: 2}
   useFixedStarter: 1
   logQueueOrder: 1
 --- !u!114 &491569618
@@ -3401,6 +3396,11 @@ MonoBehaviour:
   treatmentPatientPoint: {fileID: 349918622}
   matchPointRotation: 0
   anatomyController: {fileID: 1045452156}
+  treatmentScale: {x: 2, y: 2, z: 1}
+  shopScale: {x: 0, y: 0, z: 0}
+  animateScale: 1
+  scaleDuration: 0.35
+  useUnscaledTime: 1
   debugLog: 1
 --- !u!114 &491569620
 MonoBehaviour:
@@ -3515,6 +3515,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentFeedback
   hurtReference: 25
+--- !u!114 &491569622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 491569611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9db7f87a0864350955dc91b172dcb3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerSpawner
+  customerParent: {fileID: 1594731088}
+  spawnPoint: {fileID: 1874742787}
+  outsideDoorPoint: {fileID: 900000011}
+  insideDoorPoint: {fileID: 900000021}
+  counterPoint: {fileID: 1538641501}
+  exitPoint: {fileID: 900000031}
+  door: {fileID: 900000002}
+  logWarnings: 1
 --- !u!1 &492163331
 GameObject:
   m_ObjectHideFlags: 0

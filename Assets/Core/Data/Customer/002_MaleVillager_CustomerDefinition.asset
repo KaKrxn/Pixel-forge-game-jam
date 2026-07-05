@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea56ea55f454c87963fb0b79fd7e301, type: 3}
   m_Name: 002_MaleVillager_CustomerDefinition
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
-  customerId: 
-  displayName: 
-  customerPrefab: {fileID: 0}
-  caseData: {fileID: 0}
+  customerId: 002
+  displayName: MaleVillager
+  customerPrefab: {fileID: 7124140612516472824, guid: 0f56d4c272391e9469fd065c8ee5d150, type: 3}
+  caseData: {fileID: 11400000, guid: 8061a623f5ae31e4c9410fac1c9125ff, type: 2}

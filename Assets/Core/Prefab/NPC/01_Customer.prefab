@@ -316,7 +316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d0b72f20f5c3064bb6b9a5de63f3859, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerCaseProvider
-  caseData: {fileID: 11400000, guid: 50b2c95037b34bd438fb0a3a93a1e7db, type: 2}
+  caseData: {fileID: 11400000, guid: 0f97722285af7b845a62ead94d17a61e, type: 2}
 --- !u!1 &1315323063019188640
 GameObject:
   m_ObjectHideFlags: 0

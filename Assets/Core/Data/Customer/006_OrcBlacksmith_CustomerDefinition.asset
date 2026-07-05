@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ea56ea55f454c87963fb0b79fd7e301, type: 3}
   m_Name: 006_OrcBlacksmith_CustomerDefinition
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
-  customerId: 
-  displayName: 
+  customerId: 006
+  displayName: OrcBlacksmith
   customerPrefab: {fileID: 0}
-  caseData: {fileID: 0}
+  caseData: {fileID: 11400000, guid: f6e805701d5b30942a7472bb27f7d969, type: 2}
