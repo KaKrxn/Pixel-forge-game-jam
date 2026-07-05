@@ -12,6 +12,10 @@ public sealed class CustomerAgent : MonoBehaviour
     [SerializeField] private Bubble bubble;
     [SerializeField] private CustomerLayer customerLayer;
     [SerializeField] private Door door;
+    [Header("Audio")]
+    [SerializeField] private AudioSource footstepSource;
+    [SerializeField] private AudioClip footstepLoopClip;
+    [SerializeField, Range(0f, 1f)] private float footstepVolume = 1f;
 
     private GameFlow flow;
     private EnterStep enterStep = EnterStep.None;
@@ -35,6 +39,7 @@ public sealed class CustomerAgent : MonoBehaviour
 
     private void Awake()
     {
+        ResolveFootstepSource();
         HideBubble();
     }
 
@@ -71,6 +76,7 @@ public sealed class CustomerAgent : MonoBehaviour
         door?.Close();
         gameObject.SetActive(true);
         HideBubble();
+        StartFootsteps();
         enterStep = outsideDoorPoint != null ? EnterStep.WalkingToOutsideDoor : EnterStep.WalkingToCounter;
     }
 
@@ -104,6 +110,7 @@ public sealed class CustomerAgent : MonoBehaviour
         enterStep = EnterStep.None;
         HideBubble();
         door?.Close();
+        StartFootsteps();
         exitStep = insideDoorPoint != null ? ExitStep.WalkingToInsideDoor : ExitStep.WalkingToExit;
     }
 
@@ -152,6 +159,7 @@ public sealed class CustomerAgent : MonoBehaviour
     private void ArriveAtCounter()
     {
         enterStep = EnterStep.None;
+        StopFootsteps();
 
         if (bubble != null)
         {
@@ -236,6 +244,45 @@ public sealed class CustomerAgent : MonoBehaviour
     private void FinishExit()
     {
         exitStep = ExitStep.None;
+        StopFootsteps();
         flow?.CustomerLeft(this);
+    }
+
+    private void ResolveFootstepSource()
+    {
+        if (footstepSource == null)
+        {
+            footstepSource = GetComponent<AudioSource>();
+        }
+    }
+
+    private void StartFootsteps()
+    {
+        ResolveFootstepSource();
+        if (footstepSource == null || footstepLoopClip == null)
+        {
+            return;
+        }
+
+        if (footstepSource.clip != footstepLoopClip)
+        {
+            footstepSource.clip = footstepLoopClip;
+        }
+
+        footstepSource.loop = true;
+        footstepSource.volume = footstepVolume;
+
+        if (!footstepSource.isPlaying)
+        {
+            footstepSource.Play();
+        }
+    }
+
+    private void StopFootsteps()
+    {
+        if (footstepSource != null && footstepSource.isPlaying)
+        {
+            footstepSource.Stop();
+        }
     }
 }

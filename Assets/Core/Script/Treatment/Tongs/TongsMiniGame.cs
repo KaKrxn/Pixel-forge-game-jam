@@ -43,6 +43,13 @@ public sealed class TongsMiniGame : MonoBehaviour
     [Header("UI")]
     [SerializeField] private MiniGameOverlay overlay;
     [SerializeField] private string overlayToolId = "Tongs";
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip tongsGrabClip;
+    [SerializeField] private AudioClip parasiteGrabClip;
+    [SerializeField] private AudioClip parasiteExtractedClip;
+    [SerializeField] private AudioClip completeClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
     [Header("Obstacle")]
     [SerializeField] private PatientAggressionController aggressionController;
     [Header("Rules")]
@@ -95,6 +102,11 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     private void Awake()
     {
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+        }
+
         RefreshParasiteList();
         SubscribeParasites();
 
@@ -285,6 +297,11 @@ public sealed class TongsMiniGame : MonoBehaviour
 
     public void EquipTongs()
     {
+        if (!tongsEquipped)
+        {
+            PlaySfx(tongsGrabClip);
+        }
+
         tongsEquipped = true;
     }
 
@@ -333,6 +350,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         activeParasite = target;
         meterParasite = target;
         activeParasite.BeginHold(pointerPosition);
+        PlaySfx(parasiteGrabClip);
         flow?.SetTreatmentStress(true);
         RefreshMeters();
     }
@@ -962,6 +980,7 @@ public sealed class TongsMiniGame : MonoBehaviour
             meterParasite = null;
         }
 
+        PlaySfx(parasiteExtractedClip);
         RefreshMeters();
         RefreshCompletionState();
     }
@@ -1000,6 +1019,7 @@ public sealed class TongsMiniGame : MonoBehaviour
         }
 
         completionRaised = true;
+        PlaySfx(completeClip);
         Stop();
 
         if (completeTreatmentOnButton)
@@ -1009,6 +1029,22 @@ public sealed class TongsMiniGame : MonoBehaviour
         }
 
         MiniGameCompleted?.Invoke();
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        if (sfxSource != null && sfxSource.gameObject.activeInHierarchy)
+        {
+            sfxSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position, sfxVolume);
     }
 
     private bool HasAnyParasite()

@@ -10,6 +10,27 @@ Sources:
 
 This document maps the SFX/BGM requirements from the GDD to the currently listed audio asset names. It is intended as a handoff list for implementation and for checking which sounds are still missing.
 
+## Implementation Status
+
+Updated: 2026-07-05
+
+Code hooks now exist for the first SFX pass. These hooks expose serialized `AudioClip` fields in Inspector and do nothing if clips are still empty.
+
+| Script | Hooked events | Clip fields |
+| --- | --- | --- |
+| `CustomerAgent` | Customer starts/stops walking while entering or exiting | `footstepLoopClip` |
+| `Door` | Door open/close | `openClips`, `closeClips` |
+| `RoomTransitionSfx` | Blink transition start, room switch, transition finish | `toTreatmentCloseClip`, `toTreatmentSwitchClip`, `toTreatmentOpenClip`, `toCounterCloseClip`, `toCounterSwitchClip`, `toCounterOpenClip` |
+| `Candle` | Refill reaches full, flickering state, extinguished state | `refillCompleteClip`, `flickerClip`, `extinguishedClip` |
+| `KnifeMiniGame` | Knife grab, Tongs grab inside Knife, slice start, pull start, mini game complete | `knifeGrabClip`, `tongsGrabClip`, `sliceStartClip`, `pullStartClip`, `completeClip` |
+| `TongsMiniGame` | Tongs grab, parasite grab/start pull, parasite extracted, mini game complete | `tongsGrabClip`, `parasiteGrabClip`, `parasiteExtractedClip`, `completeClip` |
+| `GameResolutionController` | Game win, game lose | `winClip`, `loseClip` |
+
+Next Unity setup step:
+- Add/confirm `AudioSource` components on the objects that own these scripts, or assign an always-active scene SFX source.
+- Drag the listed audio assets into the matching clip fields.
+- For mini game complete clips, prefer an always-active SFX source if the clip must continue after the mini game root hides.
+
 ## Available / Listed Audio
 
 ### Door
