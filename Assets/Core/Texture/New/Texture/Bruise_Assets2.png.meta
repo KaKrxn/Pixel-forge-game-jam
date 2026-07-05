@@ -1,0 +1,832 @@
+fileFormatVersion: 2
+guid: 45bdc67f672d341409395a7ddfaa951e
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8559518893335834779
+    second: Bruise_Assets2_0
+  - first:
+      213: 9141786775293119205
+    second: Bruise_Assets2_1
+  - first:
+      213: -97427870807405159
+    second: Bruise_Assets2_2
+  - first:
+      213: -8242271910548735969
+    second: Bruise_Assets2_3
+  - first:
+      213: 4297001355319290720
+    second: Bruise_Assets2_4
+  - first:
+      213: 6174381677972743389
+    second: Bruise_Assets2_5
+  - first:
+      213: 5867493705407901529
+    second: Bruise_Assets2_6
+  - first:
+      213: 4756171769701225933
+    second: Bruise_Assets2_7
+  - first:
+      213: 6087442655284188990
+    second: Bruise_Assets2_8
+  - first:
+      213: 6275054061443760081
+    second: Bruise_Assets2_9
+  - first:
+      213: -9120575184931782384
+    second: Bruise_Assets2_10
+  - first:
+      213: 705282203302938063
+    second: Bruise_Assets2_11
+  - first:
+      213: -6785051843021736775
+    second: Bruise_Assets2_12
+  - first:
+      213: -4682181183880013919
+    second: Bruise_Assets2_13
+  - first:
+      213: 2849310534978019586
+    second: Bruise_Assets2_14
+  - first:
+      213: 4490315177448155595
+    second: Bruise_Assets2_15
+  - first:
+      213: -6094799787148954922
+    second: Bruise_Assets2_16
+  - first:
+      213: -8309069099765189413
+    second: Bruise_Assets2_17
+  - first:
+      213: 8262510707382286748
+    second: Bruise_Assets2_18
+  - first:
+      213: 5421485813728089613
+    second: Bruise_Assets2_19
+  - first:
+      213: 3510524040041799146
+    second: Bruise_Assets2_20
+  - first:
+      213: -4713030283383727054
+    second: Bruise_Assets2_21
+  - first:
+      213: -1454988776148239887
+    second: Bruise_Assets2_22
+  - first:
+      213: 8216075579648336331
+    second: Bruise_Assets2_23
+  - first:
+      213: -701672478665134307
+    second: Bruise_Assets2_24
+  - first:
+      213: 2601470621989273981
+    second: Bruise_Assets2_25
+  - first:
+      213: 998857807411958208
+    second: Bruise_Assets2_26
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Bruise_Assets2_0
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 239
+        width: 27
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56f0972baea763980800000000000000
+      internalID: -8559518893335834779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_1
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 239
+        width: 24
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5eac5b903a62ede70800000000000000
+      internalID: 9141786775293119205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_2
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 240
+        width: 19
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99d4d412eddd5aef0800000000000000
+      internalID: -97427870807405159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_3
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 239
+        width: 48
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f18ff85ed519d9d80800000000000000
+      internalID: -8242271910548735969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_4
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 239
+        width: 45
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06bad2757f302ab30800000000000000
+      internalID: 4297001355319290720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_5
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 241
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd4ee3f3c6fcfa550800000000000000
+      internalID: 6174381677972743389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_6
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 192
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95fada010768d6150800000000000000
+      internalID: 5867493705407901529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_7
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 193
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc558c77601510240800000000000000
+      internalID: 4756171769701225933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_8
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 193
+        width: 47
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3756c2a7d0fa7450800000000000000
+      internalID: 6087442655284188990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_9
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 144
+        width: 46
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1df3ab61c68751750800000000000000
+      internalID: 6275054061443760081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_10
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 144
+        width: 9
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01106e231353d6180800000000000000
+      internalID: -9120575184931782384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_11
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 145
+        width: 11
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc5c64a5d6aa9c900800000000000000
+      internalID: 705282203302938063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_12
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 145
+        width: 37
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b4741a2c47a6d1a0800000000000000
+      internalID: -6785051843021736775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_13
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 156
+        width: 61
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a750d0450d850fb0800000000000000
+      internalID: -4682181183880013919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_14
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 174
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 201a424d5d8ca8720800000000000000
+      internalID: 2849310534978019586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_15
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 169
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc9a759fcddc05e30800000000000000
+      internalID: 4490315177448155595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_16
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 160
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d23cdd92ebea6ba0800000000000000
+      internalID: -6094799787148954922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_17
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 165
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd432565da140bc80800000000000000
+      internalID: -8309069099765189413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_18
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 112
+        width: 58
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c99f16236b55aa270800000000000000
+      internalID: 8262510707382286748
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_19
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 147
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0615129f9cfc3b40800000000000000
+      internalID: 5421485813728089613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_20
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 98
+        width: 73
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aed192ec303e7b030800000000000000
+      internalID: 3510524040041799146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_21
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 50
+        width: 58
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23c114f8de3f79eb0800000000000000
+      internalID: -4713030283383727054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_22
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 50
+        width: 58
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f9f08dba67decbe0800000000000000
+      internalID: -1454988776148239887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_23
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 50
+        width: 58
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc163b4853d550270800000000000000
+      internalID: 8216075579648336331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_24
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 51
+        width: 73
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1f2f7829982346f0800000000000000
+      internalID: -701672478665134307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_25
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 8
+        width: 73
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d71094d5fb74a1420800000000000000
+      internalID: 2601470621989273981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bruise_Assets2_26
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 7
+        width: 73
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c15ae732e7acdd00800000000000000
+      internalID: 998857807411958208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Bruise_Assets2_0: -8559518893335834779
+      Bruise_Assets2_1: 9141786775293119205
+      Bruise_Assets2_10: -9120575184931782384
+      Bruise_Assets2_11: 705282203302938063
+      Bruise_Assets2_12: -6785051843021736775
+      Bruise_Assets2_13: -4682181183880013919
+      Bruise_Assets2_14: 2849310534978019586
+      Bruise_Assets2_15: 4490315177448155595
+      Bruise_Assets2_16: -6094799787148954922
+      Bruise_Assets2_17: -8309069099765189413
+      Bruise_Assets2_18: 8262510707382286748
+      Bruise_Assets2_19: 5421485813728089613
+      Bruise_Assets2_2: -97427870807405159
+      Bruise_Assets2_20: 3510524040041799146
+      Bruise_Assets2_21: -4713030283383727054
+      Bruise_Assets2_22: -1454988776148239887
+      Bruise_Assets2_23: 8216075579648336331
+      Bruise_Assets2_24: -701672478665134307
+      Bruise_Assets2_25: 2601470621989273981
+      Bruise_Assets2_26: 998857807411958208
+      Bruise_Assets2_3: -8242271910548735969
+      Bruise_Assets2_4: 4297001355319290720
+      Bruise_Assets2_5: 6174381677972743389
+      Bruise_Assets2_6: 5867493705407901529
+      Bruise_Assets2_7: 4756171769701225933
+      Bruise_Assets2_8: 6087442655284188990
+      Bruise_Assets2_9: 6275054061443760081
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
