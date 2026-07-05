@@ -270,6 +270,8 @@ public sealed class MiniGameOverlay : MonoBehaviour
         {
             painSlider.value = pain;
         }
+
+        TreatmentFeedback.PushPain(pain);
     }
 
     public void SetCompleteVisible(bool visible)

@@ -105,6 +105,10 @@ public sealed class Sanity : MonoBehaviour
     public void AddSanity(float amount)
     {
         ChangeSanity(amount);
+
+        // Explicit sanity adds come from treatment mistakes (pain spike, stray/edge). Passive rise goes
+        // through Tick/ChangeSanity, so this only fires "hurt" feedback on real mistakes.
+        TreatmentFeedback.PushHurt(amount);
     }
 
     private float GetCandlePressureRate()

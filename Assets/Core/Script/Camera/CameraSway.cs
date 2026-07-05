@@ -7,6 +7,7 @@ public sealed class CameraSway : MonoBehaviour
     [SerializeField] private Vector2 frequency = new Vector2(0.35f, 0.27f);
     [SerializeField] private bool snapToPixelGrid = true;
     [SerializeField] private float pixelsPerUnit = 16f;
+    [SerializeField] private CameraShake cameraShake;
 
     private Vector3 basePosition;
 
@@ -29,7 +30,8 @@ public sealed class CameraSway : MonoBehaviour
 
         float x = Mathf.Sin(Time.time * Mathf.PI * 2f * frequency.x) * amplitude.x;
         float y = Mathf.Sin(Time.time * Mathf.PI * 2f * frequency.y) * amplitude.y;
-        Vector3 nextPosition = basePosition + new Vector3(x, y, 0f);
+        Vector3 shakeOffset = cameraShake != null ? cameraShake.CurrentOffset : Vector3.zero;
+        Vector3 nextPosition = basePosition + new Vector3(x, y, 0f) + shakeOffset;
         nextPosition.z = basePosition.z;
 
         target.position = snapToPixelGrid ? Snap(nextPosition) : nextPosition;
