@@ -353,7 +353,6 @@ MonoBehaviour:
   painSpikeAmount: 25
   jitterStrength: 0
   jitterFrequency: 2
-  jitterAffectsSliceCheck: 0
   pullPerSecond: 0.5
   pullPainPerSecond: 0.22
   hideWhenCompleted: 1

@@ -176,7 +176,7 @@ public sealed class Pustule : MonoBehaviour
         float frequency = Mathf.Max(0.01f, jitterFrequency);
         float noiseX = Mathf.PerlinNoise((Time.time + jitterSeed) * frequency, jitterSeed);
         float noiseY = Mathf.PerlinNoise(jitterSeed, (Time.time + jitterSeed) * frequency);
-        Vector2 jitter = new Vector2(noiseX - 0.5f, noiseY - 0.5f) * (2f * jitterStrength);
+        Vector2 jitter = new Vector2(noiseX - 0.5f, noiseY - 0.5f) * (2f * jitterStrength * Mathf.Lerp(1f, 2f, painLevel));
         return pointerWorldPosition + jitter;
     }
 

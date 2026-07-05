@@ -23,7 +23,6 @@ public sealed class Lesion : MonoBehaviour
     [SerializeField, Min(0f)] private float painSpikeAmount = 25f;
     [SerializeField, Min(0f)] private float jitterStrength;
     [SerializeField, Min(0f)] private float jitterFrequency = 2f;
-    [SerializeField] private bool jitterAffectsSliceCheck;
     [SerializeField, Min(0f)] private float pullPerSecond = 0.5f;
     [SerializeField, Min(0f)] private float pullPainPerSecond = 0.22f;
     [SerializeField] private bool hideWhenCompleted = true;
@@ -150,7 +149,7 @@ public sealed class Lesion : MonoBehaviour
             return;
         }
 
-        Vector2 knifeTip = jitterAffectsSliceCheck ? ApplySliceJitter(pointerWorldPosition) : pointerWorldPosition;
+        Vector2 knifeTip = ApplySliceJitter(pointerWorldPosition);
         currentKnifeTip = knifeTip;
 
         if (!sliceStarted)
@@ -215,7 +214,7 @@ public sealed class Lesion : MonoBehaviour
         float frequency = Mathf.Max(0.01f, jitterFrequency);
         float noiseX = Mathf.PerlinNoise((Time.time + jitterSeed) * frequency, jitterSeed);
         float noiseY = Mathf.PerlinNoise(jitterSeed, (Time.time + jitterSeed) * frequency);
-        Vector2 jitter = new Vector2(noiseX - 0.5f, noiseY - 0.5f) * (2f * jitterStrength);
+        Vector2 jitter = new Vector2(noiseX - 0.5f, noiseY - 0.5f) * (2f * jitterStrength * Mathf.Lerp(1f, 2f, painLevel));
         return pointerWorldPosition + jitter;
     }
 

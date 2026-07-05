@@ -8,19 +8,27 @@ public sealed class RoomLightController : MonoBehaviour
     [SerializeField] private Light2D[] globalLights;
     [SerializeField] private Light2D[] candlePointLights;
     [SerializeField] private Graphic darknessOverlay;
+    [Tooltip("Multiplier (0..1) applied to each light's authored intensity, keyed by candle light (0..1). At 1 it keeps the intensity you set in the Inspector.")]
     [SerializeField] private AnimationCurve globalIntensityByLight = AnimationCurve.Linear(0f, 0.1f, 1f, 1f);
-    [SerializeField] private AnimationCurve pointIntensityByLight = AnimationCurve.Linear(0f, 0f, 1f, 1.2f);
+    [SerializeField] private AnimationCurve pointIntensityByLight = AnimationCurve.Linear(0f, 0f, 1f, 1f);
     [SerializeField] private AnimationCurve overlayAlphaByLight = AnimationCurve.Linear(0f, 0.8f, 1f, 0f);
     [SerializeField, Min(0f)] private float smoothingSpeed = 8f;
     [SerializeField] private bool enableFlicker = true;
     [SerializeField, Min(0f)] private float flickerAmplitude = 0.12f;
     [SerializeField, Min(0f)] private float flickerSpeed = 18f;
     [SerializeField, Min(0f)] private float overlayFlickerAmount = 0.05f;
+    [Header("Setup")]
+    [Tooltip("If the candle point-light array is empty, auto-collect Light2D found under the Candle's children.")]
+    [SerializeField] private bool autoCollectCandleChildLights = true;
+    [SerializeField] private bool warnWhenNoLights = true;
 
     private float targetGlobalIntensity = 1f;
     private float targetPointIntensity = 1f;
     private float targetOverlayAlpha;
     private CandleLightState currentState = CandleLightState.Bright;
+    private bool referencesResolved;
+    private float[] globalBaseIntensities;
+    private float[] candlePointBaseIntensities;
 
     private void Awake()
     {
@@ -48,12 +56,12 @@ public sealed class RoomLightController : MonoBehaviour
         float smoothing = smoothingSpeed <= 0f ? 1f : 1f - Mathf.Exp(-smoothingSpeed * deltaTime);
         float flicker = GetFlickerOffset();
 
-        float globalIntensity = Mathf.Max(0f, targetGlobalIntensity);
-        float pointIntensity = Mathf.Max(0f, targetPointIntensity + flicker);
+        float globalMultiplier = Mathf.Max(0f, targetGlobalIntensity);
+        float pointMultiplier = Mathf.Max(0f, targetPointIntensity + flicker);
         float overlayAlpha = Mathf.Clamp01(targetOverlayAlpha - flicker * overlayFlickerAmount);
 
-        ApplyLightIntensity(globalLights, globalIntensity, smoothing);
-        ApplyLightIntensity(candlePointLights, pointIntensity, smoothing);
+        ApplyLightMultiplier(globalLights, globalBaseIntensities, globalMultiplier, smoothing);
+        ApplyLightMultiplier(candlePointLights, candlePointBaseIntensities, pointMultiplier, smoothing);
         ApplyOverlayAlpha(overlayAlpha, smoothing);
     }
 
@@ -85,8 +93,8 @@ public sealed class RoomLightController : MonoBehaviour
 
     private void ApplyInstant()
     {
-        ApplyLightIntensity(globalLights, targetGlobalIntensity, 1f);
-        ApplyLightIntensity(candlePointLights, targetPointIntensity, 1f);
+        ApplyLightMultiplier(globalLights, globalBaseIntensities, targetGlobalIntensity, 1f);
+        ApplyLightMultiplier(candlePointLights, candlePointBaseIntensities, targetPointIntensity, 1f);
         ApplyOverlayAlpha(targetOverlayAlpha, 1f);
     }
 
@@ -101,7 +109,7 @@ public sealed class RoomLightController : MonoBehaviour
         return noise * flickerAmplitude;
     }
 
-    private static void ApplyLightIntensity(Light2D[] lights, float targetIntensity, float smoothing)
+    private static void ApplyLightMultiplier(Light2D[] lights, float[] baseIntensities, float multiplier, float smoothing)
     {
         if (lights == null)
         {
@@ -115,7 +123,11 @@ public sealed class RoomLightController : MonoBehaviour
                 continue;
             }
 
-            lights[i].intensity = Mathf.Lerp(lights[i].intensity, targetIntensity, smoothing);
+            float baseIntensity = baseIntensities != null && i < baseIntensities.Length
+                ? baseIntensities[i]
+                : lights[i].intensity;
+            float target = baseIntensity * multiplier;
+            lights[i].intensity = Mathf.Lerp(lights[i].intensity, target, smoothing);
         }
     }
 
@@ -161,6 +173,57 @@ public sealed class RoomLightController : MonoBehaviour
         {
             candle = FindFirstObjectByType<Candle>();
         }
+
+        if (autoCollectCandleChildLights && (candlePointLights == null || candlePointLights.Length == 0) && candle != null)
+        {
+            candlePointLights = candle.GetComponentsInChildren<Light2D>(true);
+        }
+
+        if (referencesResolved)
+        {
+            return;
+        }
+
+        referencesResolved = true;
+        CaptureBaseIntensities();
+
+        if (warnWhenNoLights && !HasAnyLight())
+        {
+            Debug.LogWarning(
+                "[RoomLightController] No Light2D references assigned (globalLights and candlePointLights are both empty). " +
+                "The candle value will not drive any light. Assign the room/candle Light2D in the Inspector.",
+                this);
+        }
+    }
+
+    private void CaptureBaseIntensities()
+    {
+        // Snapshot the intensity you authored in the Inspector so the candle scales from it
+        // (intensity = authoredIntensity * multiplier) instead of overwriting it.
+        globalBaseIntensities = BuildBaseIntensityArray(globalLights);
+        candlePointBaseIntensities = BuildBaseIntensityArray(candlePointLights);
+    }
+
+    private static float[] BuildBaseIntensityArray(Light2D[] lights)
+    {
+        if (lights == null || lights.Length == 0)
+        {
+            return System.Array.Empty<float>();
+        }
+
+        float[] bases = new float[lights.Length];
+        for (int i = 0; i < lights.Length; i++)
+        {
+            bases[i] = lights[i] != null ? lights[i].intensity : 0f;
+        }
+
+        return bases;
+    }
+
+    private bool HasAnyLight()
+    {
+        return (globalLights != null && globalLights.Length > 0)
+            || (candlePointLights != null && candlePointLights.Length > 0);
     }
 
     private static float EvaluateCurve(AnimationCurve curve, float time, float fallback)

@@ -32,6 +32,7 @@ public sealed class Parasite : MonoBehaviour
     private Vector2 holdStartPointerPosition;
     private float jitterSeed;
     private float currentTipX;
+    private float currentJitterOffset;
     private Vector3 visualBaseLocalPosition;
     private Quaternion visualBaseLocalRotation;
     private bool hasVisualBasePosition;
@@ -242,19 +243,22 @@ public sealed class Parasite : MonoBehaviour
     {
         edgeContact = false;
 
-        if (!edgeContactEnabled || type == null)
-        {
-            UpdateVisualState();
-            return;
-        }
-
-        float jitterOffset = 0f;
-        if (jitterEnabled && type.JitterStrength > 0f)
+        // Compute the jitter offset whenever the type defines a strength, so the tool visibly sways
+        // (applied to the visual in UpdatePullVisual) even if edge-contact penalties are off.
+        // Jitter grows with pain: more pain -> more sway.
+        currentJitterOffset = 0f;
+        if (type != null && type.JitterStrength > 0f)
         {
             float frequency = Mathf.Max(0.01f, type.JitterFrequency);
             float noise = Mathf.PerlinNoise((Time.time + jitterSeed) * frequency, jitterSeed);
             float scaledJitterStrength = type.JitterStrength * Mathf.Lerp(1f, 2f, painLevel);
-            jitterOffset = (noise - 0.5f) * 2f * scaledJitterStrength;
+            currentJitterOffset = (noise - 0.5f) * 2f * scaledJitterStrength;
+        }
+
+        if (!edgeContactEnabled || type == null)
+        {
+            UpdateVisualState();
+            return;
         }
 
         float channelCenterX = holdStartPointerPosition.x + channelCenterOffset;
@@ -263,7 +267,8 @@ public sealed class Parasite : MonoBehaviour
             channelCenterX += RequiredDirection * type.ChannelHalfWidth * 0.35f;
         }
 
-        currentTipX = pointerPosition.x + jitterOffset;
+        float edgeJitter = jitterEnabled ? currentJitterOffset : 0f;
+        currentTipX = pointerPosition.x + edgeJitter;
         float offset = Mathf.Abs(currentTipX - channelCenterX);
         edgeContact = offset > type.ChannelHalfWidth;
 
@@ -425,6 +430,7 @@ public sealed class Parasite : MonoBehaviour
         float maxDistance = maxVisualFollowDistance > 0f ? maxVisualFollowDistance : type.RequiredDistance;
         Vector2 followOffset = new Vector2(worldOffset.x, 0f);
         Vector2 clampedOffset = Vector2.ClampMagnitude(followOffset * visualFollowStrength, maxDistance);
+        clampedOffset.x += currentJitterOffset; // visible tool sway (Perlin jitter, grows with pain)
         Vector3 localOffset = transform.InverseTransformVector(new Vector3(clampedOffset.x, clampedOffset.y, 0f));
         // Only apply the lateral (X) follow + tilt. Preserve the vertical position so the upward
         // "emerge from the wound" driven by ParasiteReveal.SetProgress is not overwritten each frame.
