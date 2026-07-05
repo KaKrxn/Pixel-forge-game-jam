@@ -3760,7 +3760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3b470a5f9044ae5938ec3ef0d0e21ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerQueueBuilder
-  fixedStarter: {fileID: 11400000, guid: a1461b63d5bb2584289adcf6bdeb16c5, type: 2}
+  fixedStarter: {fileID: 11400000, guid: a69926e971c573d47ac66235b2a88701, type: 2}
   customerPool:
   - {fileID: 11400000, guid: a69926e971c573d47ac66235b2a88701, type: 2}
   - {fileID: 11400000, guid: 6f83c755a6f562a47b2efb6b80ca6392, type: 2}
