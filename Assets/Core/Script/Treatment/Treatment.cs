@@ -15,6 +15,7 @@ public sealed class Treatment : MonoBehaviour
     [SerializeField] private AnatomyController anatomyController;
     [SerializeField] private TongsMiniGame tongsMiniGame;
     [SerializeField] private TreatmentPatientPresenter patientPresenter;
+    [SerializeField] private TreatmentTopHud topHud;
     [Header("Debug")]
     [SerializeField] private bool debugTreatmentFlow = true;
 
@@ -23,6 +24,8 @@ public sealed class Treatment : MonoBehaviour
 
     private void Awake()
     {
+        ResolveSceneReferences();
+
         if (completeButton != null)
         {
             completeButton.onClick.RemoveListener(CompleteTreatmentCase);
@@ -41,6 +44,7 @@ public sealed class Treatment : MonoBehaviour
             resumeButton.onClick.AddListener(ResumeTreatment);
         }
 
+        topHud?.Clear();
         Hide();
     }
 
@@ -85,14 +89,18 @@ public sealed class Treatment : MonoBehaviour
             roomTransition.ShowTreatmentRoom(() =>
             {
                 Show();
+                topHud?.Bind(activeCustomer);
                 RefreshText();
+                RefreshTopHudVisualState();
                 BeginTreatmentContent();
             });
             return;
         }
 
         Show();
+        topHud?.Bind(activeCustomer);
         RefreshText();
+        RefreshTopHudVisualState();
         BeginTreatmentContent();
     }
 
@@ -124,6 +132,7 @@ public sealed class Treatment : MonoBehaviour
         flow?.SetTreatmentStress(false);
         tongsMiniGame?.Pause();
         anatomyController?.PauseForCounter();
+        topHud?.SetVisible(false);
         Hide();
 
         if (roomTransition != null)
@@ -133,6 +142,7 @@ public sealed class Treatment : MonoBehaviour
                 flow?.SetCandleAtCounter(true);
                 Show();
                 RefreshText();
+                RefreshTopHudVisualState();
             });
             return;
         }
@@ -154,14 +164,18 @@ public sealed class Treatment : MonoBehaviour
             roomTransition.ShowTreatmentRoom(() =>
             {
                 Show();
+                topHud?.SetVisible(activeCustomer != null);
                 RefreshText();
+                RefreshTopHudVisualState();
                 ResumeTreatmentContent();
             });
             return;
         }
 
         Show();
+        topHud?.SetVisible(activeCustomer != null);
         RefreshText();
+        RefreshTopHudVisualState();
         ResumeTreatmentContent();
     }
 
@@ -172,6 +186,7 @@ public sealed class Treatment : MonoBehaviour
         flow?.SetCandleAtCounter(false);
         anatomyController?.Stop();
         tongsMiniGame?.Stop();
+        topHud?.Clear();
         Hide();
         patientPresenter?.ReturnToCounterForExit(activeCustomer);
         flow?.CompleteTreatment(activeCustomer);
@@ -248,6 +263,22 @@ public sealed class Treatment : MonoBehaviour
         if (resumeButton != null)
         {
             resumeButton.gameObject.SetActive(isAtCounter);
+        }
+
+        RefreshTopHudVisualState();
+    }
+
+    private void RefreshTopHudVisualState()
+    {
+        bool showCharacterVisual = !isAtCounter && anatomyController != null && anatomyController.IsInsidePart;
+        topHud?.SetCharacterVisualVisible(showCharacterVisual);
+    }
+
+    private void ResolveSceneReferences()
+    {
+        if (topHud == null)
+        {
+            topHud = FindFirstObjectByType<TreatmentTopHud>(FindObjectsInactive.Include);
         }
     }
 
