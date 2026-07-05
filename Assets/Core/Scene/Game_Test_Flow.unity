@@ -3343,6 +3343,14 @@ MonoBehaviour:
   closedEyeHoldDuration: 0.2
   openEyeDuration: 0.22
   useUnscaledTime: 1
+  sfxSource: {fileID: 0}
+  toTreatmentCloseClip: {fileID: 8300000, guid: b7ec55c0517ccda46b21a97705815c6d, type: 3}
+  toTreatmentSwitchClip: {fileID: 8300000, guid: b7ec55c0517ccda46b21a97705815c6d, type: 3}
+  toTreatmentOpenClip: {fileID: 8300000, guid: 669cd3eccb770a54d9f88da3cd84df9c, type: 3}
+  toCounterCloseClip: {fileID: 8300000, guid: d7c2e3ab3eab4634999e3f305fc72154, type: 3}
+  toCounterSwitchClip: {fileID: 8300000, guid: d7c2e3ab3eab4634999e3f305fc72154, type: 3}
+  toCounterOpenClip: {fileID: 8300000, guid: 669cd3eccb770a54d9f88da3cd84df9c, type: 3}
+  sfxVolume: 1
 --- !u!114 &491569617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3380,6 +3388,10 @@ MonoBehaviour:
   resultPanel: {fileID: 563180589}
   pauseTimeOnResolution: 1
   defaultGameOverReason: 1
+  sfxSource: {fileID: 0}
+  winClip: {fileID: 8300000, guid: aa47380846928a14c8701e08bfb12c50, type: 3}
+  loseClip: {fileID: 8300000, guid: e546b5e4d3049c44f802bab90ea100a0, type: 3}
+  sfxVolume: 1
 --- !u!114 &491569619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5280,6 +5292,12 @@ MonoBehaviour:
   fallbackHitRadius: 0.45
   overlay: {fileID: 582104043}
   overlayToolId: Tongs
+  sfxSource: {fileID: 0}
+  tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
+  parasiteGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
+  parasiteExtractedClip: {fileID: 8300000, guid: 292553559f711714f9e9b35379b94836, type: 3}
+  completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
+  sfxVolume: 1
   aggressionController: {fileID: 0}
   requireTongsEquipped: 1
   autoFindParasitesInChildren: 1
@@ -5954,6 +5972,11 @@ MonoBehaviour:
   lowLightThreshold: 30
   flickeringThreshold: 10
   drainOnPlay: 1
+  sfxSource: {fileID: 0}
+  refillCompleteClip: {fileID: 8300000, guid: 6c2dcc343c55bc04c80ed03c2514598b, type: 3}
+  flickerClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
+  extinguishedClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
+  sfxVolume: 1
   refillHitArea: {fileID: 684896823}
 --- !u!95 &684896822
 Animator:
@@ -7682,8 +7705,10 @@ MonoBehaviour:
   closedVisual: {fileID: 1391398453}
   startClosed: 1
   sfxSource: {fileID: 0}
-  openClips: []
-  closeClips: []
+  openClips:
+  - {fileID: 8300000, guid: 669cd3eccb770a54d9f88da3cd84df9c, type: 3}
+  closeClips:
+  - {fileID: 8300000, guid: 9a22b1650ca9a2d4bab6212fc82b359b, type: 3}
   volume: 1
   randomPitchRange: {x: 0.95, y: 1.05}
   playOnlyOnStateChanged: 1
@@ -8913,6 +8938,12 @@ MonoBehaviour:
   fallbackHitRadius: 0.45
   overlay: {fileID: 582104043}
   overlayToolId: Tongs
+  sfxSource: {fileID: 0}
+  tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
+  parasiteGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
+  parasiteExtractedClip: {fileID: 8300000, guid: 292553559f711714f9e9b35379b94836, type: 3}
+  completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
+  sfxVolume: 1
   aggressionController: {fileID: 0}
   requireTongsEquipped: 1
   autoFindParasitesInChildren: 1
@@ -9633,6 +9664,13 @@ MonoBehaviour:
   overlay: {fileID: 582104043}
   overlayToolId: Knife
   pullToolId: Tongs
+  sfxSource: {fileID: 0}
+  knifeGrabClip: {fileID: 8300000, guid: 92077094584ba2543860a20a14955f72, type: 3}
+  tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
+  sliceStartClip: {fileID: 8300000, guid: 3ae30c5c0843d224caf410eb81427a22, type: 3}
+  pullStartClip: {fileID: 8300000, guid: e84d1becbfc6a9f42bf8431ab16ced60, type: 3}
+  completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
+  sfxVolume: 1
   aggressionController: {fileID: 0}
   autoCompleteWhenAllLesionsDone: 1
   startHidden: 1

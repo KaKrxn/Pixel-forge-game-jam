@@ -14,6 +14,15 @@ public sealed class RoomTransition : MonoBehaviour
     [SerializeField] private float closedEyeHoldDuration = 0.08f;
     [SerializeField] private float openEyeDuration = 0.22f;
     [SerializeField] private bool useUnscaledTime = true;
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip toTreatmentCloseClip;
+    [SerializeField] private AudioClip toTreatmentSwitchClip;
+    [SerializeField] private AudioClip toTreatmentOpenClip;
+    [SerializeField] private AudioClip toCounterCloseClip;
+    [SerializeField] private AudioClip toCounterSwitchClip;
+    [SerializeField] private AudioClip toCounterOpenClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
 
     public bool IsInTreatmentRoom { get; private set; }
 
@@ -28,6 +37,11 @@ public sealed class RoomTransition : MonoBehaviour
         if (targetCamera == null)
         {
             targetCamera = Camera.main;
+        }
+
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
         }
 
         SetFade(0f, blocksRaycasts: false);
@@ -62,9 +76,12 @@ public sealed class RoomTransition : MonoBehaviour
 
         if (!isActiveAndEnabled || fadeCanvasGroup == null)
         {
+            PlayTransitionStartedSfx(direction);
             TransitionStarted?.Invoke(direction);
             ApplyImmediate(counterRoomVisible, cameraPosition);
+            PlayRoomSwitchedSfx(direction);
             RoomSwitched?.Invoke(direction);
+            PlayTransitionFinishedSfx(direction);
             TransitionFinished?.Invoke(direction);
             completed?.Invoke();
             return;
@@ -80,11 +97,13 @@ public sealed class RoomTransition : MonoBehaviour
 
     private IEnumerator BlinkTransition(bool counterRoomVisible, Vector3 cameraPosition, RoomTransitionDirection direction, Action completed)
     {
+        PlayTransitionStartedSfx(direction);
         TransitionStarted?.Invoke(direction);
         SetFade(0f, blocksRaycasts: true);
         yield return Fade(0f, 1f, closeEyeDuration);
 
         ApplyImmediate(counterRoomVisible, cameraPosition);
+        PlayRoomSwitchedSfx(direction);
         RoomSwitched?.Invoke(direction);
 
         if (closedEyeHoldDuration > 0f)
@@ -95,6 +114,7 @@ public sealed class RoomTransition : MonoBehaviour
         yield return Fade(1f, 0f, openEyeDuration);
         SetFade(0f, blocksRaycasts: false);
         transitionRoutine = null;
+        PlayTransitionFinishedSfx(direction);
         TransitionFinished?.Invoke(direction);
         completed?.Invoke();
     }
@@ -182,5 +202,36 @@ public sealed class RoomTransition : MonoBehaviour
         fadeCanvasGroup.blocksRaycasts = blocksRaycasts;
         fadeCanvasGroup.interactable = false;
         fadeCanvasGroup.gameObject.SetActive(alpha > 0f || blocksRaycasts);
+    }
+
+    private void PlayTransitionStartedSfx(RoomTransitionDirection direction)
+    {
+        PlaySfx(direction == RoomTransitionDirection.ToTreatment ? toTreatmentCloseClip : toCounterCloseClip);
+    }
+
+    private void PlayRoomSwitchedSfx(RoomTransitionDirection direction)
+    {
+        PlaySfx(direction == RoomTransitionDirection.ToTreatment ? toTreatmentSwitchClip : toCounterSwitchClip);
+    }
+
+    private void PlayTransitionFinishedSfx(RoomTransitionDirection direction)
+    {
+        PlaySfx(direction == RoomTransitionDirection.ToTreatment ? toTreatmentOpenClip : toCounterOpenClip);
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        if (sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position, sfxVolume);
     }
 }

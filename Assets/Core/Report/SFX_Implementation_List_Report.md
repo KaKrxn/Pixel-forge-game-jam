@@ -27,9 +27,9 @@ Code hooks now exist for the first SFX pass. These hooks expose serialized `Audi
 | `GameResolutionController` | Game win, game lose | `winClip`, `loseClip` |
 
 Next Unity setup step:
-- Add/confirm `AudioSource` components on the objects that own these scripts, or assign an always-active scene SFX source.
-- Drag the listed audio assets into the matching clip fields.
-- For mini game complete clips, prefer an always-active SFX source if the clip must continue after the mini game root hides.
+- Clip references have been assigned in the active scenes / prefabs on the `codex/audio-sfx` branch.
+- `AudioSource` fields are intentionally allowed to stay empty. Runtime fallback uses `AudioSource.PlayClipAtPoint`, and customer footsteps create a runtime `AudioSource` when needed.
+- Unity still needs an editor open/play pass to confirm imported audio volume and loop behavior feel correct in-context.
 
 ## Available / Listed Audio
 

@@ -107,11 +107,17 @@ public sealed class GameResolutionController : MonoBehaviour
 
     private void PlaySfx(AudioClip clip)
     {
-        if (clip == null || sfxSource == null)
+        if (clip == null)
         {
             return;
         }
 
-        sfxSource.PlayOneShot(clip, sfxVolume);
+        if (sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position, sfxVolume);
     }
 }

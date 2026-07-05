@@ -80,19 +80,20 @@ public sealed class Door : MonoBehaviour
 
     private void PlayStateSound(bool open)
     {
-        if (sfxSource == null)
-        {
-            return;
-        }
-
         AudioClip clip = GetRandomClip(open ? openClips : closeClips);
         if (clip == null)
         {
             return;
         }
 
-        sfxSource.pitch = GetRandomPitch();
-        sfxSource.PlayOneShot(clip, volume);
+        if (sfxSource != null)
+        {
+            sfxSource.pitch = GetRandomPitch();
+            sfxSource.PlayOneShot(clip, volume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position, volume);
     }
 
     private AudioClip GetRandomClip(AudioClip[] clips)

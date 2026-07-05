@@ -259,6 +259,12 @@ public sealed class CustomerAgent : MonoBehaviour
     private void StartFootsteps()
     {
         ResolveFootstepSource();
+        if (footstepSource == null && footstepLoopClip != null)
+        {
+            footstepSource = gameObject.AddComponent<AudioSource>();
+            footstepSource.playOnAwake = false;
+        }
+
         if (footstepSource == null || footstepLoopClip == null)
         {
             return;

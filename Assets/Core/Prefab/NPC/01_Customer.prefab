@@ -181,6 +181,9 @@ MonoBehaviour:
   bubble: {fileID: 7985754499085701208}
   customerLayer: {fileID: 1831335163454106368}
   door: {fileID: 0}
+  footstepSource: {fileID: 0}
+  footstepLoopClip: {fileID: 8300000, guid: d7c2e3ab3eab4634999e3f305fc72154, type: 3}
+  footstepVolume: 1
 --- !u!114 &1831335163454106368
 MonoBehaviour:
   m_ObjectHideFlags: 0

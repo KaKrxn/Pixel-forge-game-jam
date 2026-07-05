@@ -267,6 +267,13 @@ MonoBehaviour:
   overlay: {fileID: 0}
   overlayToolId: Knife
   pullToolId: Tongs
+  sfxSource: {fileID: 0}
+  knifeGrabClip: {fileID: 8300000, guid: 92077094584ba2543860a20a14955f72, type: 3}
+  tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
+  sliceStartClip: {fileID: 8300000, guid: 3ae30c5c0843d224caf410eb81427a22, type: 3}
+  pullStartClip: {fileID: 8300000, guid: e84d1becbfc6a9f42bf8431ab16ced60, type: 3}
+  completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
+  sfxVolume: 1
   autoCompleteWhenAllLesionsDone: 1
   startHidden: 1
   useUnscaledTime: 0
