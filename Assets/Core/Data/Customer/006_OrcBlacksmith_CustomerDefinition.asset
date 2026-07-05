@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
   customerId: 006
   displayName: OrcBlacksmith
-  customerPrefab: {fileID: 0}
+  customerPrefab: {fileID: 7124140612516472824, guid: cdf363ea32b26a349ae1aafba02140a5, type: 3}
   caseData: {fileID: 11400000, guid: f6e805701d5b30942a7472bb27f7d969, type: 2}

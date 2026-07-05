@@ -3408,7 +3408,7 @@ MonoBehaviour:
   treatmentPatientPoint: {fileID: 349918622}
   matchPointRotation: 0
   anatomyController: {fileID: 1045452156}
-  treatmentScale: {x: 2, y: 2, z: 1}
+  treatmentScale: {x: 3, y: 3, z: 1}
   shopScale: {x: 0, y: 0, z: 0}
   animateScale: 1
   scaleDuration: 0.35
@@ -5972,12 +5972,12 @@ MonoBehaviour:
   lowLightThreshold: 30
   flickeringThreshold: 10
   drainOnPlay: 1
+  refillHitArea: {fileID: 684896823}
   sfxSource: {fileID: 0}
   refillCompleteClip: {fileID: 8300000, guid: 6c2dcc343c55bc04c80ed03c2514598b, type: 3}
   flickerClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   extinguishedClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   sfxVolume: 1
-  refillHitArea: {fileID: 684896823}
 --- !u!95 &684896822
 Animator:
   serializedVersion: 7
