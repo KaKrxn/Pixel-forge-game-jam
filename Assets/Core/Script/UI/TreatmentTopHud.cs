@@ -331,6 +331,12 @@ public sealed class TreatmentTopHud : MonoBehaviour
 
     private Sprite ResolvePortrait()
     {
+        // Prefer the per-customer portrait from the case so each patient shows their own avatar.
+        if (caseData != null && caseData.CustomerPortrait != null)
+        {
+            return caseData.CustomerPortrait;
+        }
+
         if (characterVisualSprite != null)
         {
             return characterVisualSprite;

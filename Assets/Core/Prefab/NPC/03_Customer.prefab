@@ -186,6 +186,8 @@ MonoBehaviour:
   footstepSource: {fileID: 0}
   footstepLoopClip: {fileID: 8300000, guid: d7c2e3ab3eab4634999e3f305fc72154, type: 3}
   footstepVolume: 1
+  footstepStepDistance: 0.45
+  footstepMinInterval: 0.12
 --- !u!114 &1831335163454106368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -218,7 +220,7 @@ MonoBehaviour:
   candle: {fileID: 0}
   maxSanity: 100
   currentSanity: 0
-  candleProtectedIncreaseRate: 0.035
+  candleProtectedIncreaseRate: 0.15
   candleOutIncreaseRate: 5
   useCandleTierMultipliers: 1
   lowLightSanityMultiplier: 1.5

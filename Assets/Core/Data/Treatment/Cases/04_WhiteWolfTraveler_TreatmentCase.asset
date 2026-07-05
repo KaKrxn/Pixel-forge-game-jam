@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
   caseId: white_wolf_traveler
   customerDisplayName: White Wolf
+  customerPortrait: {fileID: 3566751390782418191, guid: 931d6037a1a92ea4ca6cd43d26994169, type: 3}
   dialogData: {fileID: 11400000, guid: 455bb223ef548054dab149468653aeaf, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments:
   - area: 0
     miniGameType: 1
-    designerNote:
+    designerNote: 
   - area: 1
     miniGameType: 2
-    designerNote:
+    designerNote: 
   - area: 2
     miniGameType: 3
-    designerNote:
+    designerNote: 

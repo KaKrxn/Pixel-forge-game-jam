@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
   caseId: goblin_laborer
   customerDisplayName: Goblin Laborer
+  customerPortrait: {fileID: -8645997495139284898, guid: c3dc38c9ca1d67241bc611e3eed45f2c, type: 3}
   dialogData: {fileID: 11400000, guid: bc43626513d32ee4392c7c2dd88f9d8a, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments:
   - area: 0
     miniGameType: 1
-    designerNote:
+    designerNote: 
   - area: 1
     miniGameType: 2
-    designerNote:
+    designerNote: 
   - area: 2
     miniGameType: 3
-    designerNote:
+    designerNote: 

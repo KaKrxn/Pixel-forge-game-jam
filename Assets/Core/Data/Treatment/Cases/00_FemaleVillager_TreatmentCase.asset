@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
   caseId: female_villager
   customerDisplayName: Female Villager
+  customerPortrait: {fileID: 6119323824255669847, guid: b41b5f497a9efb94c8feeb1b6cdeed67, type: 3}
   dialogData: {fileID: 11400000, guid: 1d1ed348225e3be4cb543ffea4510ceb, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments:

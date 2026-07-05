@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
   caseId: male_villager
   customerDisplayName: Male Villager
+  customerPortrait: {fileID: -6461544239557861515, guid: ddba06e6dae9b1b4bb2faf2d7e47a093, type: 3}
   dialogData: {fileID: 11400000, guid: 49854fec88e6eb44caf0e395cfb6906f, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments:
   - area: 0
     miniGameType: 1
-    designerNote:
+    designerNote: 
   - area: 1
     miniGameType: 2
-    designerNote:
+    designerNote: 
   - area: 2
     miniGameType: 3
-    designerNote:
+    designerNote: 

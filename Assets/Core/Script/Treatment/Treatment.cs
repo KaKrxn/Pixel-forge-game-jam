@@ -270,7 +270,8 @@ public sealed class Treatment : MonoBehaviour
 
     private void RefreshTopHudVisualState()
     {
-        bool showCharacterVisual = !isAtCounter && anatomyController != null && anatomyController.IsInsidePart;
+        // Show the patient avatar throughout treatment (anatomy select + mini game), hidden at the counter.
+        bool showCharacterVisual = !isAtCounter;
         topHud?.SetCharacterVisualVisible(showCharacterVisual);
     }
 

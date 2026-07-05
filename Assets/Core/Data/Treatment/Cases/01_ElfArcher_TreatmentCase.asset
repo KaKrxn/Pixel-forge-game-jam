@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TreatmentCaseData
   caseId: elf_archer
   customerDisplayName: Elf Archer
+  customerPortrait: {fileID: -8182822271710523226, guid: 4180e19e64cc1614cbd294564469c141, type: 3}
   dialogData: {fileID: 11400000, guid: 319d565802c5b1d4f8215cadeeb1f7b7, type: 2}
   aggressionProfile: {fileID: 0}
   requiredTreatments:
   - area: 0
     miniGameType: 1
-    designerNote:
+    designerNote: 
   - area: 1
     miniGameType: 2
-    designerNote:
+    designerNote: 
   - area: 2
     miniGameType: 3
-    designerNote:
+    designerNote: 
