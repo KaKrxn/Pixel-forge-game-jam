@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 1802289387597539757}
   - component: {fileID: 7391384537311868207}
   - component: {fileID: 5903917453684366965}
+  - component: {fileID: 4044776097391251873}
   m_Layer: 0
   m_Name: 00_Customer
   m_TagString: Untagged
@@ -180,6 +181,7 @@ MonoBehaviour:
   stopDistance: 0.05
   bubble: {fileID: 7985754499085701208}
   customerLayer: {fileID: 1831335163454106368}
+  customerVisual: {fileID: 0}
   door: {fileID: 0}
 --- !u!114 &1831335163454106368
 MonoBehaviour:
@@ -317,6 +319,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomerCaseProvider
   caseData: {fileID: 11400000, guid: 365859b421bf18542876071a085949c3, type: 2}
+--- !u!114 &4044776097391251873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133218870710452088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f42f01049a49144f83ec0475d71ad6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomerVisual
+  bodyRenderer: {fileID: 1802289387597539757}
+  animator: {fileID: 7391384537311868207}
+  sickSprite: {fileID: 6119323824255669847, guid: b41b5f497a9efb94c8feeb1b6cdeed67, type: 3}
+  sickController: {fileID: -6208808737424151783, guid: b41b5f497a9efb94c8feeb1b6cdeed67, type: 3}
+  curedSprite: {fileID: 2421538073284625629, guid: b645347f34e74d94e93c3d0b9092f531, type: 3}
+  curedController: {fileID: -8786419410531736142, guid: b645347f34e74d94e93c3d0b9092f531, type: 3}
+  curedEffectRoot: {fileID: 0}
+  applySickOnAwake: 1
 --- !u!1 &1315323063019188640
 GameObject:
   m_ObjectHideFlags: 0

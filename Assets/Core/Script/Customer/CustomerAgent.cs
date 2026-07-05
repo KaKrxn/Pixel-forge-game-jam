@@ -11,6 +11,7 @@ public sealed class CustomerAgent : MonoBehaviour
     [SerializeField] private float stopDistance = 0.05f;
     [SerializeField] private Bubble bubble;
     [SerializeField] private CustomerLayer customerLayer;
+    [SerializeField] private CustomerVisual customerVisual;
     [SerializeField] private Door door;
 
     private GameFlow flow;
@@ -97,6 +98,16 @@ public sealed class CustomerAgent : MonoBehaviour
     public void ConfigureDoor(Door nextDoor)
     {
         door = nextDoor;
+    }
+
+    public void MarkCured()
+    {
+        if (customerVisual == null)
+        {
+            customerVisual = GetComponent<CustomerVisual>();
+        }
+
+        customerVisual?.ShowCured();
     }
 
     public void BeginExit()
