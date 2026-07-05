@@ -16,4 +16,13 @@ MonoBehaviour:
   customerDisplayName: Young Elf Villager
   dialogData: {fileID: 11400000, guid: ae5dc865d8a585d44af5dad0f0f3557f, type: 2}
   aggressionProfile: {fileID: 0}
-  requiredTreatments: []
+  requiredTreatments:
+  - area: 0
+    miniGameType: 1
+    designerNote:
+  - area: 1
+    miniGameType: 2
+    designerNote:
+  - area: 2
+    miniGameType: 3
+    designerNote:

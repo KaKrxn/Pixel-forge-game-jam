@@ -16,4 +16,13 @@ MonoBehaviour:
   customerDisplayName: Elf Archer
   dialogData: {fileID: 11400000, guid: 319d565802c5b1d4f8215cadeeb1f7b7, type: 2}
   aggressionProfile: {fileID: 0}
-  requiredTreatments: []
+  requiredTreatments:
+  - area: 0
+    miniGameType: 1
+    designerNote:
+  - area: 1
+    miniGameType: 2
+    designerNote:
+  - area: 2
+    miniGameType: 3
+    designerNote:
