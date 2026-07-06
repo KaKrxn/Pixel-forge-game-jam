@@ -21,5 +21,5 @@ MonoBehaviour:
   painSpikeAmount: 25
   edgePenaltyPerSecond: 8
   channelHalfWidth: 0.6
-  jitterStrength: 0.4
+  jitterStrength: 0.2
   jitterFrequency: 0.4
