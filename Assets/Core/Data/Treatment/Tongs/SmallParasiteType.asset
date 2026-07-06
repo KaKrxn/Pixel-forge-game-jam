@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: SmallParasiteType
   m_EditorClassIdentifier: Assembly-CSharp::ParasiteType
   variant: 0
-  requiredDistance: 1
+  requiredDistance: 2.5
   pullSpeed: 0.8
   needsDirection: 0
-  painPerSecond: 0.25
+  painPerSecond: 0.4
   painDrainRate: 0.4
   painSpikeAmount: 25
   edgePenaltyPerSecond: 8

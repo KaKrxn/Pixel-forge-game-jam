@@ -348,10 +348,10 @@ MonoBehaviour:
   startRadius: 0.45
   rollbackPerSecond: 0.35
   strayPenaltyPerSecond: 8
-  painPerSecond: 0.26
+  painPerSecond: 1
   painDrainRate: 0.4
   painSpikeAmount: 25
-  jitterStrength: 0
+  jitterStrength: 1
   jitterFrequency: 2
   pullPerSecond: 0.5
   pullPainPerSecond: 0.22

@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: LongParasiteType
   m_EditorClassIdentifier: Assembly-CSharp::ParasiteType
   variant: 1
-  requiredDistance: 4
+  requiredDistance: 7
   pullSpeed: 1
   needsDirection: 0
-  painPerSecond: 0.18
+  painPerSecond: 0.6
   painDrainRate: 0.4
   painSpikeAmount: 25
   edgePenaltyPerSecond: 8
   channelHalfWidth: 0.35
-  jitterStrength: 0
+  jitterStrength: 1
   jitterFrequency: 1.8

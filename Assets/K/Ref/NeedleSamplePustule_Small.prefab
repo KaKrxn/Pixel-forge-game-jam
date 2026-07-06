@@ -145,14 +145,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pustule
   type: 0
   pustuleRadius: 0.32
-  pierceTime: 0.4
-  drainSpeed: 0.6
-  painPerSecond: 0.22
+  pierceTime: 0.6
+  drainSpeed: 1.2
+  painPerSecond: 1
   painDrainRate: 0.4
   painSpikeAmount: 25
   strayPenaltyPerSecond: 8
   rollbackPerSecond: 0.3
-  jitterStrength: 0
+  jitterStrength: 1
   jitterFrequency: 1.8
   hideWhenCompleted: 1
   targetRenderer: {fileID: 6553136515229348417}
@@ -161,6 +161,8 @@ MonoBehaviour:
   completedColor: {r: 1, g: 1, b: 1, a: 0.2}
   fullVisualRoot: {fileID: 1771018424434041931}
   emptyVisualRoot: {fileID: 5525773472851041162}
+  needlePierceParticles: {fileID: 0}
+  drainCompleteParticles: {fileID: 0}
 --- !u!1 &1771018424434041931
 GameObject:
   m_ObjectHideFlags: 0
