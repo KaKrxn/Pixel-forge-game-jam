@@ -757,10 +757,14 @@ public sealed class TongsMiniGame : MonoBehaviour
         Vector3 beforeRootPosition = parasite.transform.position;
         Vector3 beforePrefabAnchorPosition = parasite.SpawnAnchorWorldPosition;
 
-        if (alignParasiteAnchorToSpawnPoint && !usingBodyPrefabAnchors)
+        // Align by the parasite's own spawn anchor (emergence point) whenever the prefab defines one, so
+        // differently-sized variants line their emergence point up with the wound instead of dropping their
+        // root there (which buries small parasites). Works with body-prefab anchors too. Prefabs without a
+        // spawn anchor keep the previous root-position placement, so nothing regresses.
+        if (alignParasiteAnchorToSpawnPoint && parasite.HasSpawnAnchor)
         {
             parasite.AlignSpawnAnchorToWorld(spawnPosition);
-            LogSpawn($"Applied anchor alignment for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, beforePrefabSpawnAnchor={FormatVector(beforePrefabAnchorPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, afterPrefabSpawnAnchor={FormatVector(parasite.SpawnAnchorWorldPosition)}, rootDelta={FormatVector(parasite.transform.position - beforeRootPosition)}.", parasite);
+            LogSpawn($"Applied anchor alignment for '{parasite.name}'. beforeRoot={FormatVector(beforeRootPosition)}, beforePrefabSpawnAnchor={FormatVector(beforePrefabAnchorPosition)}, targetSpawn={FormatVector(spawnPosition)}, afterRoot={FormatVector(parasite.transform.position)}, afterPrefabSpawnAnchor={FormatVector(parasite.SpawnAnchorWorldPosition)}, rootDelta={FormatVector(parasite.transform.position - beforeRootPosition)}, usingBodyPrefabAnchors={usingBodyPrefabAnchors}.", parasite);
             return;
         }
 

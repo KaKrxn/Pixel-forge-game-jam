@@ -221,7 +221,7 @@ SpriteRenderer:
   m_SortingOrder: 28
   m_MaskInteraction: 0
   m_Sprite: {fileID: 2533131605772755277, guid: 7d7472e1089d58d4fbe99459f178fbd4, type: 3}
-  m_Color: {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 1}
+  m_Color: {r: 0.9, g: 0.9, b: 0.9, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -331,7 +331,7 @@ MonoBehaviour:
   channelDepth: 1
   channelTopOffset: 0.7
   spawnAnchor: {fileID: 1583342629052476430}
-  targetRenderer: {fileID: 2002002002002002005}
+  targetRenderer: {fileID: 353851785667359649}
   visualRoot: {fileID: 1951796808769693276}
   parasiteReveal: {fileID: 2002002002002002007}
   moveVisualWithPull: 1
@@ -366,6 +366,9 @@ MonoBehaviour:
   pixelsPerUnit: 16
   driveMaskWithPointer: 1
   dynamicMaskWidth: 0.85
+  maskFollowsPointerX: 1
+  fitMaskWidthToBody: 1
+  dynamicMaskWidthPadding: 0.12
   dynamicMaskMinLength: 0.08
   dynamicMaskExtraLength: 0.35
   fadeBodyWhenNoMask: 1

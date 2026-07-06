@@ -21,6 +21,11 @@ public sealed class ParasiteReveal : MonoBehaviour
     [SerializeField, Min(1f)] private float pixelsPerUnit = 16f;
     [SerializeField] private bool driveMaskWithPointer = true;
     [SerializeField, Min(0.01f)] private float dynamicMaskWidth = 0.85f;
+    [Tooltip("Follow the pointer horizontally so sideways pull/tilt doesn't clip the body out of the reveal mask.")]
+    [SerializeField] private bool maskFollowsPointerX = true;
+    [Tooltip("Auto-widen the mask to at least the body sprite width plus this padding, so the body is never clipped.")]
+    [SerializeField] private bool fitMaskWidthToBody = true;
+    [SerializeField, Min(0f)] private float dynamicMaskWidthPadding = 0.12f;
     [SerializeField, Min(0.01f)] private float dynamicMaskMinLength = 0.08f;
     [SerializeField, Min(0f)] private float dynamicMaskExtraLength = 0.35f;
     [SerializeField] private bool fadeBodyWhenNoMask = true;
@@ -136,7 +141,11 @@ public sealed class ParasiteReveal : MonoBehaviour
         Vector2 origin = maskOriginWorld;
         Vector2 drag = pointerWorldPosition - origin;
         float length = Mathf.Max(dynamicMaskMinLength, Vector2.Dot(drag, Vector2.up) + dynamicMaskExtraLength);
-        Vector2 center = origin + Vector2.up * (length * 0.5f);
+
+        // Keep the mask's bottom edge at the wound line (origin.y) but let its center X follow the pointer so
+        // the body stays inside the reveal window while it slides/tilts sideways.
+        float centerX = maskFollowsPointerX ? pointerWorldPosition.x : origin.x;
+        Vector2 center = new Vector2(centerX, origin.y + length * 0.5f);
         Transform maskTransform = woundMask.transform;
         maskTransform.position = new Vector3(center.x, center.y, maskTransform.position.z);
         maskTransform.rotation = Quaternion.identity;
@@ -144,7 +153,19 @@ public sealed class ParasiteReveal : MonoBehaviour
         Vector2 spriteSize = woundMask.sprite != null ? woundMask.sprite.bounds.size : Vector2.one;
         float width = Mathf.Max(0.01f, spriteSize.x);
         float height = Mathf.Max(0.01f, spriteSize.y);
-        maskTransform.localScale = new Vector3(dynamicMaskWidth / width, length / height, 1f);
+        maskTransform.localScale = new Vector3(ResolveDynamicMaskWidth() / width, length / height, 1f);
+    }
+
+    private float ResolveDynamicMaskWidth()
+    {
+        // Never let the reveal window be narrower than the body it is supposed to show.
+        if (!fitMaskWidthToBody || bodyRenderer == null)
+        {
+            return dynamicMaskWidth;
+        }
+
+        float bodyWidth = bodyRenderer.bounds.size.x + dynamicMaskWidthPadding;
+        return Mathf.Max(dynamicMaskWidth, bodyWidth);
     }
 
     public void CaptureBasePose()

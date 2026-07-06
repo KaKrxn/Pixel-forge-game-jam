@@ -40,6 +40,10 @@ public sealed class Lesion : MonoBehaviour
     [SerializeField] private bool followPointerWhilePulling = true;
     [SerializeField, Min(0f)] private float pullVisualMaxDistance = 0.45f;
     [SerializeField, Min(0f)] private float pullVisualFollowSpeed = 16f;
+    [Header("VFX")]
+    [SerializeField] private ParticleSystem cutSpeckParticles;
+    [SerializeField] private ParticleSystem woundOpenParticles;
+    [SerializeField, Range(0.01f, 1f)] private float cutSpeckProgressInterval = 0.18f;
 
     private Collider2D hitCollider;
     private readonly List<Vector2> worldPath = new List<Vector2>();
@@ -55,6 +59,7 @@ public sealed class Lesion : MonoBehaviour
     private bool isOutsidePath;
     private Vector3 initialPullVisualLocalPosition;
     private bool hasInitialPullVisualPosition;
+    private float nextCutSpeckProgress;
 
     public LesionType Type => type;
     public float CutProgress => cutProgress;
@@ -94,6 +99,7 @@ public sealed class Lesion : MonoBehaviour
         jitterSeed = UnityEngine.Random.value * 1000f;
         isOutsidePath = false;
         currentKnifeTip = transform.position;
+        nextCutSpeckProgress = cutSpeckProgressInterval;
         ResetPullVisualPosition();
         gameObject.SetActive(true);
         ApplyVisualState();
@@ -236,6 +242,7 @@ public sealed class Lesion : MonoBehaviour
         cutProgress = Mathf.Clamp01((nextWaypointIndex - 1f) / Mathf.Max(1f, worldPath.Count - 1f));
         if (!Mathf.Approximately(previousProgress, cutProgress))
         {
+            TryPlayCutSpecks(previousProgress, cutProgress, knifeTip);
             RefreshGuideLine();
             ProgressChanged?.Invoke(GetOverallProgress());
         }
@@ -248,9 +255,11 @@ public sealed class Lesion : MonoBehaviour
 
     private void CompleteCut()
     {
+        Vector2 effectPoint = currentKnifeTip;
         cutProgress = 1f;
         RefreshGuideLine();
         ProgressChanged?.Invoke(GetOverallProgress());
+        PlayParticleAt(cutSpeckParticles, effectPoint);
 
         if (type == LesionType.Bulge && !woundOpen)
         {
@@ -258,6 +267,7 @@ public sealed class Lesion : MonoBehaviour
             sliceStarted = false;
             ApplyVisualState();
             RefreshGuideLine();
+            PlayParticleAt(woundOpenParticles != null ? woundOpenParticles : cutSpeckParticles, effectPoint);
             return;
         }
 
@@ -280,6 +290,46 @@ public sealed class Lesion : MonoBehaviour
             RefreshGuideLine();
             ProgressChanged?.Invoke(GetOverallProgress());
         }
+    }
+
+    private void TryPlayCutSpecks(float previousProgress, float currentProgress, Vector2 worldPoint)
+    {
+        if (cutSpeckParticles == null || cutSpeckProgressInterval <= 0f)
+        {
+            return;
+        }
+
+        if (currentProgress <= previousProgress)
+        {
+            return;
+        }
+
+        if (currentProgress < nextCutSpeckProgress && currentProgress < 1f)
+        {
+            return;
+        }
+
+        PlayParticleAt(cutSpeckParticles, worldPoint);
+
+        while (nextCutSpeckProgress <= currentProgress)
+        {
+            nextCutSpeckProgress += cutSpeckProgressInterval;
+        }
+    }
+
+    private static void PlayParticleAt(ParticleSystem particles, Vector2 worldPoint)
+    {
+        if (particles == null)
+        {
+            return;
+        }
+
+        Transform particleTransform = particles.transform;
+        Vector3 position = particleTransform.position;
+        position.x = worldPoint.x;
+        position.y = worldPoint.y;
+        particleTransform.position = position;
+        particles.Play(withChildren: true);
     }
 
     private void ApplyPain(float rate, float deltaTime, Sanity sanity)

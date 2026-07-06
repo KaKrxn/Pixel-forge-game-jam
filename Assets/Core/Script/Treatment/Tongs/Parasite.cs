@@ -45,6 +45,7 @@ public sealed class Parasite : MonoBehaviour
     public bool EdgeContact => edgeContact;
     public int RequiredDirection => requiredDirection < 0 ? -1 : 1;
     public Vector3 SpawnAnchorWorldPosition => GetSpawnAnchorWorldPosition();
+    public bool HasSpawnAnchor => spawnAnchor != null;
 
     public event Action<Parasite> Extracted;
     public event Action<float> PullProgressChanged;
