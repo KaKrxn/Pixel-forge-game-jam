@@ -37,6 +37,7 @@ public sealed class TreatmentToolCursor : MonoBehaviour
     private string currentToolId;
     private ToolVisual activeTool;
     private bool active;
+    private int lastDrivenFrame = -1;
 
     public static TreatmentToolCursor Instance { get; private set; }
 
@@ -57,7 +58,11 @@ public sealed class TreatmentToolCursor : MonoBehaviour
         RestoreSystemCursor();
     }
 
-    /// <summary>Show the cursor for the given tool id (from the overlay). An empty/unknown id hides it.</summary>
+    /// <summary>
+    /// Show the cursor for the given tool id (from the overlay) for as long as the tool is equipped. The
+    /// tool sprite follows the focus point and the OS cursor stays hidden the whole time; an empty/unknown
+    /// id (no tool equipped) hides the tool sprite and restores the OS cursor.
+    /// </summary>
     public void Show(string toolId)
     {
         if (string.IsNullOrEmpty(toolId) || !HasTool(toolId))
@@ -69,8 +74,20 @@ public sealed class TreatmentToolCursor : MonoBehaviour
         currentToolId = toolId;
         activeTool = FindTool(toolId);
         active = true;
+        lastDrivenFrame = Time.frameCount;
         ApplyVisual();
         ApplySystemCursor();
+    }
+
+    private void LateUpdate()
+    {
+        // If no mini game drove the cursor this frame, it means we left the mini game by some path that
+        // never called Hide() (e.g. the mini game object was deactivated/destroyed). Auto-restore the OS
+        // cursor so it can never get stuck hidden after exiting a mini game.
+        if (active && lastDrivenFrame != Time.frameCount)
+        {
+            Hide();
+        }
     }
 
     /// <summary>Move the active tool so its tip sits exactly on this world point.</summary>
@@ -151,6 +168,7 @@ public sealed class TreatmentToolCursor : MonoBehaviour
     {
         if (hideSystemCursor)
         {
+            // Hide the OS cursor for the whole time a tool is equipped; restore it when none is.
             Cursor.visible = !active;
         }
     }
