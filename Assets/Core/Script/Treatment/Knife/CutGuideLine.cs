@@ -15,6 +15,7 @@ public sealed class CutGuideLine : MonoBehaviour
     [SerializeField] private Material lineMaterial;
 
     private LineRenderer line;
+    private Material runtimeMaterial;
 
     private void Awake()
     {
@@ -26,6 +27,15 @@ public sealed class CutGuideLine : MonoBehaviour
     {
         ResolveLine();
         ApplySettings();
+    }
+
+    private void OnDestroy()
+    {
+        if (runtimeMaterial != null)
+        {
+            Destroy(runtimeMaterial);
+            runtimeMaterial = null;
+        }
     }
 
     public void ShowRemaining(IReadOnlyList<Vector2> path, float progress)
@@ -124,7 +134,32 @@ public sealed class CutGuideLine : MonoBehaviour
         line.alignment = LineAlignment.View;
         line.useWorldSpace = true;
 
-        if (lineMaterial != null)
+        ApplyMaterial();
+    }
+
+    private void ApplyMaterial()
+    {
+        if (line == null || lineMaterial == null)
+        {
+            return;
+        }
+
+        // At runtime own a per-instance copy so animating mainTextureScale on one guide line does not
+        // change the dot spacing of every other guide line sharing the source material. In edit mode use
+        // the shared asset directly (ShowRemaining is not driven there, so nothing gets overwritten).
+        if (Application.isPlaying)
+        {
+            if (runtimeMaterial == null)
+            {
+                runtimeMaterial = new Material(lineMaterial);
+            }
+
+            if (line.sharedMaterial != runtimeMaterial)
+            {
+                line.sharedMaterial = runtimeMaterial;
+            }
+        }
+        else if (line.sharedMaterial != lineMaterial)
         {
             line.sharedMaterial = lineMaterial;
         }
@@ -132,12 +167,13 @@ public sealed class CutGuideLine : MonoBehaviour
 
     private void ApplyTextureScale(float length)
     {
-        if (line == null || line.sharedMaterial == null)
+        Material target = Application.isPlaying ? runtimeMaterial : lineMaterial;
+        if (line == null || target == null)
         {
             return;
         }
 
-        line.sharedMaterial.mainTextureScale = new Vector2(length * dotsPerUnit, 1f);
+        target.mainTextureScale = new Vector2(length * dotsPerUnit, 1f);
     }
 
     private float GetRenderedLength()

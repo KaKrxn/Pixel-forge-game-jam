@@ -351,7 +351,7 @@ MonoBehaviour:
   painPerSecond: 1
   painDrainRate: 0.4
   painSpikeAmount: 25
-  jitterStrength: 1
+  jitterStrength: 0
   jitterFrequency: 2
   pullPerSecond: 0.5
   pullPainPerSecond: 0.22

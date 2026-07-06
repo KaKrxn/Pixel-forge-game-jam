@@ -146,7 +146,7 @@ MonoBehaviour:
   type: 1
   pustuleRadius: 0.4
   pierceTime: 0.8
-  drainSpeed: 2
+  drainSpeed: 0.3
   painPerSecond: 1
   painDrainRate: 0.4
   painSpikeAmount: 25
