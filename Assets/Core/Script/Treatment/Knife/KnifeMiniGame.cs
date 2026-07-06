@@ -45,6 +45,28 @@ public sealed class KnifeMiniGame : MonoBehaviour
         }
     }
 
+    private readonly struct LesionSpawnCandidate
+    {
+        public LesionSpawnCandidate(RuntimeLesionAnchor anchor, Lesion prefab, LesionType type, LesionCutOrientation orientation, Vector3 position, Quaternion rotation, Bounds bounds)
+        {
+            Anchor = anchor;
+            Prefab = prefab;
+            Type = type;
+            Orientation = orientation;
+            Position = position;
+            Rotation = rotation;
+            Bounds = bounds;
+        }
+
+        public RuntimeLesionAnchor Anchor { get; }
+        public Lesion Prefab { get; }
+        public LesionType Type { get; }
+        public LesionCutOrientation Orientation { get; }
+        public Vector3 Position { get; }
+        public Quaternion Rotation { get; }
+        public Bounds Bounds { get; }
+    }
+
     [SerializeField] private GameFlow flow;
     [SerializeField] private GameObject root;
     [SerializeField] private Transform lesionRoot;
@@ -57,6 +79,10 @@ public sealed class KnifeMiniGame : MonoBehaviour
     [SerializeField] private bool spawnLesionsOnBegin;
     [SerializeField, Min(1)] private int minLesions = 2;
     [SerializeField, Min(1)] private int maxLesions = 5;
+    [Header("Spawn Validation")]
+    [Tooltip("Reject lesion placements that fall outside the body safe area or overlap an accepted lesion.")]
+    [SerializeField] private bool validateLesionSpawns = true;
+    [SerializeField, Min(1)] private int maxSpawnAttemptsPerAnchor = 6;
     [Header("Input")]
     [SerializeField] private Camera inputCamera;
     [SerializeField] private float worldInputPlaneZ;
@@ -97,6 +123,8 @@ public sealed class KnifeMiniGame : MonoBehaviour
     private bool completionRaised;
     private TreatmentBodyPrefab activeBodyPrefab;
     private ParticleSystem activeSliceParticle;
+    private Collider2D lesionSafeArea;
+    private readonly Vector2[] spawnCornerBuffer = new Vector2[4];
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -224,6 +252,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
         ReplaceRuntimeRoot(body);
         activeBodyPrefab = body;
         lesionRoot = body.LesionRoot != null ? body.LesionRoot : body.GameplayRoot;
+        lesionSafeArea = body.LesionSafeArea;
         spawnAnchors.Clear();
         spawnAnchors.AddRange(body.GetLesionAnchorTransforms());
         lesionSpawnAnchors.Clear();
@@ -614,27 +643,113 @@ public sealed class KnifeMiniGame : MonoBehaviour
         lesions.Clear();
         HideAllLesionSpawnVisuals();
 
+        // Phase 1: build a list of accepted candidates that pass safe-area + overlap validation.
         List<RuntimeLesionAnchor> anchors = GetShuffledAnchors();
         int low = Mathf.Max(1, minLesions);
         int high = Mathf.Max(low, maxLesions);
-        int count = Mathf.Min(UnityEngine.Random.Range(low, high + 1), anchors.Count);
-        Transform parent = lesionRoot != null ? lesionRoot : transform;
+        int requestedCount = UnityEngine.Random.Range(low, high + 1);
         List<Lesion> prefabBag = new List<Lesion>();
+        List<LesionSpawnCandidate> accepted = new List<LesionSpawnCandidate>();
 
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < anchors.Count && accepted.Count < requestedCount; i++)
         {
-            RuntimeLesionAnchor anchor = anchors[i];
-            if (!TryGetPrefabForAnchor(anchor, prefabBag, out Lesion prefab, out LesionType lesionType, out LesionCutOrientation orientation))
+            if (TryBuildValidCandidate(anchors[i], prefabBag, accepted, out LesionSpawnCandidate candidate))
             {
+                accepted.Add(candidate);
+            }
+        }
+
+        LogTreatmentFlow($"SpawnLesions requested={requestedCount} anchors={anchors.Count} accepted={accepted.Count} validate={validateLesionSpawns} safeArea={(lesionSafeArea != null ? lesionSafeArea.name : "none")}.");
+
+        // Phase 2: instantiate only the accepted candidates.
+        Transform parent = lesionRoot != null ? lesionRoot : transform;
+        for (int i = 0; i < accepted.Count; i++)
+        {
+            LesionSpawnCandidate candidate = accepted[i];
+            Lesion lesion = Instantiate(candidate.Prefab, candidate.Position, candidate.Rotation, parent);
+            lesion.name = $"{candidate.Prefab.name}_{i + 1:00}_{candidate.Type}_{candidate.Orientation}";
+            lesions.Add(lesion);
+            spawnedLesions.Add(lesion);
+            candidate.Anchor.Anchor?.ShowSpawnVisual(candidate.Type, candidate.Orientation);
+        }
+    }
+
+    private bool TryBuildValidCandidate(RuntimeLesionAnchor anchor, List<Lesion> prefabBag, List<LesionSpawnCandidate> accepted, out LesionSpawnCandidate candidate)
+    {
+        candidate = default;
+        if (anchor == null || !anchor.IsValid)
+        {
+            return false;
+        }
+
+        int attempts = Mathf.Max(1, maxSpawnAttemptsPerAnchor);
+        string anchorName = anchor.SpawnPoint != null ? anchor.SpawnPoint.name : "null";
+
+        // Re-rolling type/orientation across attempts gives vertical cuts a chance to fall back to a
+        // horizontal one (or another type) that fits, while preserving the random spawn feel.
+        for (int attempt = 0; attempt < attempts; attempt++)
+        {
+            if (!TryGetPrefabForAnchor(anchor, prefabBag, out Lesion prefab, out LesionType type, out LesionCutOrientation orientation))
+            {
+                LogTreatmentFlow($"TryBuildValidCandidate anchor='{anchorName}' attempt={attempt} rejected: no valid prefab/type.");
                 continue;
             }
 
-            Lesion lesion = Instantiate(prefab, anchor.SpawnPoint.position, anchor.GetRotation(orientation), parent);
-            lesion.name = $"{prefab.name}_{i + 1:00}_{lesionType}_{orientation}";
-            lesions.Add(lesion);
-            spawnedLesions.Add(lesion);
-            anchor.Anchor?.ShowSpawnVisual(lesionType, orientation);
+            Vector3 position = anchor.SpawnPoint.position;
+            Quaternion rotation = anchor.GetRotation(orientation);
+            Bounds bounds = prefab.GetSpawnBounds(position, rotation);
+
+            if (validateLesionSpawns && !IsCandidateInsideSafeArea(prefab, position, rotation))
+            {
+                LogTreatmentFlow($"TryBuildValidCandidate anchor='{anchorName}' attempt={attempt} rejected: outside safe area ({type}/{orientation}).");
+                continue;
+            }
+
+            if (validateLesionSpawns && DoesCandidateOverlapAccepted(bounds, accepted))
+            {
+                LogTreatmentFlow($"TryBuildValidCandidate anchor='{anchorName}' attempt={attempt} rejected: overlaps accepted lesion ({type}/{orientation}).");
+                continue;
+            }
+
+            candidate = new LesionSpawnCandidate(anchor, prefab, type, orientation, position, rotation, bounds);
+            return true;
         }
+
+        LogTreatmentFlow($"TryBuildValidCandidate anchor='{anchorName}' skipped after {attempts} attempts.");
+        return false;
+    }
+
+    private bool IsCandidateInsideSafeArea(Lesion prefab, Vector3 position, Quaternion rotation)
+    {
+        // No safe area authored -> fall back to legacy behavior (accept anywhere).
+        if (lesionSafeArea == null)
+        {
+            return true;
+        }
+
+        prefab.GetSpawnCorners(position, rotation, spawnCornerBuffer);
+        for (int i = 0; i < spawnCornerBuffer.Length; i++)
+        {
+            if (!lesionSafeArea.OverlapPoint(spawnCornerBuffer[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool DoesCandidateOverlapAccepted(Bounds bounds, List<LesionSpawnCandidate> accepted)
+    {
+        for (int i = 0; i < accepted.Count; i++)
+        {
+            if (bounds.Intersects(accepted[i].Bounds))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool HasAnyLesionPrefabSource()

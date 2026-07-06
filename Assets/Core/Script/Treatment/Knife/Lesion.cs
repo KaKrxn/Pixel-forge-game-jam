@@ -44,6 +44,10 @@ public sealed class Lesion : MonoBehaviour
     [SerializeField] private ParticleSystem cutSpeckParticles;
     [SerializeField] private ParticleSystem woundOpenParticles;
     [SerializeField, Range(0.01f, 1f)] private float cutSpeckProgressInterval = 0.18f;
+    [Header("Spawn Footprint")]
+    [Tooltip("Width (x) and height (y) the lesion occupies when spawned, used for safe-area and overlap validation.")]
+    [SerializeField] private Vector2 spawnFootprint = new Vector2(0.85f, 0.38f);
+    [SerializeField, Min(0f)] private float spawnPadding = 0.08f;
 
     private Collider2D hitCollider;
     private readonly List<Vector2> worldPath = new List<Vector2>();
@@ -70,6 +74,40 @@ public sealed class Lesion : MonoBehaviour
     public bool IsWoundOpen => woundOpen;
     public bool CanSlice => !completed && (!woundOpen || type == LesionType.Tumor);
     public bool CanPull => !completed && type == LesionType.Bulge && woundOpen;
+    public Vector2 SpawnFootprint => spawnFootprint;
+    public float SpawnPadding => spawnPadding;
+
+    /// <summary>
+    /// Axis-aligned world bounds of the (padded) footprint at a candidate pose. The orientation is already
+    /// baked into <paramref name="worldRotation"/> (the anchor rotates the footprint for vertical cuts).
+    /// The z size is inflated so overlap tests never fail on the shared 2D plane.
+    /// </summary>
+    public Bounds GetSpawnBounds(Vector3 worldPosition, Quaternion worldRotation)
+    {
+        Vector2 half = spawnFootprint * 0.5f + Vector2.one * spawnPadding;
+        Vector3 right = worldRotation * Vector3.right * half.x;
+        Vector3 up = worldRotation * Vector3.up * half.y;
+        float extentX = Mathf.Abs(right.x) + Mathf.Abs(up.x);
+        float extentY = Mathf.Abs(right.y) + Mathf.Abs(up.y);
+        return new Bounds(new Vector3(worldPosition.x, worldPosition.y, 0f), new Vector3(extentX * 2f, extentY * 2f, 1000f));
+    }
+
+    /// <summary>Writes the four (padded) footprint corners in world space into <paramref name="corners"/> (length 4).</summary>
+    public void GetSpawnCorners(Vector3 worldPosition, Quaternion worldRotation, Vector2[] corners)
+    {
+        if (corners == null || corners.Length < 4)
+        {
+            return;
+        }
+
+        Vector2 half = spawnFootprint * 0.5f + Vector2.one * spawnPadding;
+        Vector3 right = worldRotation * Vector3.right * half.x;
+        Vector3 up = worldRotation * Vector3.up * half.y;
+        corners[0] = worldPosition + right + up; // top-right
+        corners[1] = worldPosition + right - up; // bottom-right
+        corners[2] = worldPosition - right - up; // bottom-left
+        corners[3] = worldPosition - right + up; // top-left
+    }
 
     public event Action<Lesion> Completed;
     public event Action<float> PainChanged;

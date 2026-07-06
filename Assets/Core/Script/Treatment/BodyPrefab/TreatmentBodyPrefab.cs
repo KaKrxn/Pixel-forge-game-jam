@@ -18,6 +18,8 @@ public sealed class TreatmentBodyPrefab : MonoBehaviour
     [Header("Knife")]
     [SerializeField] private Transform lesionRoot;
     [SerializeField] private List<Transform> lesionSpawnAnchors = new List<Transform>();
+    [Tooltip("Optional trigger collider covering where lesions may fully fit. When set, spawns are validated against it.")]
+    [SerializeField] private Collider2D lesionSafeArea;
 
     [Header("Needle")]
     [SerializeField] private Transform pustuleRoot;
@@ -31,6 +33,7 @@ public sealed class TreatmentBodyPrefab : MonoBehaviour
     public IReadOnlyList<Transform> ParasiteSpawnAnchors => parasiteSpawnAnchors;
     public Transform LesionRoot => lesionRoot;
     public IReadOnlyList<Transform> LesionSpawnAnchors => lesionSpawnAnchors;
+    public Collider2D LesionSafeArea => lesionSafeArea;
     public Transform PustuleRoot => pustuleRoot;
     public IReadOnlyList<Transform> PustuleSpawnAnchors => pustuleSpawnAnchors;
 

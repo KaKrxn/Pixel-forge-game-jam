@@ -35,6 +35,10 @@ public sealed class LesionSpawnAnchor : MonoBehaviour
     [Header("Visual")]
     [SerializeField] private GameObject defaultVisualRoot;
     [SerializeField] private List<LesionSpawnVisualVariant> visualVariants = new List<LesionSpawnVisualVariant>();
+    [Header("Editor Preview")]
+    [Tooltip("Footprint drawn as a gizmo to preview lesion coverage per allowed orientation (green=horizontal, cyan=vertical).")]
+    [SerializeField] private Vector2 previewFootprint = new Vector2(0.85f, 0.38f);
+    [SerializeField, Min(0f)] private float previewPadding = 0.08f;
 
     public Transform SpawnPoint => spawnPoint != null ? spawnPoint : transform;
     public bool HasAllowedLesionType => allowTumor || allowBulge;
@@ -129,4 +133,37 @@ public sealed class LesionSpawnAnchor : MonoBehaviour
             defaultVisualRoot.SetActive(true);
         }
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        Vector3 center = SpawnPoint != null ? SpawnPoint.position : transform.position;
+        if (allowHorizontal)
+        {
+            DrawFootprintGizmo(center, GetSpawnRotation(LesionCutOrientation.Horizontal), Color.green);
+        }
+
+        if (allowVertical)
+        {
+            DrawFootprintGizmo(center, GetSpawnRotation(LesionCutOrientation.Vertical), Color.cyan);
+        }
+    }
+
+    private void DrawFootprintGizmo(Vector3 center, Quaternion rotation, Color color)
+    {
+        Vector2 half = previewFootprint * 0.5f + Vector2.one * previewPadding;
+        Vector3 right = rotation * Vector3.right * half.x;
+        Vector3 up = rotation * Vector3.up * half.y;
+        Vector3 topRight = center + right + up;
+        Vector3 bottomRight = center + right - up;
+        Vector3 bottomLeft = center - right - up;
+        Vector3 topLeft = center - right + up;
+
+        Gizmos.color = color;
+        Gizmos.DrawLine(topRight, bottomRight);
+        Gizmos.DrawLine(bottomRight, bottomLeft);
+        Gizmos.DrawLine(bottomLeft, topLeft);
+        Gizmos.DrawLine(topLeft, topRight);
+    }
+#endif
 }

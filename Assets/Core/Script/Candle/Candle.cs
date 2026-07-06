@@ -32,6 +32,9 @@ public sealed class Candle : MonoBehaviour
     [SerializeField] private AudioClip flickerClip;
     [SerializeField] private AudioClip extinguishedClip;
     [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    [Header("Refill Particle")]
+    [SerializeField] private ParticleSystem refillClickParticle;
+    [SerializeField] private bool spawnRefillParticleAtPointer = true;
 
     public float CurrentLight => currentLight;
     public float MaxLight => maxLight;
@@ -170,6 +173,7 @@ public sealed class Candle : MonoBehaviour
         {
             clicksThisSecond++;
             ChangeLight(clickRefillAmount);
+            PlayRefillParticle();
         }
 #else
         SetRefilling(false);
@@ -197,6 +201,46 @@ public sealed class Candle : MonoBehaviour
 #else
         return false;
 #endif
+    }
+
+    private void PlayRefillParticle()
+    {
+        if (refillClickParticle == null)
+        {
+            return;
+        }
+
+        Vector3 position = transform.position;
+        if (spawnRefillParticleAtPointer && TryGetPointerWorldPosition(out Vector3 pointerWorld))
+        {
+            position = pointerWorld;
+        }
+
+        // Instantiate a detached copy so it works whether the reference is a prefab asset or a scene
+        // object, and self-destructs after it finishes. Refill clicks are one-shot bursts.
+        ParticleSystem instance = Instantiate(refillClickParticle, position, refillClickParticle.transform.rotation);
+        instance.gameObject.SetActive(true);
+        instance.Play(true);
+
+        ParticleSystem.MainModule main = instance.main;
+        float lifetime = Mathf.Max(0.1f, main.duration + main.startLifetime.constantMax);
+        Destroy(instance.gameObject, lifetime);
+    }
+
+    private bool TryGetPointerWorldPosition(out Vector3 worldPosition)
+    {
+#if ENABLE_INPUT_SYSTEM
+        Mouse mouse = Mouse.current;
+        Camera camera = Camera.main;
+        if (mouse != null && camera != null)
+        {
+            Vector3 world = camera.ScreenToWorldPoint(mouse.position.ReadValue());
+            worldPosition = new Vector3(world.x, world.y, transform.position.z);
+            return true;
+        }
+#endif
+        worldPosition = transform.position;
+        return false;
     }
 
     private void SetRefilling(bool refilling)

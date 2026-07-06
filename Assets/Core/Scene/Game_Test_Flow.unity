@@ -6441,6 +6441,8 @@ MonoBehaviour:
   flickerClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   extinguishedClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   sfxVolume: 1
+  refillClickParticle: {fileID: 4315924886173929403, guid: 5036ead08618b7f46926f098595a1852, type: 3}
+  spawnRefillParticleAtPointer: 1
 --- !u!95 &684896822
 Animator:
   serializedVersion: 7
@@ -10606,6 +10608,8 @@ MonoBehaviour:
   spawnLesionsOnBegin: 0
   minLesions: 2
   maxLesions: 5
+  validateLesionSpawns: 1
+  maxSpawnAttemptsPerAnchor: 6
   inputCamera: {fileID: 519420031}
   worldInputPlaneZ: 0
   overlay: {fileID: 582104043}

@@ -12,32 +12,40 @@ The current Knife MiniGame can spawn lesions in visually bad positions:
 
 The goal is to keep the authored random spawn feeling while preventing unfair or visually broken lesion placement.
 
-## Implementation Status (reconciled 2026-07-06)
+## Implementation Status (implemented 2026-07-06)
 
-This document is a **design proposal**. As of this update, the validation layer it proposes is
-**NOT implemented**. Only the anchor-based random spawn described in Section 2 exists in code.
+The validation layer described below is now **implemented in code**. Remaining work is **authoring only**
+(assign a safe-area collider per Knife body, tune footprints and per-anchor rules in the Inspector).
 
-**Already in the project (Section 2 is accurate):**
+**Implemented (code):**
 
-- `LesionSpawnAnchor` per-anchor flags: `allowTumor`, `allowBulge` (`Allowed Lesions`) and
-  `allowHorizontal`, `allowVertical` (`Allowed Cut Directions`), plus `IsUsable`,
-  `TryGetRandomLesionType`, `TryGetRandomOrientation`, and `GetSpawnRotation` (vertical = base + 90°).
-- Per-anchor visual variants keyed by lesion type + orientation (`ShowSpawnVisual`).
-- `KnifeMiniGame.SpawnLesions()` two-phase-free flow: shuffle anchors → clamp count to anchor count →
-  instantiate at `anchor.SpawnPoint.position` with `anchor.GetRotation(orientation)`.
-- Duplicate spawn-point avoidance (in `GetShuffledAnchors`) and spawned-count already clamped to the
-  number of usable anchors.
-- Runtime anchor wrapper type already exists: `RuntimeLesionAnchor` (nested in `KnifeMiniGame`).
+- `Lesion.spawnFootprint` / `Lesion.spawnPadding` + `SpawnFootprint`, `SpawnPadding`, `GetSpawnBounds()`,
+  `GetSpawnCorners()`.
+- `TreatmentBodyPrefab.lesionSafeArea` + `LesionSafeArea` accessor (under `[Header("Knife")]`).
+- `KnifeMiniGame.LesionSpawnCandidate` struct and a two-phase `SpawnLesions()` (build accepted candidates
+  → instantiate), with `TryBuildValidCandidate`, `IsCandidateInsideSafeArea`, `DoesCandidateOverlapAccepted`.
+- Bounded per-anchor retry (`maxSpawnAttemptsPerAnchor`) that re-rolls type/orientation, overlap prevention
+  (`Bounds.Intersects`), safe-area corner check (`Collider2D.OverlapPoint` on all 4 padded corners), a
+  `validateLesionSpawns` toggle, and `[TreatmentFlow]` rejection logs (outside safe area / overlap / no prefab).
+- Editor gizmo footprint preview on `LesionSpawnAnchor` (`previewFootprint` / `previewPadding`;
+  green = horizontal, cyan = vertical).
 
-**NOT implemented yet (everything below in Sections 4, 6, 7, 11 is still a proposal):**
+**Behavior notes / deviations from the original proposal:**
 
-- `Lesion.spawnFootprint` / `Lesion.spawnPadding` and any footprint bounds/corner API.
-- `TreatmentBodyPrefab.lesionSafeArea` (`TreatmentBodyPrefab` currently exposes only `lesionRoot` and
-  `lesionSpawnAnchors` for the Knife path — no safe-area collider).
-- `LesionSpawnCandidate`, `TryBuildValidCandidate`, `IsCandidateInsideSafeArea`,
-  `DoesCandidateOverlapAccepted` — no candidate/validation pass exists.
-- Overlap prevention, safe-area corner checks, orientation retry, and rejection debug logs.
-- Editor gizmo footprint preview on `LesionSpawnAnchor` and any `Validate Knife Spawn Anchors` tool.
+- Orientation retry is implemented as **bounded random re-rolls** of type + orientation per anchor
+  (`maxSpawnAttemptsPerAnchor`), not the explicit "other orientation → other type" order in Section 4.6.
+  This keeps the random feel while still letting a vertical cut fall back to a fitting alternative.
+- When no safe area is assigned (`lesionSafeArea == null`), safe-area checks are skipped (legacy behavior);
+  overlap checks still apply while `validateLesionSpawns` is on.
+- The `Validate Knife Spawn Anchors` custom-inspector button (Section 6, "Optional future improvement")
+  is still **not** implemented; the runtime rejection logs cover diagnosis for now.
+
+**Already existed before this work (Section 2 baseline):**
+
+- `LesionSpawnAnchor` per-anchor flags (`allowTumor`, `allowBulge`, `allowHorizontal`, `allowVertical`),
+  `TryGetRandomLesionType`, `TryGetRandomOrientation`, `GetSpawnRotation` (vertical = base + 90°),
+  per-anchor visual variants, `RuntimeLesionAnchor` wrapper, duplicate spawn-point avoidance, and the
+  anchor-count clamp.
 
 ## 2. Current System Analysis
 
@@ -97,10 +105,11 @@ The improved spawn system should:
 
 ## 4. Proposed Design
 
-> Status: **Not implemented — proposal.** Sections 4–11 describe work still to be done. Names below are
-> reconciled to current code where a type already exists (e.g. the runtime wrapper is the existing
-> `RuntimeLesionAnchor` nested in `KnifeMiniGame`, and lesion type/orientation enums are `LesionType` /
-> `LesionCutOrientation`). `TreatmentBodyPrefab` and `Lesion` do **not** yet have the fields shown here.
+> Status: **Implemented** (see the Implementation Status section above for the concrete symbol names and
+> the deviations from this original proposal). The sections below are the design that guided the build;
+> the final API names match the code (`Lesion.spawnFootprint`/`spawnPadding`,
+> `TreatmentBodyPrefab.lesionSafeArea`, `KnifeMiniGame.LesionSpawnCandidate`, `RuntimeLesionAnchor`,
+> `LesionType` / `LesionCutOrientation`).
 
 ### 4.1 Add Lesion Spawn Footprint
 

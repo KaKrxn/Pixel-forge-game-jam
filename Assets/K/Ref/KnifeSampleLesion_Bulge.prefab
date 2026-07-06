@@ -370,6 +370,8 @@ MonoBehaviour:
   cutSpeckParticles: {fileID: 0}
   woundOpenParticles: {fileID: 0}
   cutSpeckProgressInterval: 0.18
+  spawnFootprint: {x: 0.85, y: 0.38}
+  spawnPadding: 0.08
 --- !u!120 &1645824579883146808
 LineRenderer:
   serializedVersion: 3
