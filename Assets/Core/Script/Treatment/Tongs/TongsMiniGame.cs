@@ -158,15 +158,16 @@ public sealed class TongsMiniGame : MonoBehaviour
             return;
         }
 
-        // The tongs are always the active tool here; the parasite visual carries the jitter, so the cursor
-        // simply follows the grip point (the pointer).
-        if (requireTongsEquipped && !tongsEquipped)
+        // Show whichever tool the shared tray has selected — even one this mini game doesn't use
+        // functionally. The parasite visual carries the jitter, so the cursor just follows the pointer.
+        string toolId = overlay != null ? overlay.SelectedToolId : null;
+        if (string.IsNullOrEmpty(toolId))
         {
             cursor.Hide();
             return;
         }
 
-        cursor.Show(overlayToolId);
+        cursor.Show(toolId);
         cursor.SetFocusPoint(worldPointer);
     }
 

@@ -220,13 +220,9 @@ public sealed class KnifeMiniGame : MonoBehaviour
             return;
         }
 
-        string toolId = toolState switch
-        {
-            KnifeToolState.Knife => overlayToolId,
-            KnifeToolState.Tongs => pullToolId,
-            _ => null
-        };
-
+        // Show whichever tool the shared tray has selected — even one this mini game doesn't use
+        // functionally (e.g. holding the needle inside the knife mini game).
+        string toolId = overlay != null ? overlay.SelectedToolId : null;
         if (string.IsNullOrEmpty(toolId))
         {
             cursor.Hide();

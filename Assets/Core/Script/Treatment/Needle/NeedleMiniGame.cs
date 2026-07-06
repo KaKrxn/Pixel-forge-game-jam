@@ -167,13 +167,16 @@ public sealed class NeedleMiniGame : MonoBehaviour
             return;
         }
 
-        if (toolState != NeedleToolState.Needle)
+        // Show whichever tool the shared tray has selected — even one this mini game doesn't use
+        // functionally (e.g. holding the knife inside the needle mini game).
+        string toolId = overlay != null ? overlay.SelectedToolId : null;
+        if (string.IsNullOrEmpty(toolId))
         {
             cursor.Hide();
             return;
         }
 
-        cursor.Show(overlayToolId);
+        cursor.Show(toolId);
 
         // The needle tip is the point gameplay checks; on a big pustule it jitters away from the cursor
         // while draining. Feeding it to the shared cursor makes the shake visible.
