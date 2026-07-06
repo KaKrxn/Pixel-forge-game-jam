@@ -152,8 +152,8 @@ MonoBehaviour:
   painSpikeAmount: 25
   strayPenaltyPerSecond: 8
   rollbackPerSecond: 0.3
-  jitterStrength: 1
-  jitterFrequency: 1.8
+  jitterStrength: 0.1
+  jitterFrequency: 0.3
   hideWhenCompleted: 1
   targetRenderer: {fileID: 7057509195745298915}
   normalColor: {r: 0.96, g: 0.72, b: 0.34, a: 1}
