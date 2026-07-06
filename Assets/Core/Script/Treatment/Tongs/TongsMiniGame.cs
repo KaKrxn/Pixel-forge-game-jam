@@ -142,10 +142,32 @@ public sealed class TongsMiniGame : MonoBehaviour
 
         TickParasites(worldPointer, deltaTime);
 
+        DriveToolCursor(worldPointer);
+
         if (WasPrimaryPointerReleasedThisFrame())
         {
             EndActiveHold();
         }
+    }
+
+    private void DriveToolCursor(Vector2 worldPointer)
+    {
+        TreatmentToolCursor cursor = TreatmentToolCursor.Instance;
+        if (cursor == null)
+        {
+            return;
+        }
+
+        // The tongs are always the active tool here; the parasite visual carries the jitter, so the cursor
+        // simply follows the grip point (the pointer).
+        if (requireTongsEquipped && !tongsEquipped)
+        {
+            cursor.Hide();
+            return;
+        }
+
+        cursor.Show(overlayToolId);
+        cursor.SetFocusPoint(worldPointer);
     }
 
     public void Begin(CustomerAgent customer)
@@ -218,6 +240,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         LogTreatmentFlow($"Stop root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndActiveHold();
+        TreatmentToolCursor.Instance?.Hide();
         isRunning = false;
         usingBodyPrefabAnchors = false;
         activeBodyPrefab = null;
@@ -231,6 +254,7 @@ public sealed class TongsMiniGame : MonoBehaviour
     {
         LogTreatmentFlow($"Pause root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndActiveHold();
+        TreatmentToolCursor.Instance?.Hide();
         isRunning = false;
         aggressionController?.Pause();
         SetRootVisible(false);

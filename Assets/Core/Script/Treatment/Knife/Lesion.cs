@@ -76,6 +76,7 @@ public sealed class Lesion : MonoBehaviour
     public bool CanPull => !completed && type == LesionType.Bulge && woundOpen;
     public Vector2 SpawnFootprint => spawnFootprint;
     public float SpawnPadding => spawnPadding;
+    public Vector2 CurrentKnifeTip => currentKnifeTip;
 
     /// <summary>
     /// Axis-aligned world bounds of the (padded) footprint at a candidate pose. The orientation is already

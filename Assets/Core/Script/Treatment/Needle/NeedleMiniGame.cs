@@ -151,10 +151,36 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
         TickPustules(worldPointer, deltaTime);
 
+        DriveToolCursor(worldPointer);
+
         if (WasPrimaryPointerReleasedThisFrame())
         {
             EndAction();
         }
+    }
+
+    private void DriveToolCursor(Vector2 worldPointer)
+    {
+        TreatmentToolCursor cursor = TreatmentToolCursor.Instance;
+        if (cursor == null)
+        {
+            return;
+        }
+
+        if (toolState != NeedleToolState.Needle)
+        {
+            cursor.Hide();
+            return;
+        }
+
+        cursor.Show(overlayToolId);
+
+        // The needle tip is the point gameplay checks; on a big pustule it jitters away from the cursor
+        // while draining. Feeding it to the shared cursor makes the shake visible.
+        Vector2 focus = activePustule != null && activeActionMode != NeedleActionMode.None
+            ? activePustule.CurrentTip
+            : worldPointer;
+        cursor.SetFocusPoint(focus);
     }
 
     public void Begin(CustomerAgent customer)
@@ -237,6 +263,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         LogTreatmentFlow($"Stop root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndAction();
+        TreatmentToolCursor.Instance?.Hide();
         isRunning = false;
         activeBodyPrefab = null;
         aggressionController?.Stop();
@@ -249,6 +276,7 @@ public sealed class NeedleMiniGame : MonoBehaviour
     {
         LogTreatmentFlow($"Pause root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndAction();
+        TreatmentToolCursor.Instance?.Hide();
         isRunning = false;
         aggressionController?.Pause();
         SetRootVisible(false);

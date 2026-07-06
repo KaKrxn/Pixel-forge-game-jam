@@ -204,10 +204,43 @@ public sealed class KnifeMiniGame : MonoBehaviour
             UpdateSliceTrail(worldPointer);
         }
 
+        DriveToolCursor(worldPointer);
+
         if (WasPrimaryPointerReleasedThisFrame())
         {
             EndAction();
         }
+    }
+
+    private void DriveToolCursor(Vector2 worldPointer)
+    {
+        TreatmentToolCursor cursor = TreatmentToolCursor.Instance;
+        if (cursor == null)
+        {
+            return;
+        }
+
+        string toolId = toolState switch
+        {
+            KnifeToolState.Knife => overlayToolId,
+            KnifeToolState.Tongs => pullToolId,
+            _ => null
+        };
+
+        if (string.IsNullOrEmpty(toolId))
+        {
+            cursor.Hide();
+            return;
+        }
+
+        cursor.Show(toolId);
+
+        // The blade tip is the point gameplay actually checks; it jitters away from the cursor while
+        // slicing (grows with pain). Feeding it to the shared cursor makes the shake visible.
+        Vector2 focus = activeLesion != null && activeActionMode == KnifeActionMode.Slice
+            ? activeLesion.CurrentKnifeTip
+            : worldPointer;
+        cursor.SetFocusPoint(focus);
     }
 
     public void Begin(CustomerAgent customer)
@@ -289,6 +322,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         LogTreatmentFlow($"Stop root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndAction();
+        TreatmentToolCursor.Instance?.Hide();
         isRunning = false;
         activeBodyPrefab = null;
         aggressionController?.Stop();
@@ -301,6 +335,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     {
         LogTreatmentFlow($"Pause root={DescribeObject(root)} activeBody={DescribeBody(activeBodyPrefab)}");
         EndAction();
+        TreatmentToolCursor.Instance?.Hide();
         isRunning = false;
         aggressionController?.Pause();
         SetRootVisible(false);
