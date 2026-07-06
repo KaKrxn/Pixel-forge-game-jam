@@ -197,7 +197,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7005992570315594272}
   - component: {fileID: 5963946996359077799}
-  - component: {fileID: -8737903622147788738}
   m_Layer: 0
   m_Name: Knife_Torsoo_BodyPrefab
   m_TagString: Untagged
@@ -255,57 +254,6 @@ MonoBehaviour:
   - {fileID: 7533072138589041275}
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &-8737903622147788738
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6400688003469276451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c78d4b9207bc47bf969924e1779a2984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KnifeMiniGame
-  flow: {fileID: 0}
-  root: {fileID: 6400688003469276451}
-  lesionRoot: {fileID: 8367556473548492508}
-  lesions: []
-  lesionSpawnOptions:
-  - lesionType: 1
-    lesionPrefab: {fileID: 1764347367109524641, guid: 82ed756a551c8ee49b29fd3a7e6c6c19, type: 3}
-  - lesionType: 0
-    lesionPrefab: {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
-  lesionSpawnAnchors: []
-  lesionPrefabs:
-  - {fileID: 1764347367109524641, guid: 82ed756a551c8ee49b29fd3a7e6c6c19, type: 3}
-  - {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
-  spawnAnchors:
-  - {fileID: 7130228480449890428}
-  - {fileID: 856725545692450672}
-  - {fileID: 7862787060981727792}
-  - {fileID: 2923789392572989142}
-  - {fileID: 7533072138589041275}
-  spawnLesionsOnBegin: 0
-  minLesions: 2
-  maxLesions: 5
-  inputCamera: {fileID: 0}
-  worldInputPlaneZ: 0
-  overlay: {fileID: 0}
-  overlayToolId: Knife
-  pullToolId: Tongs
-  sfxSource: {fileID: 0}
-  knifeGrabClip: {fileID: 0}
-  tongsGrabClip: {fileID: 0}
-  sliceStartClip: {fileID: 0}
-  pullStartClip: {fileID: 0}
-  completeClip: {fileID: 0}
-  sfxVolume: 1
-  aggressionController: {fileID: 0}
-  autoCompleteWhenAllLesionsDone: 1
-  startHidden: 1
-  useUnscaledTime: 0
-  debugTreatmentFlow: 1
 --- !u!1 &7542624280017080147
 GameObject:
   m_ObjectHideFlags: 0

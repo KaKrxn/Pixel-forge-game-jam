@@ -292,7 +292,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7156376880985388595}
   - component: {fileID: 2153847615148599529}
-  - component: {fileID: -2561672558194448285}
   m_Layer: 0
   m_Name: Knife_Arm_BodyPrefab
   m_TagString: Untagged
@@ -349,55 +348,6 @@ MonoBehaviour:
   - {fileID: 5974246591435017949}
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &-2561672558194448285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7296575419673496233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c78d4b9207bc47bf969924e1779a2984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KnifeMiniGame
-  flow: {fileID: 0}
-  root: {fileID: 7296575419673496233}
-  lesionRoot: {fileID: 3236218818831518652}
-  lesions: []
-  lesionSpawnOptions:
-  - lesionType: 1
-    lesionPrefab: {fileID: 1764347367109524641, guid: 82ed756a551c8ee49b29fd3a7e6c6c19, type: 3}
-  - lesionType: 0
-    lesionPrefab: {fileID: 4951928356822930790, guid: a269a1eff68f61a48aaae410d18d71e4, type: 3}
-  lesionSpawnAnchors: []
-  lesionPrefabs: []
-  spawnAnchors:
-  - {fileID: 8871994707015795802}
-  - {fileID: 9035930862748874908}
-  - {fileID: 2133987770935795685}
-  - {fileID: 1731205538829682257}
-  - {fileID: 5974246591435017949}
-  spawnLesionsOnBegin: 0
-  minLesions: 2
-  maxLesions: 5
-  inputCamera: {fileID: 0}
-  worldInputPlaneZ: 0
-  overlay: {fileID: 0}
-  overlayToolId: Knife
-  pullToolId: Tongs
-  sfxSource: {fileID: 0}
-  knifeGrabClip: {fileID: 8300000, guid: 92077094584ba2543860a20a14955f72, type: 3}
-  tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
-  sliceStartClip: {fileID: 8300000, guid: 3ae30c5c0843d224caf410eb81427a22, type: 3}
-  pullStartClip: {fileID: 8300000, guid: e84d1becbfc6a9f42bf8431ab16ced60, type: 3}
-  completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
-  sfxVolume: 1
-  aggressionController: {fileID: 0}
-  autoCompleteWhenAllLesionsDone: 1
-  startHidden: 1
-  useUnscaledTime: 0
-  debugTreatmentFlow: 1
 --- !u!1 &7342396421237383183
 GameObject:
   m_ObjectHideFlags: 0

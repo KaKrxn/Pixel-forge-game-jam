@@ -356,7 +356,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8130410806944288889}
   - component: {fileID: 8707598172206570758}
-  - component: {fileID: -4308483477644052899}
   m_Layer: 0
   m_Name: Knife_Head_BodyPrefab
   m_TagString: Untagged
@@ -415,46 +414,6 @@ MonoBehaviour:
   - {fileID: 1701154751981534778}
   pustuleRoot: {fileID: 0}
   pustuleSpawnAnchors: []
---- !u!114 &-4308483477644052899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6964877286065779959}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c78d4b9207bc47bf969924e1779a2984, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KnifeMiniGame
-  flow: {fileID: 0}
-  root: {fileID: 0}
-  lesionRoot: {fileID: 0}
-  lesions: []
-  lesionSpawnOptions: []
-  lesionSpawnAnchors: []
-  lesionPrefabs: []
-  spawnAnchors: []
-  spawnLesionsOnBegin: 0
-  minLesions: 2
-  maxLesions: 5
-  inputCamera: {fileID: 0}
-  worldInputPlaneZ: 0
-  overlay: {fileID: 0}
-  overlayToolId: Knife
-  pullToolId: Tongs
-  sfxSource: {fileID: 0}
-  knifeGrabClip: {fileID: 8300000, guid: 92077094584ba2543860a20a14955f72, type: 3}
-  tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
-  sliceStartClip: {fileID: 8300000, guid: 3ae30c5c0843d224caf410eb81427a22, type: 3}
-  pullStartClip: {fileID: 8300000, guid: e84d1becbfc6a9f42bf8431ab16ced60, type: 3}
-  completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
-  sfxVolume: 1
-  aggressionController: {fileID: 0}
-  autoCompleteWhenAllLesionsDone: 1
-  startHidden: 1
-  useUnscaledTime: 0
-  debugTreatmentFlow: 1
 --- !u!1 &7285114197631858760
 GameObject:
   m_ObjectHideFlags: 0

@@ -2791,7 +2791,7 @@ AudioSource:
   m_GameObject: {fileID: 390288043}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: d0dd00dd490db5347ace009a9282f4ea, type: 2}
+  OutputAudioMixerGroup: {fileID: -4428089337359794081, guid: d0dd00dd490db5347ace009a9282f4ea, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -6428,7 +6428,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Candle
   maxLight: 100
   currentLight: 100
-  drainRate: 0.2
+  drainRate: 0.9
   refillRate: 30
   clickRefillAmount: 3
   clickRefillCapPerSecond: 8
@@ -6436,7 +6436,7 @@ MonoBehaviour:
   flickeringThreshold: 10
   drainOnPlay: 1
   refillHitArea: {fileID: 684896823}
-  sfxSource: {fileID: 0}
+  sfxSource: {fileID: 1569621942}
   refillCompleteClip: {fileID: 8300000, guid: 6c2dcc343c55bc04c80ed03c2514598b, type: 3}
   flickerClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
   extinguishedClip: {fileID: 8300000, guid: ea3eebe4aebf662418108e25b4e0a496, type: 3}
@@ -9790,7 +9790,7 @@ MonoBehaviour:
   maxParasites: 7
   parasiteSortingOrderStart: 27
   parasiteSortingOrderStep: 4
-  debugSpawn: 1
+  debugSpawn: 0
   inputCamera: {fileID: 519420031}
   worldInputPlaneZ: 0
   fallbackHitRadius: 0.45
@@ -10618,11 +10618,13 @@ MonoBehaviour:
   pullStartClip: {fileID: 8300000, guid: e84d1becbfc6a9f42bf8431ab16ced60, type: 3}
   completeClip: {fileID: 8300000, guid: a966c76e73b3b60488cb98440d61d7e2, type: 3}
   sfxVolume: 1
+  sliceParticle: {fileID: 8110110216036038276, guid: 9d72d41c60e7c9d4f86793693e0f4dfe, type: 3}
+  moveParticleToCutPoint: 1
   aggressionController: {fileID: 0}
   autoCompleteWhenAllLesionsDone: 1
   startHidden: 1
   useUnscaledTime: 0
-  debugTreatmentFlow: 1
+  debugTreatmentFlow: 0
 --- !u!1 &1248159359
 GameObject:
   m_ObjectHideFlags: 0
@@ -12557,6 +12559,135 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1569621941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1569621943}
+  - component: {fileID: 1569621942}
+  m_Layer: 0
+  m_Name: CandleAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &1569621942
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569621941}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -4428089337359794081, guid: d0dd00dd490db5347ace009a9282f4ea, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &1569621943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569621941}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.9174, y: -0.1475, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1589421997
 GameObject:
   m_ObjectHideFlags: 0
@@ -15540,7 +15671,7 @@ MonoBehaviour:
   painCursorThreshold: 0.6
   painBarRoot: {fileID: 245432179}
   painFill: {fileID: 818243005}
-  painBarOffset: {x: 50, y: -15}
+  painBarOffset: {x: 35, y: -35}
   painLerpSpeed: 12
 --- !u!1 &1824846241
 GameObject:
@@ -17265,7 +17396,7 @@ MonoBehaviour:
   sfxVolume: 1
   pierceParticle: {fileID: 2638936682321596675, guid: 176a4a6c2f5c7e345879d69031222a4f, type: 3}
   moveParticleToPiercePoint: 1
-  debugTreatmentFlow: 1
+  debugTreatmentFlow: 0
 --- !u!1 &2026238772
 GameObject:
   m_ObjectHideFlags: 0
@@ -18579,4 +18710,5 @@ SceneRoots:
   - {fileID: 1900121090}
   - {fileID: 847424010}
   - {fileID: 390288045}
+  - {fileID: 1569621943}
   - {fileID: 1914681482}

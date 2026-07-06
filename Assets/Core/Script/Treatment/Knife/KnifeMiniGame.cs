@@ -72,6 +72,9 @@ public sealed class KnifeMiniGame : MonoBehaviour
     [SerializeField] private AudioClip pullStartClip;
     [SerializeField] private AudioClip completeClip;
     [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    [Header("Slice Particle")]
+    [SerializeField] private ParticleSystem sliceParticle;
+    [SerializeField] private bool moveParticleToCutPoint = true;
     [Header("Obstacle")]
     [SerializeField] private PatientAggressionController aggressionController;
     [Header("Rules")]
@@ -93,6 +96,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     private bool isComplete;
     private bool completionRaised;
     private TreatmentBodyPrefab activeBodyPrefab;
+    private ParticleSystem activeSliceParticle;
 
     public bool IsRunning => isRunning;
     public bool IsComplete => isComplete;
@@ -138,6 +142,7 @@ public sealed class KnifeMiniGame : MonoBehaviour
     private void OnDestroy()
     {
         UnsubscribeLesions();
+        StopSliceTrail();
     }
 
     private void Update()
@@ -165,6 +170,11 @@ public sealed class KnifeMiniGame : MonoBehaviour
         }
 
         TickLesions(worldPointer, deltaTime);
+
+        if (activeActionMode == KnifeActionMode.Slice)
+        {
+            UpdateSliceTrail(worldPointer);
+        }
 
         if (WasPrimaryPointerReleasedThisFrame())
         {
@@ -393,6 +403,12 @@ public sealed class KnifeMiniGame : MonoBehaviour
         activeLesion = target;
         activeActionMode = canUseTool ? KnifeActionMode.Slice : KnifeActionMode.Pull;
         PlaySfx(canUseTool ? sliceStartClip : pullStartClip);
+
+        if (activeActionMode == KnifeActionMode.Slice)
+        {
+            BeginSliceTrail(pointerPosition);
+        }
+
         meterLesion = target;
         RefreshMeters();
         flow?.SetTreatmentStress(true);
@@ -400,10 +416,56 @@ public sealed class KnifeMiniGame : MonoBehaviour
 
     private void EndAction()
     {
+        StopSliceTrail();
         activeLesion = null;
         activeActionMode = KnifeActionMode.None;
         flow?.SetTreatmentStress(false);
         RefreshMeters();
+    }
+
+    private void BeginSliceTrail(Vector2 worldPoint)
+    {
+        if (sliceParticle == null)
+        {
+            LogTreatmentFlow("BeginSliceTrail skipped: sliceParticle is not assigned.");
+            return;
+        }
+
+        StopSliceTrail(); // never keep two trails alive at once
+
+        // Instantiate a detached copy at the cut point. Instantiating works whether the reference is a
+        // prefab asset (never active in hierarchy) or a scene object, and keeps the emitter out of the
+        // mini game / body hierarchy that gets deactivated on body swaps.
+        Vector3 spawnPosition = new Vector3(worldPoint.x, worldPoint.y, worldInputPlaneZ);
+        activeSliceParticle = Instantiate(sliceParticle, spawnPosition, sliceParticle.transform.rotation);
+        activeSliceParticle.gameObject.SetActive(true);
+        activeSliceParticle.Play(true);
+        LogTreatmentFlow($"BeginSliceTrail at={worldPoint} spawned={activeSliceParticle.name} activeInHierarchy={activeSliceParticle.gameObject.activeInHierarchy}.");
+    }
+
+    private void UpdateSliceTrail(Vector2 worldPoint)
+    {
+        if (activeSliceParticle == null || !moveParticleToCutPoint)
+        {
+            return;
+        }
+
+        activeSliceParticle.transform.position = new Vector3(worldPoint.x, worldPoint.y, worldInputPlaneZ);
+    }
+
+    private void StopSliceTrail()
+    {
+        if (activeSliceParticle == null)
+        {
+            return;
+        }
+
+        // Stop emitting but let the already-spawned particles finish, then destroy the instance.
+        activeSliceParticle.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        ParticleSystem.MainModule main = activeSliceParticle.main;
+        float lifetime = Mathf.Max(0.1f, main.startLifetime.constantMax);
+        Destroy(activeSliceParticle.gameObject, lifetime);
+        activeSliceParticle = null;
     }
 
     private void TickLesions(Vector2 worldPointer, float deltaTime)
