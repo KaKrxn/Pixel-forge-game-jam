@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomerDefinition
   customerId: 002
   displayName: MaleVillager
-  customerPrefab: {fileID: 7124140612516472824, guid: 0f56d4c272391e9469fd065c8ee5d150, type: 3}
+  customerPrefab: {fileID: 7124140612516472824, guid: 150ee909834fc0f45b5b83fb86586068, type: 3}
   caseData: {fileID: 11400000, guid: 8061a623f5ae31e4c9410fac1c9125ff, type: 2}
