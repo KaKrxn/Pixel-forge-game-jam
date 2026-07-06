@@ -608,7 +608,7 @@ MonoBehaviour:
   minParasites: 3
   maxParasites: 7
   parasiteSortingOrderStart: 27
-  parasiteSortingOrderStep: 4
+  parasiteSortingOrderStep: 6
   debugSpawn: 1
   inputCamera: {fileID: 0}
   worldInputPlaneZ: 0

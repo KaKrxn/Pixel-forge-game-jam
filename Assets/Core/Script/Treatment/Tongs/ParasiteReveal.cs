@@ -20,6 +20,10 @@ public sealed class ParasiteReveal : MonoBehaviour
     [SerializeField] private bool snapToPixelGrid = true;
     [SerializeField, Min(1f)] private float pixelsPerUnit = 16f;
     [SerializeField] private bool driveMaskWithPointer = true;
+    [Tooltip("When enabled, runtime drag changes the reveal mask position. Disable this to keep the authored prefab mask position.")]
+    [SerializeField] private bool moveMaskWithPointer = true;
+    [Tooltip("When enabled, runtime drag changes the reveal mask scale. Disable this to keep the authored prefab mask size.")]
+    [SerializeField] private bool resizeMaskWithPointer = true;
     [SerializeField, Min(0.01f)] private float dynamicMaskWidth = 0.85f;
     [Tooltip("Follow the pointer horizontally so sideways pull/tilt doesn't clip the body out of the reveal mask.")]
     [SerializeField] private bool maskFollowsPointerX = true;
@@ -142,18 +146,24 @@ public sealed class ParasiteReveal : MonoBehaviour
         Vector2 drag = pointerWorldPosition - origin;
         float length = Mathf.Max(dynamicMaskMinLength, Vector2.Dot(drag, Vector2.up) + dynamicMaskExtraLength);
 
-        // Keep the mask's bottom edge at the wound line (origin.y) but let its center X follow the pointer so
-        // the body stays inside the reveal window while it slides/tilts sideways.
-        float centerX = maskFollowsPointerX ? pointerWorldPosition.x : origin.x;
-        Vector2 center = new Vector2(centerX, origin.y + length * 0.5f);
         Transform maskTransform = woundMask.transform;
-        maskTransform.position = new Vector3(center.x, center.y, maskTransform.position.z);
-        maskTransform.rotation = Quaternion.identity;
+        if (moveMaskWithPointer)
+        {
+            // Keep the mask's bottom edge at the wound line (origin.y) but let its center X follow the pointer so
+            // the body stays inside the reveal window while it slides/tilts sideways.
+            float centerX = maskFollowsPointerX ? pointerWorldPosition.x : origin.x;
+            Vector2 center = new Vector2(centerX, origin.y + length * 0.5f);
+            maskTransform.position = new Vector3(center.x, center.y, maskTransform.position.z);
+            maskTransform.rotation = Quaternion.identity;
+        }
 
-        Vector2 spriteSize = woundMask.sprite != null ? woundMask.sprite.bounds.size : Vector2.one;
-        float width = Mathf.Max(0.01f, spriteSize.x);
-        float height = Mathf.Max(0.01f, spriteSize.y);
-        maskTransform.localScale = new Vector3(ResolveDynamicMaskWidth() / width, length / height, 1f);
+        if (resizeMaskWithPointer)
+        {
+            Vector2 spriteSize = woundMask.sprite != null ? woundMask.sprite.bounds.size : Vector2.one;
+            float width = Mathf.Max(0.01f, spriteSize.x);
+            float height = Mathf.Max(0.01f, spriteSize.y);
+            maskTransform.localScale = new Vector3(ResolveDynamicMaskWidth() / width, length / height, 1f);
+        }
     }
 
     private float ResolveDynamicMaskWidth()
@@ -305,7 +315,7 @@ public sealed class ParasiteReveal : MonoBehaviour
 
         if (headRenderer != null)
         {
-            headRenderer.sortingOrder = bodySortingOrder + 1;
+            headRenderer.sortingOrder = bodySortingOrder + 2;
         }
 
         if (woundMask == null || bodyRenderer == null)
@@ -316,7 +326,7 @@ public sealed class ParasiteReveal : MonoBehaviour
         woundMask.isCustomRangeActive = true;
         woundMask.frontSortingLayerID = bodyRenderer.sortingLayerID;
         woundMask.backSortingLayerID = bodyRenderer.sortingLayerID;
-        woundMask.frontSortingOrder = bodySortingOrder + 1;
+        woundMask.frontSortingOrder = bodySortingOrder;
         woundMask.backSortingOrder = bodySortingOrder - 1;
     }
 

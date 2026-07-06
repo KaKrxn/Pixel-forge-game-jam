@@ -20,6 +20,6 @@ MonoBehaviour:
   painDrainRate: 0.4
   painSpikeAmount: 25
   edgePenaltyPerSecond: 8
-  channelHalfWidth: 0.7
-  jitterStrength: 1.5
-  jitterFrequency: 2.2
+  channelHalfWidth: 0.6
+  jitterStrength: 0.4
+  jitterFrequency: 0.4

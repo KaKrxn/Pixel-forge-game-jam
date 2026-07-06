@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 101303
   m_SortingLayer: 5
   m_SortingOrder: 39
-  m_MaskInteraction: 0
+  m_MaskInteraction: 2
   m_Sprite: {fileID: -8466461584894522011, guid: 441200b61d377c94ab1af4f7ea2eb702, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -365,15 +365,17 @@ MonoBehaviour:
   snapToPixelGrid: 1
   pixelsPerUnit: 16
   driveMaskWithPointer: 1
+  moveMaskWithPointer: 0
+  resizeMaskWithPointer: 0
   dynamicMaskWidth: 0.85
-  maskFollowsPointerX: 1
-  fitMaskWidthToBody: 1
+  maskFollowsPointerX: 0
+  fitMaskWidthToBody: 0
   dynamicMaskWidthPadding: 0.12
   dynamicMaskMinLength: 0.08
   dynamicMaskExtraLength: 0.35
   fadeBodyWhenNoMask: 1
   bodyMaskInteractionWhenBound: 1
-  bodyMaskInteractionWithoutMask: 0
+  bodyMaskInteractionWithoutMask: 2
   headMaskInteraction: 0
 --- !u!1 &6190747453643230454
 GameObject:
