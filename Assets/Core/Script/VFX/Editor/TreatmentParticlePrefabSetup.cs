@@ -8,8 +8,10 @@ public static class TreatmentParticlePrefabSetup
     private const string MaterialFolder = "Assets/Core/Material/VFX";
     private const string MagicMaterialPath = MaterialFolder + "/CandleMagicRefillParticle.mat";
     private const string BloodMaterialPath = MaterialFolder + "/TreatmentBloodSpeckParticle.mat";
+    private const string NeedleMaterialPath = MaterialFolder + "/NeedlePustulePierceParticle.mat";
     private const string MagicPrefabPath = PrefabFolder + "/CandleMagicRefillParticle.prefab";
     private const string BloodPrefabPath = PrefabFolder + "/TreatmentBloodSpeckParticle.prefab";
+    private const string NeedlePrefabPath = PrefabFolder + "/NeedlePustulePierceParticle.prefab";
 
     [MenuItem("Tools/Pixel Forge/VFX/Create Treatment Particles")]
     public static void CreateTreatmentParticles()
@@ -19,13 +21,15 @@ public static class TreatmentParticlePrefabSetup
 
         Material magicMaterial = GetOrCreateParticleMaterial(MagicMaterialPath, new Color(0.45f, 0.9f, 1f, 0.85f));
         Material bloodMaterial = GetOrCreateParticleMaterial(BloodMaterialPath, new Color(0.55f, 0.02f, 0.025f, 1f));
+        Material needleMaterial = GetOrCreateParticleMaterial(NeedleMaterialPath, new Color(1f, 0.82f, 0.28f, 0.95f));
 
         CreateCandleMagicPrefab(magicMaterial);
         CreateBloodSpeckPrefab(bloodMaterial);
+        CreateNeedlePustulePiercePrefab(needleMaterial);
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("Treatment particle prefabs created: CandleMagicRefillParticle and TreatmentBloodSpeckParticle.");
+        Debug.Log("Treatment particle prefabs created: CandleMagicRefillParticle, TreatmentBloodSpeckParticle, and NeedlePustulePierceParticle.");
     }
 
     [MenuItem("Tools/Pixel Forge/VFX/Attach Blood Speck To Selected Lesions")]
@@ -118,6 +122,52 @@ public static class TreatmentParticlePrefabSetup
         Debug.Log($"Attached CandleMagicRefillParticle to {count} candle(s).");
     }
 
+    [MenuItem("Tools/Pixel Forge/VFX/Attach Needle Pierce To Selected Pustules")]
+    public static void AttachNeedlePierceToSelectedPustules()
+    {
+        GameObject needlePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(NeedlePrefabPath);
+        if (needlePrefab == null)
+        {
+            CreateTreatmentParticles();
+            needlePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(NeedlePrefabPath);
+        }
+
+        int count = 0;
+        foreach (GameObject selected in Selection.gameObjects)
+        {
+            Pustule pustule = selected.GetComponentInParent<Pustule>(true);
+            if (pustule == null)
+            {
+                pustule = selected.GetComponentInChildren<Pustule>(true);
+            }
+
+            if (pustule == null)
+            {
+                continue;
+            }
+
+            GameObject instance = PrefabUtility.InstantiatePrefab(needlePrefab, pustule.transform) as GameObject;
+            if (instance == null)
+            {
+                continue;
+            }
+
+            instance.name = "NeedlePustulePierceParticle";
+            instance.transform.localPosition = Vector3.zero;
+            ParticleSystem particles = instance.GetComponent<ParticleSystem>();
+
+            SerializedObject serializedPustule = new SerializedObject(pustule);
+            serializedPustule.FindProperty("needlePierceParticles").objectReferenceValue = particles;
+            serializedPustule.FindProperty("drainCompleteParticles").objectReferenceValue = particles;
+            serializedPustule.ApplyModifiedProperties();
+
+            EditorUtility.SetDirty(pustule);
+            count++;
+        }
+
+        Debug.Log($"Attached NeedlePustulePierceParticle to {count} pustule(s).");
+    }
+
     private static void CreateCandleMagicPrefab(Material material)
     {
         GameObject root = new GameObject("CandleMagicRefillParticle", typeof(ParticleSystem), typeof(ParticleSystemSorting), typeof(CandleRefillParticleController));
@@ -138,6 +188,17 @@ public static class TreatmentParticlePrefabSetup
         ConfigureSorting(root.GetComponent<ParticleSystemSorting>(), "Customer", 75);
 
         SavePrefab(root, BloodPrefabPath);
+    }
+
+    private static void CreateNeedlePustulePiercePrefab(Material material)
+    {
+        GameObject root = new GameObject("NeedlePustulePierceParticle", typeof(ParticleSystem), typeof(ParticleSystemSorting));
+        ParticleSystem particles = root.GetComponent<ParticleSystem>();
+        ConfigureNeedlePustulePierce(particles);
+        ConfigureRenderer(root.GetComponent<ParticleSystemRenderer>(), material, "Customer", 76);
+        ConfigureSorting(root.GetComponent<ParticleSystemSorting>(), "Customer", 76);
+
+        SavePrefab(root, NeedlePrefabPath);
     }
 
     private static void ConfigureCandleMagic(ParticleSystem particles)
@@ -240,6 +301,57 @@ public static class TreatmentParticlePrefabSetup
         ParticleSystem.SizeOverLifetimeModule size = particles.sizeOverLifetime;
         size.enabled = true;
         size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 1f, 1f, 0.15f));
+    }
+
+    private static void ConfigureNeedlePustulePierce(ParticleSystem particles)
+    {
+        ParticleSystem.MainModule main = particles.main;
+        main.duration = 0.32f;
+        main.loop = false;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(0.18f, 0.42f);
+        main.startSpeed = new ParticleSystem.MinMaxCurve(0.18f, 0.62f);
+        main.startSize = new ParticleSystem.MinMaxCurve(0.025f, 0.075f);
+        main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.92f, 0.38f, 1f), new Color(0.72f, 0.35f, 0.08f, 1f));
+        main.gravityModifier = 0.04f;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
+        main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        main.playOnAwake = false;
+
+        ParticleSystem.EmissionModule emission = particles.emission;
+        emission.rateOverTime = 0f;
+        emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 8, 16) });
+
+        ParticleSystem.ShapeModule shape = particles.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.radius = 0.035f;
+        shape.arc = 360f;
+
+        ParticleSystem.VelocityOverLifetimeModule velocity = particles.velocityOverLifetime;
+        velocity.enabled = true;
+        velocity.space = ParticleSystemSimulationSpace.Local;
+        velocity.x = new ParticleSystem.MinMaxCurve(-0.22f, 0.22f);
+        velocity.y = new ParticleSystem.MinMaxCurve(-0.08f, 0.28f);
+
+        ParticleSystem.ColorOverLifetimeModule color = particles.colorOverLifetime;
+        color.enabled = true;
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new[]
+            {
+                new GradientColorKey(new Color(1f, 0.92f, 0.38f), 0f),
+                new GradientColorKey(new Color(0.55f, 0.22f, 0.04f), 1f)
+            },
+            new[]
+            {
+                new GradientAlphaKey(1f, 0f),
+                new GradientAlphaKey(0.8f, 0.45f),
+                new GradientAlphaKey(0f, 1f)
+            });
+        color.color = gradient;
+
+        ParticleSystem.SizeOverLifetimeModule size = particles.sizeOverLifetime;
+        size.enabled = true;
+        size.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 1f, 1f, 0.08f));
     }
 
     private static void ConfigureRenderer(ParticleSystemRenderer renderer, Material material, string sortingLayerName, int sortingOrder)

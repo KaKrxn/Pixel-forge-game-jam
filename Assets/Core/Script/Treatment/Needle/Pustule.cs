@@ -23,6 +23,9 @@ public sealed class Pustule : MonoBehaviour
     [Header("State Visuals")]
     [SerializeField] private GameObject fullVisualRoot;
     [SerializeField] private GameObject emptyVisualRoot;
+    [Header("VFX")]
+    [SerializeField] private ParticleSystem needlePierceParticles;
+    [SerializeField] private ParticleSystem drainCompleteParticles;
 
     private Collider2D hitCollider;
     private float pierceProgress;
@@ -105,6 +108,7 @@ public sealed class Pustule : MonoBehaviour
         {
             isPierced = true;
             ApplyVisualState();
+            PlayParticleAt(needlePierceParticles, currentTip);
         }
     }
 
@@ -258,6 +262,7 @@ public sealed class Pustule : MonoBehaviour
         ApplyVisualState();
         ProgressChanged?.Invoke(OverallProgress);
         PainChanged?.Invoke(painLevel);
+        PlayParticleAt(drainCompleteParticles, transform.position);
 
         if (hideWhenCompleted)
         {
@@ -278,6 +283,21 @@ public sealed class Pustule : MonoBehaviour
         {
             targetRenderer = GetComponentInChildren<SpriteRenderer>();
         }
+    }
+
+    private static void PlayParticleAt(ParticleSystem particles, Vector2 worldPoint)
+    {
+        if (particles == null)
+        {
+            return;
+        }
+
+        Transform particleTransform = particles.transform;
+        Vector3 position = particleTransform.position;
+        position.x = worldPoint.x;
+        position.y = worldPoint.y;
+        particleTransform.position = position;
+        particles.Play(withChildren: true);
     }
 
     private void ApplyVisualState()

@@ -2765,6 +2765,135 @@ RectTransform:
   m_AnchoredPosition: {x: 924.4486, y: 507.80466}
   m_SizeDelta: {x: 50, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &390288043
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 390288045}
+  - component: {fileID: 390288044}
+  m_Layer: 0
+  m_Name: MiniGameAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &390288044
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390288043}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: d0dd00dd490db5347ace009a9282f4ea, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &390288045
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390288043}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.9174, y: -0.1475, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &403424828
 GameObject:
   m_ObjectHideFlags: 0
@@ -9667,7 +9796,7 @@ MonoBehaviour:
   fallbackHitRadius: 0.45
   overlay: {fileID: 582104043}
   overlayToolId: Tongs
-  sfxSource: {fileID: 0}
+  sfxSource: {fileID: 390288044}
   tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
   parasiteGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
   parasiteExtractedClip: {fileID: 8300000, guid: 292553559f711714f9e9b35379b94836, type: 3}
@@ -10482,7 +10611,7 @@ MonoBehaviour:
   overlay: {fileID: 582104043}
   overlayToolId: Knife
   pullToolId: Tongs
-  sfxSource: {fileID: 0}
+  sfxSource: {fileID: 390288044}
   knifeGrabClip: {fileID: 8300000, guid: 92077094584ba2543860a20a14955f72, type: 3}
   tongsGrabClip: {fileID: 8300000, guid: 2373f63f7f4bec240b1ed9b3f4b0e841, type: 3}
   sliceStartClip: {fileID: 8300000, guid: 3ae30c5c0843d224caf410eb81427a22, type: 3}
@@ -15760,7 +15889,7 @@ AudioSource:
   m_GameObject: {fileID: 1900121088}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: d0dd00dd490db5347ace009a9282f4ea, type: 2}
+  OutputAudioMixerGroup: {fileID: -4428089337359794081, guid: d0dd00dd490db5347ace009a9282f4ea, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -15993,6 +16122,13 @@ MonoBehaviour:
   autoCompleteWhenAllPustulesDone: 1
   startHidden: 1
   useUnscaledTime: 0
+  sfxSource: {fileID: 0}
+  pierceClip: {fileID: 0}
+  drainClip: {fileID: 0}
+  completeClip: {fileID: 0}
+  sfxVolume: 1
+  pierceParticle: {fileID: 0}
+  moveParticleToPiercePoint: 1
   debugTreatmentFlow: 1
 --- !u!4 &1910242606
 Transform:
@@ -16011,6 +16147,37 @@ Transform:
   - {fileID: 216467450}
   - {fileID: 1962288086}
   m_Father: {fileID: 1692959104}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1914681481
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1914681482}
+  m_Layer: 0
+  m_Name: '=== Audio === '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1914681482
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914681481}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.12765, y: -2.62102, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1933005140
 GameObject:
@@ -17091,6 +17258,13 @@ MonoBehaviour:
   autoCompleteWhenAllPustulesDone: 1
   startHidden: 1
   useUnscaledTime: 0
+  sfxSource: {fileID: 390288044}
+  pierceClip: {fileID: 0}
+  drainClip: {fileID: 0}
+  completeClip: {fileID: 0}
+  sfxVolume: 1
+  pierceParticle: {fileID: 2638936682321596675, guid: 176a4a6c2f5c7e345879d69031222a4f, type: 3}
+  moveParticleToPiercePoint: 1
   debugTreatmentFlow: 1
 --- !u!1 &2026238772
 GameObject:
@@ -18404,3 +18578,5 @@ SceneRoots:
   - {fileID: 620121078}
   - {fileID: 1900121090}
   - {fileID: 847424010}
+  - {fileID: 390288045}
+  - {fileID: 1914681482}

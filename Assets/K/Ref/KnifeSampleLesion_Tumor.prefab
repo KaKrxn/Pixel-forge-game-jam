@@ -374,6 +374,9 @@ MonoBehaviour:
   followPointerWhilePulling: 1
   pullVisualMaxDistance: 0.45
   pullVisualFollowSpeed: 16
+  cutSpeckParticles: {fileID: 0}
+  woundOpenParticles: {fileID: 0}
+  cutSpeckProgressInterval: 0.18
 --- !u!120 &5847285373089025079
 LineRenderer:
   serializedVersion: 3

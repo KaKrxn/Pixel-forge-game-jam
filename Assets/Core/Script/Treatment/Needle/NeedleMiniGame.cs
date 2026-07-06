@@ -58,6 +58,15 @@ public sealed class NeedleMiniGame : MonoBehaviour
     [SerializeField] private bool autoCompleteWhenAllPustulesDone = true;
     [SerializeField] private bool startHidden = true;
     [SerializeField] private bool useUnscaledTime;
+    [Header("Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip pierceClip;    // needle jab
+    [SerializeField] private AudioClip drainClip;     // draining / squeezing pus
+    [SerializeField] private AudioClip completeClip;  // treatment complete
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    [Header("Pierce Particle")]
+    [SerializeField] private ParticleSystem pierceParticle;
+    [SerializeField] private bool moveParticleToPiercePoint = true;
     [Header("Debug")]
     [SerializeField] private bool debugTreatmentFlow = true;
 
@@ -101,6 +110,11 @@ public sealed class NeedleMiniGame : MonoBehaviour
 
     private void Awake()
     {
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+        }
+
         RefreshPustuleList();
         SubscribePustules();
 
@@ -351,6 +365,19 @@ public sealed class NeedleMiniGame : MonoBehaviour
             : canSqueeze
                 ? NeedleActionMode.Squeeze
                 : NeedleActionMode.Drain;
+
+        LogTreatmentFlow($"BeginActionAt mode={activeActionMode} toolState={toolState} target={DescribeObject(target)} pointer={pointerPosition}.");
+
+        if (activeActionMode == NeedleActionMode.Pierce)
+        {
+            PlaySfx(pierceClip);
+            PlayPierceParticle(pointerPosition);
+        }
+        else
+        {
+            PlaySfx(drainClip); // draining or squeezing pus
+        }
+
         RefreshMeters();
         flow?.SetTreatmentStress(activeActionMode != NeedleActionMode.Pierce);
     }
@@ -930,8 +957,51 @@ public sealed class NeedleMiniGame : MonoBehaviour
         }
 
         completionRaised = true;
+        PlaySfx(completeClip);
         Stop();
         MiniGameCompleted?.Invoke();
+    }
+
+    private void PlaySfx(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        if (sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clip, sfxVolume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, transform.position, sfxVolume);
+    }
+
+    private void PlayPierceParticle(Vector2 worldPoint)
+    {
+        if (pierceParticle == null)
+        {
+            LogTreatmentFlow("PlayPierceParticle skipped: pierceParticle is not assigned.");
+            return;
+        }
+
+        // Spawn a fresh copy at the pierce point. Instantiating works whether the reference is a prefab
+        // asset (never active in hierarchy) or a scene object, keeps it out of the mini game hierarchy
+        // that gets deactivated on body swaps, and lets overlapping pierces play independently.
+        Vector3 spawnPosition = moveParticleToPiercePoint
+            ? new Vector3(worldPoint.x, worldPoint.y, worldInputPlaneZ)
+            : pierceParticle.transform.position;
+
+        ParticleSystem instance = Instantiate(pierceParticle, spawnPosition, pierceParticle.transform.rotation);
+        instance.gameObject.SetActive(true);
+        instance.Play(true);
+
+        ParticleSystem.MainModule main = instance.main;
+        float lifetime = Mathf.Max(0.1f, main.duration + main.startLifetime.constantMax);
+        Destroy(instance.gameObject, lifetime);
+
+        LogTreatmentFlow($"PlayPierceParticle at={worldPoint} spawned={instance.name} activeInHierarchy={instance.gameObject.activeInHierarchy} lifetime={lifetime:0.00}.");
     }
 
     private void RefreshMeters()
