@@ -19,6 +19,7 @@ public sealed class BodyPartButton : MonoBehaviour, IPointerEnterHandler, IPoint
     private Image image;
     private RectTransform rectTransform;
     private Vector3 baseScale = Vector3.one;
+    private bool hasBaseScale;
     private AnatomyController controller;
     private PartState state = PartState.Untouched;
     private bool isHovering;
@@ -28,6 +29,7 @@ public sealed class BodyPartButton : MonoBehaviour, IPointerEnterHandler, IPoint
     private void Awake()
     {
         CacheReferences();
+        CacheBaseScale();
         ApplyAlphaHitTest();
         ApplyVisualState();
     }
@@ -35,8 +37,21 @@ public sealed class BodyPartButton : MonoBehaviour, IPointerEnterHandler, IPoint
     private void OnEnable()
     {
         CacheReferences();
-        baseScale = rectTransform != null ? rectTransform.localScale : transform.localScale;
+        CacheBaseScale();
+        // Re-showing the anatomy screen must start from a clean base: the panel can be folded
+        // away while the pointer is still over this button (entering a mini game), so reset any
+        // leftover hover state instead of re-caching a hover-enlarged scale.
+        isHovering = false;
+        SetScale(baseScale);
         ApplyVisualState();
+    }
+
+    private void OnDisable()
+    {
+        // OnPointerExit never fires when the panel is deactivated mid-hover, so restore the base
+        // scale here. Otherwise the button stays enlarged and that inflated value compounds.
+        isHovering = false;
+        SetScale(baseScale);
     }
 
     private void OnValidate()
@@ -95,6 +110,18 @@ public sealed class BodyPartButton : MonoBehaviour, IPointerEnterHandler, IPoint
     private bool IsSelectable()
     {
         return controller != null && controller.CanSelectArea(area);
+    }
+
+    private void CacheBaseScale()
+    {
+        // Capture the authored scale only once, before any hover can inflate it.
+        if (hasBaseScale)
+        {
+            return;
+        }
+
+        baseScale = rectTransform != null ? rectTransform.localScale : transform.localScale;
+        hasBaseScale = true;
     }
 
     private void CacheReferences()
